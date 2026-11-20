@@ -67,10 +67,16 @@ describe('C5 movement', () => {
     runSteps(s, 120);
     expect(s.player.pos[1]).toBe(0);
   });
-  it('stays on the island (fall_enabled=false)', () => {
-    const s = game();
+  it('has no world boundary (fall_enabled=false, A8): 12 s walk = 12 * player_speed', () => {
+    const s = game({ player: { pos: [0, 0, 50] } });
     runSteps(s, 60 * 12, [{ tick: 0, move: [0, 1] }]);
-    expect(Math.hypot(s.player.pos[0], s.player.pos[2])).toBeLessThanOrEqual(40 + 1e-9);
+    expect(s.player.pos[2]).toBeCloseTo(50 + 12 * T.player_speed, 6);
+  });
+  it('normalises the raw vector (no per-component clamp): [2,1] keeps its direction', () => {
+    const s = game();
+    runSteps(s, 60, [{ tick: 0, move: [2, 1] }]);
+    expect(s.player.pos[0]).toBeCloseTo((2 / Math.sqrt(5)) * T.player_speed, 6);
+    expect(s.player.pos[2]).toBeCloseTo((1 / Math.sqrt(5)) * T.player_speed, 6);
   });
 });
 
@@ -119,6 +125,11 @@ describe('C7 pulse', () => {
     expect(s.shades[0]!.pos[0]).toBeCloseTo(5 + T.pulse_push_m, 9);
     expect(s.score).toBe(T.score.per_stun);
   });
+  it('pushes the full pulse_push_m even near the island edge', () => {
+    const s = game({ player: { pos: [35, 0, 0], carried: 2 }, shades: [{ id: 'A', pos: [38, 1, 0] }] });
+    runSteps(s, 1, [{ tick: 0, pulse: true }]);
+    expect(s.shades[0]!.pos[0]).toBeCloseTo(38 + T.pulse_push_m, 9);
+  });
   it('stunned shade does not move for pulse_stun_s, then chases again', () => {
     const s = game({ player: { carried: 2 }, shades: [{ id: 'A', pos: [3, 1, 0] }] });
     runSteps(s, 1, [{ tick: 0, pulse: true }]);
@@ -165,7 +176,7 @@ describe('C9 lantern safe zone', () => {
       ev.push(...runSteps(s, 1));
       minD = Math.min(minD, distXZ(s.shades[0]!.pos, s.lanterns[0]!.pos));
     }
-    expect(minD).toBeGreaterThanOrEqual(T.safe_radius - 1e-9);
+    expect(minD).toBeGreaterThan(T.safe_radius); // strictly outside: "within r" means <= r
     expect(minD).toBeLessThan(T.safe_radius + 0.01); // it did reach the boundary
     expect(names(ev)).not.toContain('player_hit');
   });

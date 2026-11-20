@@ -99,6 +99,11 @@
       "ticks": 300,
       "state": "playing",
       "score": 150
+    },
+    "event_counts": {
+      "mote_picked": 5,
+      "deposit": 1,
+      "lantern_lit": 1
     }
   }
 }

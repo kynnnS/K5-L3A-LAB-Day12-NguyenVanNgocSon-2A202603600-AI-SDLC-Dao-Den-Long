@@ -1,0 +1,73 @@
+{
+  "id": "12-multi-pickup-capacity",
+  "requirement": "C6",
+  "description": "4 motes in range in one tick with carried 8/10: picks exactly 2 (carried 9, 10), 2 remain",
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 1,
+  "scenario": {
+    "player": {
+      "carried": 8
+    },
+    "random_motes": false,
+    "random_shades": false,
+    "shades": [],
+    "motes": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        -1,
+        0,
+        0
+      ]
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "mote_picked",
+        "data": {
+          "carried": 9
+        }
+      },
+      {
+        "tick": 1,
+        "name": "mote_picked",
+        "data": {
+          "carried": 10
+        }
+      }
+    ],
+    "event_counts": {
+      "mote_picked": 2
+    },
+    "snapshots": [
+      {
+        "tick": 1,
+        "motes_active": 2,
+        "player": {
+          "carried": 10
+        },
+        "score": 20
+      }
+    ],
+    "end": {
+      "ticks": 5,
+      "score": 20
+    }
+  }
+}

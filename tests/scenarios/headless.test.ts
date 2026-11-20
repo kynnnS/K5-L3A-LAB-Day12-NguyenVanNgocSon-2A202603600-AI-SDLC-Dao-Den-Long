@@ -1,5 +1,7 @@
 /** Integration tests: run the real built CLI exactly as the grader would. */
+import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ROOT, runCli } from '../helpers.js';
@@ -41,10 +43,21 @@ describe('C2 CLI exit codes and errors', () => {
     expect(runCli({ ticks: 5, scenario: { player: { pos: 'origin' } } }).code).toBe(2);
     expect(runCli({ ticks: 5, rawScenario: '[1,2' }).code).toBe(2);
   });
-  it('missing required args / unsupported night -> non-zero, message on stderr', () => {
+  it('unsupported night -> non-zero, message on stderr', () => {
     const r = runCli({ ticks: 5, extra: ['--night', '2'] });
     expect(r.code).not.toBe(0);
     expect(r.stderr).toMatch(/night/);
+  });
+  it('missing required args -> exit 1, message on stderr, empty stdout', () => {
+    for (const drop of ['--seed', '--night', '--ticks', '--out']) {
+      const args = ['build/headless/cli.js', '--seed', '1', '--night', '1', '--ticks', '5', '--out', join(tmpdir(), 'ddl-missing.jsonl')];
+      const i = args.indexOf(drop);
+      args.splice(i, 2);
+      const r = spawnSync('node', args, { cwd: ROOT, encoding: 'utf8' });
+      expect(r.status, drop).toBe(1);
+      expect(r.stderr).toMatch(new RegExp(`missing ${drop}`));
+      expect(r.stdout).toBe('');
+    }
   });
   it('--ticks 0 -> only snapshot 0 + end', () => {
     const r = runCli({ ticks: 0 });

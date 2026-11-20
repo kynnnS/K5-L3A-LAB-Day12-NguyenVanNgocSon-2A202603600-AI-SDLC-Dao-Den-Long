@@ -3,14 +3,15 @@
 export interface Expect {
   events?: Array<Record<string, unknown>>; // ordered subsequence, partial match
   absent_events?: string[];
+  event_counts?: Record<string, number>; // exact number of events per name
   snapshots?: Array<Record<string, unknown>>; // matched by tick, partial match
   end?: Record<string, unknown>;
 }
 
-/** Partial deep match: every key in `want` must equal (recursively) the key in `got`. Arrays match element-wise by position. */
+/** Partial deep match: every key in `want` must equal (recursively) the key in `got`. Arrays must have the same length and match element-wise. */
 export function partialMatch(got: unknown, want: unknown): boolean {
   if (Array.isArray(want)) {
-    return Array.isArray(got) && got.length >= want.length && want.every((w, i) => partialMatch(got[i], w));
+    return Array.isArray(got) && got.length === want.length && want.every((w, i) => partialMatch(got[i], w));
   }
   if (typeof want === 'object' && want !== null) {
     if (typeof got !== 'object' || got === null) return false;
@@ -31,6 +32,10 @@ export function checkExpect(lines: Array<Record<string, any>>, expect: Expect): 
   }
   for (const name of expect.absent_events ?? []) {
     if (events.some((e) => e.name === name)) fails.push(`unexpected event: ${name}`);
+  }
+  for (const [name, n] of Object.entries(expect.event_counts ?? {})) {
+    const got = events.filter((e) => e.name === name).length;
+    if (got !== n) fails.push(`event count ${name}: got ${got} want ${n}`);
   }
   for (const want of expect.snapshots ?? []) {
     const snap = lines.find((l) => l.type === 'snapshot' && l.tick === want.tick);

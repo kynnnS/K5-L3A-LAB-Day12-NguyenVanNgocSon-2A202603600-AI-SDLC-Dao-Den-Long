@@ -42,6 +42,9 @@
       "ticks": 120,
       "state": "playing",
       "score": 0
+    },
+    "event_counts": {
+      "player_hit": 1
     }
   }
 }

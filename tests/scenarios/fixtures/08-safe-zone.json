@@ -1,7 +1,7 @@
 {
   "id": "08-safe-zone",
   "requirement": "C9",
-  "description": "Player stands at lit L1; chasing shade stops at safe_radius 6 m, never hits",
+  "description": "Player stands at lit L1; chasing shade stops just outside safe_radius (6.001 m), never hits",
   "seed": 1,
   "ticks": 900,
   "snapshot_every": 100,
@@ -51,7 +51,7 @@
             "pos": [
               0,
               1,
-              19
+              18.999
             ],
             "state": "chase"
           }

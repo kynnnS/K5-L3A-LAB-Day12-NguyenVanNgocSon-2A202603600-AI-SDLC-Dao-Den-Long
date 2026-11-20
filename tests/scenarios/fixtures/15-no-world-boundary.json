@@ -1,0 +1,56 @@
+{
+  "id": "15-no-world-boundary",
+  "requirement": "C5,A8",
+  "description": "Walking 10 s along +Z covers player_speed*10 = 60 m (no island clamp; fall_enabled=false)",
+  "seed": 1,
+  "ticks": 600,
+  "snapshot_every": 300,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "motes": [],
+    "shades": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 300,
+        "player": {
+          "pos": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      {
+        "tick": 600,
+        "player": {
+          "pos": [
+            0,
+            0,
+            60
+          ]
+        }
+      }
+    ],
+    "absent_events": [
+      "player_hit"
+    ],
+    "end": {
+      "ticks": 600,
+      "state": "playing"
+    }
+  }
+}
