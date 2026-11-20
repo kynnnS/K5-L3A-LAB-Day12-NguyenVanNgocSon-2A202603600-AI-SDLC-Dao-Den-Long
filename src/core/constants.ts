@@ -7,7 +7,7 @@ import type { Vec3 } from './types.js';
 export const TICKS_PER_SECOND = 60;
 export const DT = 1 / TICKS_PER_SECOND;
 
-/** Night 1 "Dao Ben": a round island. */
+/** Night 1 "Dao Ben": a round island (visual size + spawn ring; NOT a movement boundary, see A8). */
 export const ISLAND_RADIUS = 40;
 export const LANTERN_RING_RADIUS = 22;
 

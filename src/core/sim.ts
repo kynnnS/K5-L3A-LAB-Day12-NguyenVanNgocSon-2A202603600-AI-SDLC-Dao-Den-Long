@@ -7,7 +7,7 @@
  *   6 spawns  7 shades (stun / chase / lantern safe zones)  8 hits  9 end checks
  */
 import {
-  DT, GRAVITY, ISLAND_RADIUS, JUMP_SPEED, MOTE_INITIAL, MOTE_MAX, MOTE_MAX_R, MOTE_MIN_R,
+  DT, GRAVITY, JUMP_SPEED, MOTE_INITIAL, MOTE_MAX, MOTE_MAX_R, MOTE_MIN_R,
   MOTE_RESPAWN_TICKS, SHADE_FIRST_SPAWN_TICK, SHADE_HEIGHT, SHADE_MAX_NIGHT1,
   SHADE_SPAWN_INTERVAL_TICKS, SHADE_SPAWN_R, TICKS_PER_SECOND, defaultLanternPositions,
 } from './constants.js';
@@ -46,8 +46,13 @@ function randomIslandPoint(state: GameState): Vec3 {
   return [Math.sin(a) * r, 0, Math.cos(a) * r];
 }
 
-function newMote(state: GameState, pos: Vec3): Mote {
-  return { id: `M${state.nextMoteId++}`, pos };
+/** Next free auto id `M<n>` (skips ids already used by scenario motes). */
+function newMote(state: GameState, pos: Vec3, taken: Set<string | undefined>): Mote {
+  let id: string;
+  do id = `M${state.nextMoteId++}`;
+  while (taken.has(id));
+  taken.add(id);
+  return { id, pos };
 }
 
 function newShadeId(state: GameState, taken: Set<string>): string {
@@ -94,15 +99,10 @@ export function createGame(tuning: Tuning, seed: number, scenario: ScenarioSpec 
 
   if (scenario.motes) {
     const taken = new Set(scenario.motes.map((m) => m.id).filter(Boolean));
-    state.motes = scenario.motes.map((m) => {
-      if (m.id) return { id: m.id, pos: [...m.pos] };
-      let mote: Mote;
-      do mote = newMote(state, [...m.pos]);
-      while (taken.has(mote.id));
-      return mote;
-    });
+    state.motes = scenario.motes.map((m) => (m.id ? { id: m.id, pos: [...m.pos] } : newMote(state, [...m.pos], taken)));
   } else if (state.randomMotes) {
-    for (let i = 0; i < MOTE_INITIAL; i++) state.motes.push(newMote(state, randomIslandPoint(state)));
+    const taken = new Set<string>();
+    for (let i = 0; i < MOTE_INITIAL; i++) state.motes.push(newMote(state, randomIslandPoint(state), taken));
   }
 
   if (scenario.shades) {
@@ -117,22 +117,17 @@ export function createGame(tuning: Tuning, seed: number, scenario: ScenarioSpec 
   return state;
 }
 
+/** Moves `pos` to just outside `radius` (strictly > r, so "within r" (<= r) never holds). */
+const SAFE_MARGIN = 0.001;
 function pushOutOf(pos: Vec3, center: Vec3, radius: number): void {
   const dx = pos[0] - center[0];
   const dz = pos[2] - center[2];
   const d = Math.hypot(dx, dz);
-  if (d >= radius) return;
+  if (d > radius) return;
+  radius += SAFE_MARGIN;
   const [ux, uz] = d < EPS ? [1, 0] : [dx / d, dz / d];
   pos[0] = center[0] + ux * radius;
   pos[2] = center[2] + uz * radius;
-}
-
-function clampToIsland(pos: Vec3): void {
-  const d = Math.hypot(pos[0], pos[2]);
-  if (d > ISLAND_RADIUS) {
-    pos[0] *= ISLAND_RADIUS / d;
-    pos[2] *= ISLAND_RADIUS / d;
-  }
 }
 
 /** Shades cannot enter the safe radius of a lit lantern. */
@@ -158,9 +153,10 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
   const pulsePressed = input.pulse && !state.prevButtons.pulse;
   state.prevButtons = { jump: input.jump, interact: input.interact, pulse: input.pulse };
 
-  // 2. Movement (camera-relative, normalised) and jump.
-  let mx = Math.max(-1, Math.min(1, input.move[0]));
-  let mz = Math.max(-1, Math.min(1, input.move[1]));
+  // 2. Movement (camera-relative, normalised) and jump. No world boundary: fall_enabled=false
+  //    means leaving the island has no effect (Mây walks on the cloud sea), see assumption A8.
+  let mx = input.move[0];
+  let mz = input.move[1];
   const len = Math.hypot(mx, mz);
   if (len > 1) { mx /= len; mz /= len; }
   if (len > 0) {
@@ -169,7 +165,6 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
     const wz = -mx * Math.sin(th) + mz * Math.cos(th);
     p.pos[0] += wx * tuning.player_speed * DT;
     p.pos[2] += wz * tuning.player_speed * DT;
-    if (!tuning.fall_enabled) clampToIsland(p.pos);
   }
   if (jumpPressed && p.pos[1] <= 0) p.velY = JUMP_SPEED;
   if (p.pos[1] > 0 || p.velY > 0) {
@@ -225,7 +220,6 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
       const [ux, uz] = d < EPS ? [1, 0] : [(s.pos[0] - p.pos[0]) / d, (s.pos[2] - p.pos[2]) / d];
       s.pos[0] += ux * tuning.pulse_push_m;
       s.pos[2] += uz * tuning.pulse_push_m;
-      clampToIsland(s.pos);
       stunned.push(s.id);
       state.score += sc.per_stun;
     }
@@ -234,7 +228,7 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
 
   // 6. Spawns (only when random generation is enabled).
   if (state.randomMotes && t % MOTE_RESPAWN_TICKS === 0 && state.motes.length < MOTE_MAX) {
-    state.motes.push(newMote(state, randomIslandPoint(state)));
+    state.motes.push(newMote(state, randomIslandPoint(state), new Set(state.motes.map((m) => m.id))));
   }
   if (
     state.randomShades &&
