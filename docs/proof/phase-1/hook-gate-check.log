@@ -1,0 +1,13 @@
+# Stop-hook gate check 2026-11-20 15:03:02 +0700 @ 476c9de
+## 1) Inject fault: player_speed 6 -> 7 in game.contract.json, run hook
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 40 passed (43)
+   Start at  15:03:02
+   Duration  531ms (tests 95%, import 3%, transform 2%, worker 1%)
+
+hook exit=2  (2 = Claude Code blocks the stop)
+## 2) Restore contract, run hook again
+hook exit=0  (0 = stop allowed)
