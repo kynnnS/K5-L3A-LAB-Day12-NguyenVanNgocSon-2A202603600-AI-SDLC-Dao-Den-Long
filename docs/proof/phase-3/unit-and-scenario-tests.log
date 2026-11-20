@@ -6,8 +6,8 @@
  ✓ tests/unit/settings.test.ts > settings persistence > round-trips through localStorage (survives reopening the game) 0ms
  ✓ tests/unit/settings.test.ts > settings persistence > clamps out-of-range values and ignores corrupt data 0ms
  ✓ tests/unit/settings.test.ts > settings persistence > works without storage (private mode): no throw 0ms
- ✓ tests/unit/phase3.test.ts > P3-1 fuel > first light -> fuel 100; decays exactly 1.0 per 60 ticks; no drift after thousands of ticks 6ms
- ✓ tests/unit/phase3.test.ts > P3-1 fuel > runs out on the exact tick: one lantern_out; deposited 0, fuel 0, ever_lit kept 1ms
+ ✓ tests/unit/phase3.test.ts > P3-1 fuel > first light -> fuel 100; decays exactly 1.0 per 60 ticks; no drift after thousands of ticks 7ms
+ ✓ tests/unit/phase3.test.ts > P3-1 fuel > runs out on the exact tick: one lantern_out; deposited 0, fuel 0, ever_lit kept 0ms
  ✓ tests/unit/phase3.test.ts > P3-1 fuel > refuel: used = min(carried, ceil((100 - fuel) / 10)), capped at 100, +5 per mote 0ms
  ✓ tests/unit/phase3.test.ts > P3-1 fuel > refuel never takes more than carried 0ms
  ✓ tests/unit/phase3.test.ts > P3-1 fuel > a full lantern is never selected (no event, no points); the next candidate is used 0ms
@@ -21,9 +21,13 @@
  ✓ tests/unit/phase3.test.ts > P3-2 drain > one shade drains 5/s on top of the 1/s decay; fuel_drain every 60 drained ticks; out at 200 1ms
  ✓ tests/unit/phase3.test.ts > P3-2 drain > two shades stack: 11 units per tick 0ms
  ✓ tests/unit/phase3.test.ts > P3-2 drain > drain -> chase when Mây comes within 6 m (7 m: keeps draining) 0ms
- ✓ tests/unit/phase3.test.ts > P3-2 drain > pulse stuns a draining shade for a total of +15; back to wander when the stun ends 0ms
+ ✓ tests/unit/phase3.test.ts > P3-2 drain > pulse stuns a draining shade for a total of +15; back to wander when the stun ends 1ms
  ✓ tests/unit/phase3.test.ts > P3-2 drain > refuel to >= 30 next to a draining shade: zone back, shade expelled (harmless) and leaves drain 0ms
  ✓ tests/unit/phase3.test.ts > P3-2 drain > drain -> wander when more than 2 m from its lantern 0ms
+ ✓ tests/unit/phase3.test.ts > P3 review fixes (independent review of Phase 3) > m1: a scenario drain shade at a healthy (>= 30) or distant (> 2 m) lantern drains nothing 0ms
+ ✓ tests/unit/phase3.test.ts > P3 review fixes (independent review of Phase 3) > m2: scenario fuel just below 30 stays below 30 (floor to 1/60 units): no safe zone 0ms
+ ✓ tests/unit/phase3.test.ts > P3 review fixes (independent review of Phase 3) > drain -> chase exactly at 6.0 m 0ms
+ ✓ tests/unit/phase3.test.ts > P3 review fixes (independent review of Phase 3) > relight with a shade waiting inside 6 m: zone back, shade expelled and harmless 0ms
  ✓ tests/unit/phase3.test.ts > P3-3 dawn rules > night 1 with ["L1","L2","L3"] lit at dawn -> won 0ms
  ✓ tests/unit/phase3.test.ts > P3-3 dawn rules > night 1 with ["L1","L2"] lit at dawn -> lost 0ms
  ✓ tests/unit/phase3.test.ts > P3-3 dawn rules > night 2 with ["L1","L2","L3","L4"] lit at dawn -> won 0ms
@@ -39,15 +43,15 @@
  ✓ tests/unit/phase3.test.ts > P3-5 pause + contract v1.2 > scenario: lit without fuel -> 100; fuel rounded to 1 decimal in snapshots; unlit fuel 0 0ms
  ✓ tests/unit/phase3.test.ts > P3-5 pause + contract v1.2 > scenario parser: drain state, target_lantern_id, successful_lights, fuel, ever_lit; bad values -> FormatError 0ms
  ✓ tests/unit/phase3.test.ts > P3-5 pause + contract v1.2 > scenario drain without target_lantern_id drains the nearest lit lantern 0ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 01-contract-example [P1-C3,C5,C6 (regression, standard numbers)] 29ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 01-contract-example [P1-C3,C5,C6 (regression, standard numbers)] 30ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 02-collect-and-light [P1-C6 / T2-P1 lantern / T3-1,5 (re-derived for Ticket-03)] 27ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 03-pulse-stun [T2-P1 pulse] 31ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 04-hit-and-drop [T2-P1 hit] 28ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 03-pulse-stun [T2-P1 pulse] 27ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 04-hit-and-drop [T2-P1 hit] 27ms
  ✓ tests/unit/core.test.ts > T1 contract v1.1 + standard numbers (Ticket-02 Part 1 / Part 4) > declares v1.2 and the exact standard tuning 1ms
  ✓ tests/unit/core.test.ts > T2 standard maps (Ticket-02 Part 2) > lantern coordinates and spawn point counts 0ms
  ✓ tests/unit/core.test.ts > T2 standard maps (Ticket-02 Part 2) > ground heights: island edges, bridge, tiers, ramps 0ms
- ✓ tests/unit/core.test.ts > T3 movement, jump > runs 6 m/s (instant accel, assumption B1) and rotates by cam_yaw_deg 2ms
- ✓ tests/unit/core.test.ts > T3 movement, jump > jump 7 m/s with g = 20 (apex <= 1.225 m), only from the ground 1ms
+ ✓ tests/unit/core.test.ts > T3 movement, jump > runs 6 m/s (instant accel, assumption B1) and rotates by cam_yaw_deg 1ms
+ ✓ tests/unit/core.test.ts > T3 movement, jump > jump 7 m/s with g = 20 (apex <= 1.225 m), only from the ground 0ms
  ✓ tests/unit/core.test.ts > T4 dash > 14 m/s for 12 ticks = 2.8 m; cooldown 90 ticks from the start; holding does not retrigger 1ms
  ✓ tests/unit/core.test.ts > T4 dash > dash in the air keeps altitude; no invulnerability 0ms
  ✓ tests/unit/core.test.ts > T5 pickup + lanterns + safe zone > pickup at XZ <= 1.0 m and height diff <= 1.5 m 0ms
@@ -62,7 +66,7 @@
  ✓ tests/unit/core.test.ts > T6 pulse > scenario shade at y = 0 is placed at ground + 1 (PRD example uses y = 0) 0ms
  ✓ tests/unit/core.test.ts > T6 pulse > scenario shade in recoil (default) moves exactly 2 m like a hit 0ms
  ✓ tests/unit/core.test.ts > T7 shades: states, hits, recoil, drops > spawning 60 ticks -> wander; chase at <= 12 m; give up at > 18 m 0ms
- ✓ tests/unit/core.test.ts > T7 shades: states, hits, recoil, drops > hit: -1 flame, drop floor(c/2) on a 1.5-2.5 m ring with TTL 480, invuln 90, hitter recoils 2 m in 60 ticks 0ms
+ ✓ tests/unit/core.test.ts > T7 shades: states, hits, recoil, drops > hit: -1 flame, drop floor(c/2) on a 1.5-2.5 m ring with TTL 480, invuln 90, hitter recoils 2 m in 60 ticks 1ms
  ✓ tests/unit/core.test.ts > T7 shades: states, hits, recoil, drops > several shades in one tick -> one flame; next hit only after 90 ticks (ids ascending) 1ms
  ✓ tests/unit/core.test.ts > T7 shades: states, hits, recoil, drops > dropped motes expire after 480 ticks 1ms
  ✓ tests/unit/core.test.ts > T8 falling off the island > walk off the edge: once, ignores invuln, loses all motes, respawn after 60 ticks with invuln 90 0ms
@@ -75,79 +79,79 @@
  ✓ tests/unit/core.test.ts > T11 drifters > idle -> chase only when carrying >= 5 within 15 m 0ms
  ✓ tests/unit/core.test.ts > T11 drifters > pulse on a chasing drifter -> flee without stealing; on a fleeing one with loot -> drops it all 0ms
  ✓ tests/unit/core.test.ts > T11 drifters > drifters spawn at 1200, 2400 (max 2), only nights 2-3 by default 10ms
- ✓ tests/unit/core.test.ts > T12 wind charm > pickup gives 600 ticks of 7.2 m/s and cooldown-free dash (not while dashing); respawns after 2700 ticks 3ms
+ ✓ tests/unit/core.test.ts > T12 wind charm > pickup gives 600 ticks of 7.2 m/s and cooldown-free dash (not while dashing); respawns after 2700 ticks 4ms
  ✓ tests/unit/core.test.ts > T13 strong wind (night 3) > every 30 s for 5 s, pushes 2 m/s 5ms
  ✓ tests/unit/core.test.ts > T14 terrain: pads, bridge, ramps, walls, tower > night 2 pad launches to island B in ~1.4 s (lands on tick 84) 0ms
- ✓ tests/unit/core.test.ts > T14 terrain: pads, bridge, ramps, walls, tower > night 2 bridge: walk A -> B without falling 1ms
- ✓ tests/unit/core.test.ts > T14 terrain: pads, bridge, ramps, walls, tower > night 3: ramp to tier 1, tier-2 cliff blocks, pad lands on tier 2, tower blocks 1ms
+ ✓ tests/unit/core.test.ts > T14 terrain: pads, bridge, ramps, walls, tower > night 2 bridge: walk A -> B without falling 0ms
+ ✓ tests/unit/core.test.ts > T14 terrain: pads, bridge, ramps, walls, tower > night 3: ramp to tier 1, tier-2 cliff blocks, pad lands on tier 2, tower blocks 0ms
  ✓ tests/unit/core.test.ts > Phase 2 review fixes > dash during a pad launch follows the launch direction, not the stick (B15) 0ms
  ✓ tests/unit/core.test.ts > Phase 2 review fixes > mote respawn skips points occupied by scenario motes (no free point -> skip) 1ms
- ✓ tests/unit/core.test.ts > Phase 2 review fixes > end record never says paused (Contract: playing | won | lost); snapshot does 0ms
+ ✓ tests/unit/core.test.ts > Phase 2 review fixes > end record never says paused (Contract: playing | won | lost); snapshot does 1ms
  ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > night 2: shades 2 at 300 then every 420 up to 8; drifters at 1200 and 2400 (max 2) 13ms
  ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > night 3: shades 2 at 300 then every 360 up to 10 15ms
- ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > spawned shades appear >= 15 m from Mây (all nights) 16ms
+ ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > spawned shades appear >= 15 m from Mây (all nights) 17ms
  ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > night 3 shades chase at 4.5 m/s (night 1: 4 m/s) 0ms
  ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > scenario countdowns: N ticks left -> state ends in the snapshot of tick N 0ms
- ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > motes dropped at the island edge land on ground (B14 re-roll), inside the 1.5-2.5 m ring 3ms
+ ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > motes dropped at the island edge land on ground (B14 re-roll), inside the 1.5-2.5 m ring 1ms
  ✓ tests/unit/core.test.ts > Phase 1-2 hardening (review test gaps) > chasing shade slides around the night 3 bell tower instead of sticking (B20) 0ms
  ✓ tests/unit/core.test.ts > T15 spawns + determinism > night 1: 20 motes on distinct standard points; +1 every 240; shades 2 at 300 then every 480 2ms
- ✓ tests/unit/core.test.ts > T15 spawns + determinism > same seed -> identical; different seed -> different 60ms
- ✓ tests/unit/core.test.ts > T16 input / scenario validation > rejects malformed inputs and scenarios 0ms
+ ✓ tests/unit/core.test.ts > T15 spawns + determinism > same seed -> identical; different seed -> different 58ms
+ ✓ tests/unit/core.test.ts > T16 input / scenario validation > rejects malformed inputs and scenarios 1ms
  ✓ tests/unit/core.test.ts > T16 input / scenario validation > held input values; dash/pause default false 0ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 05-all-lit-no-early-win [T3-3 no early win (replaces 05-win-all-lit)] 28ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 06-lose-dawn [T2-P1 win/lose] 25ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 07-lose-no-flames [T2-P1 hit + win/lose] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 08-safe-zone [T2-P1 safe zone] 25ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 06-lose-dawn [T2-P1 win/lose] 24ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 07-lose-no-flames [T2-P1 hit + win/lose] 24ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 08-safe-zone [T2-P1 safe zone] 24ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 09-default-night1 [T2-P1 spawns] 28ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 10-camera-yaw [P1-C5 movement] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 11-pulse-no-shades [T2-P1 pulse] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 12-multi-pickup-capacity [T2-P1 pickup] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 13-id-generation [P1-C11 ids] 25ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 12-multi-pickup-capacity [T2-P1 pickup] 22ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 13-id-generation [P1-C11 ids] 26ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 14-multi-shade-hit [T2-P1 hit (multi-event tick)] 25ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 15-fall-respawn [T2-P1 fall] 24ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 16-dash [T3 dash] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 15-fall-respawn [T2-P1 fall] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 16-dash [T3 dash] 24ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 17-dash-air [T3 dash] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 18-charm [T3 wind charm] 24ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 19-drifter-steal-before-hit [T3 drifter + tick order] 25ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 18-charm [T3 wind charm] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 19-drifter-steal-before-hit [T3 drifter + tick order] 24ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 20-drifter-pulse-drop [T3 drifter] 25ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 21-wind [T2-P2 night 3 wind] 29ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 21-wind [T2-P2 night 3 wind] 28ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 22-pause [T3 pause] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 23-night2-pad [T2-P2 night 2 pad] 25ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 23-night2-pad [T2-P2 night 2 pad] 24ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 24-night3-ramp [T2-P2 night 3 ramp] 24ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 25-night3-wall [T2-P2 night 3 cliffs] 24ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 26-night3-pad-tier2 [T2-P2 night 3 pad] 22ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 27-night2-bridge [T2-P2 night 2 bridge] 25ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 28-night2-bridge-side-fall [T2-P2 night 2 bridge (no railing)] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 29-p3-fuel-decay-out [T3-1 fuel decay + lantern_out] 24ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 30-p3-refuel [T3-1 refuel] 24ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 31-p3-relight [T3-1 relight + T3-4 capacity + T3-5 score] 22ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 32-p3-drain-cycle [T3-2 drain + fuel_drain] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 26-night3-pad-tier2 [T2-P2 night 3 pad] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 27-night2-bridge [T2-P2 night 2 bridge] 24ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 28-night2-bridge-side-fall [T2-P2 night 2 bridge (no railing)] 24ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 29-p3-fuel-decay-out [T3-1 fuel decay + lantern_out] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 30-p3-refuel [T3-1 refuel] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 31-p3-relight [T3-1 relight + T3-4 capacity + T3-5 score] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 32-p3-drain-cycle [T3-2 drain + fuel_drain] 25ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 33-p3-wander-to-drain [T3-2 weak lantern target + safe zone lost below 30] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 34-p3-pulse-drain [T3-2 drain -> stunned + T3-5 score 15] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 35-p3-dawn-n1-win [T3-3 dawn win/lose] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 35-p3-dawn-n1-win [T3-3 dawn win/lose] 22ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 36-p3-dawn-n1-lose [T3-3 dawn win/lose] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 37-p3-dawn-n2-win [T3-3 dawn win/lose] 22ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 38-p3-dawn-n2-lose [T3-3 dawn win/lose] 23ms
- ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 39-p3-dawn-n3-win [T3-3 dawn win/lose] 22ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 37-p3-dawn-n2-win [T3-3 dawn win/lose] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 38-p3-dawn-n2-lose [T3-3 dawn win/lose] 22ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 39-p3-dawn-n3-win [T3-3 dawn win/lose] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 40-p3-dawn-n3-lose [T3-3 dawn win/lose] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 41-p3-dawn-lantern-out [T3-3 tick order (out right after step 2, before win check)] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 42-p3-dawn-no-flames [T3-3 no_flames first] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 43-p3-capacity-cap [T3-4 capacity] 23ms
  ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 44-p3-pause-fuel [T3-1/T3-2 + T2 pause] 23ms
- ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > malformed inputs JSON -> exit 2 with stderr 23ms
- ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > non-increasing frame ticks -> exit 2 22ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > malformed inputs JSON -> exit 2 with stderr 24ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > non-increasing frame ticks -> exit 2 23ms
  ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > malformed scenario -> exit 2 46ms
  ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > unsupported night -> non-zero, message on stderr 22ms
- ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > missing required args -> exit 1, message on stderr, empty stdout 89ms
- ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > --ticks 0 -> only snapshot 0 + end 22ms
- ✓ tests/scenarios/headless.test.ts > performance: a full night (21 600 ticks) must finish in <= 30 s > night 1 82ms
- ✓ tests/scenarios/headless.test.ts > performance: a full night (21 600 ticks) must finish in <= 30 s > night 2 112ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > missing required args -> exit 1, message on stderr, empty stdout 90ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > --ticks 0 -> only snapshot 0 + end 21ms
+ ✓ tests/scenarios/headless.test.ts > performance: a full night (21 600 ticks) must finish in <= 30 s > night 1 84ms
+ ✓ tests/scenarios/headless.test.ts > performance: a full night (21 600 ticks) must finish in <= 30 s > night 2 115ms
  ✓ tests/scenarios/headless.test.ts > performance: a full night (21 600 ticks) must finish in <= 30 s > night 3 149ms
- ✓ tests/scenarios/headless.test.ts > C11 determinism (real CLI) > same seed/scenario/inputs -> byte-identical output 109ms
+ ✓ tests/scenarios/headless.test.ts > C11 determinism (real CLI) > same seed/scenario/inputs -> byte-identical output 112ms
  ✓ tests/scenarios/headless.test.ts > C11 determinism (real CLI) > default snapshot interval is 10 24ms
 
  Test Files  4 passed (4)
-      Tests  144 passed (144)
-   Start at  16:38:15
+      Tests  148 passed (148)
+   Start at  19:09:07
    Duration  1.86s (tests 97%, import 2%, transform 1%)
 

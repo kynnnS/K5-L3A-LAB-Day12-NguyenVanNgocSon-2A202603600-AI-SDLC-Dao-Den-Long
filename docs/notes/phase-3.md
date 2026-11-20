@@ -74,7 +74,7 @@ Không có test nào bị skip hay xóa mà không có test thay thế.
 
 ## 5. Ma trận truy vết
 
-Nguồn: [SUMMARY.md](../proof/phase-3/SUMMARY.md) (`bash scripts/verify.sh phase-3` tại commit a972764: 6/6 PASS, 144/144 test). Bằng chứng từng fixture (output CLI thật): [../proof/phase-3/scenarios/](../proof/phase-3/scenarios/README.md).
+Nguồn: [SUMMARY.md](../proof/phase-3/SUMMARY.md) (`bash scripts/verify.sh phase-3` tại commit 0a7f068, sau khi sửa lỗi review: 6/6 PASS, 148/148 test). Bằng chứng từng fixture (output CLI thật): [../proof/phase-3/scenarios/](../proof/phase-3/scenarios/README.md).
 
 | Yêu cầu Ticket-03 | Test / fixture | Bằng chứng | Trạng thái |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Nguồn: [SUMMARY.md](../proof/phase-3/SUMMARY.md) (`bash scripts/verify.sh phas
 | §7 Contract v1.2 (tuning, snapshot, scenario, sự kiện, bỏ `all_lit`) | unit T1, P3-5; `checkSchema` trên 44 fixture | unit-and-scenario-tests.log | PASS |
 | Pause đóng băng dầu và hút | unit P3-5, fixture 44 | scenarios/44-p3-pause-fuel | PASS |
 | Hồi quy Phase 1–2 không bị thay | 86 test cũ không đổi | unit-and-scenario-tests.log | PASS |
-| Tất định 3 Đêm, hiệu năng 21 600 tick ≤ 30 s | verify.sh (89 / 113 / 147 ms, Apple M5) | determinism.log, performance.log | PASS |
+| Tất định 3 Đêm, hiệu năng 21 600 tick ≤ 30 s | verify.sh (90 / 110 / 146 ms, Apple M5) | determinism.log, performance.log | PASS |
 | HUD dầu/sức chứa/mục tiêu, FPS ≥ 30 | Chơi thủ công | Chưa có ảnh | NOT VERIFIED |
 
 ## 6. Đánh giá Phase 3
