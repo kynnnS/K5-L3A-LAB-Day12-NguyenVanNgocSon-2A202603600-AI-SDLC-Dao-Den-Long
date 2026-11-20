@@ -11,8 +11,8 @@
   <div id="hud" class="hidden">
     <div class="tl"><div id="hud-flames" class="flames"></div></div>
     <div class="tc"><div id="hud-time" class="timer">05:00</div></div>
-    <div class="tr"><div><span class="label">Đèn</span> <b id="hud-lanterns">0/5</b></div><div><span class="label">Điểm</span> <b id="hud-score" class="score">0</b></div></div>
-    <div class="bc"><div id="hud-motes" class="motes"></div></div>
+    <div class="tr"><div><span class="label">Đèn sáng</span> <b id="hud-lanterns">0/5</b></div><div><span class="label">Điểm</span> <b id="hud-score" class="score">0</b></div></div>
+    <div class="bc"><div id="hud-motes" class="motes"></div><div id="hud-carry" class="carry">0/10</div></div>
     <div class="br">
       <div id="cd-dash" class="cd" title="Lướt (Shift)"><span>Lướt</span><small>Shift</small></div>
       <div id="cd-pulse" class="cd" title="Tỏa Sáng (F)"><span>Tỏa sáng</span><small>F</small></div>
@@ -48,6 +48,7 @@
       <h1>Cài đặt</h1>
       <label>Âm lượng <input id="set-volume" type="range" min="0" max="1" step="0.05" /></label>
       <label>Độ nhạy chuột <input id="set-sens" type="range" min="0.2" max="3" step="0.1" /></label>
+      <label>Bảng màu dễ phân biệt <input id="set-cb" type="checkbox" /></label>
       <button id="set-close">Lưu</button>
     </div>
   </div>

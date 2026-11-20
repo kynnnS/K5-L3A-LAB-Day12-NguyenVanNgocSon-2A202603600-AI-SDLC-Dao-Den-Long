@@ -8,6 +8,8 @@ export const PAL = {
   lanternLit: 0xffb347, lanternCore: 0xffe9b0, lanternOff: 0x5b5f6e, moteCore: 0xfff6c2, moteHalo: 0xffe58a,
   shadeBody: 0x120a1a, shadeRim: 0x7a3cff, shadeStunned: 0x3a3450, robe: 0xe8e2d0, scarf: 0xc8102e,
   gold: 0xf2c14e, drifter: 0x8fa3b8,
+  /** Ticket-03 colour-blind palette: shade rim + eyes. */
+  shadeRimCb: 0x00b3ff,
 };
 
 const flat = (color: number, extra: THREE.MeshStandardMaterialParameters = {}) =>
@@ -83,7 +85,11 @@ export function buildWorld(map: NightMap): THREE.Group {
   return g;
 }
 
-export interface LanternView { group: THREE.Group; body: THREE.MeshStandardMaterial; core: THREE.Mesh; light: THREE.PointLight; ring: THREE.Mesh; fill: THREE.Mesh }
+export interface LanternView {
+  group: THREE.Group; body: THREE.MeshStandardMaterial; core: THREE.Mesh; light: THREE.PointLight; ring: THREE.Mesh; fill: THREE.Mesh;
+  /** Paper shell (squashed 20% when unlit), tear marks (unlit only), fuel bar (lit only). */
+  shell: THREE.Mesh; tear: THREE.Group; fuelBar: THREE.Group; fuelFill: THREE.Mesh;
+}
 
 export function buildLantern(safeRadius: number): LanternView {
   const group = new THREE.Group();
@@ -97,6 +103,15 @@ export function buildLantern(safeRadius: number): LanternView {
   const core = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshBasicMaterial({ color: PAL.lanternCore }));
   core.position.copy(shell.position);
   core.visible = false;
+  // Torn paper: dark jagged slashes on the shell, visible only when the lantern is out (shape cue, not colour).
+  const tear = new THREE.Group();
+  const tearMat = new THREE.MeshBasicMaterial({ color: 0x0b0d18, side: THREE.DoubleSide });
+  for (const [a, y, rz] of [[0.3, 2.65, 0.5], [2.2, 2.45, -0.7], [4.1, 2.6, 0.9]] as const) {
+    const slash = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 0.5), tearMat);
+    slash.position.set(1 + Math.cos(a) * 0.46, y, Math.sin(a) * 0.46);
+    slash.rotation.set(0, -a + Math.PI / 2, rz);
+    tear.add(slash);
+  }
   const light = new THREE.PointLight(PAL.lanternLit, 0, 16, 1.6);
   light.position.set(1, 2.6, 0);
   const ring = new THREE.Mesh(new THREE.RingGeometry(safeRadius - 0.12, safeRadius, 48),
@@ -106,8 +121,15 @@ export function buildLantern(safeRadius: number): LanternView {
   const fill = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 1, 8), new THREE.MeshBasicMaterial({ color: PAL.lanternCore }));
   fill.position.set(1, 2.2, 0);
   fill.scale.y = 0.001;
-  group.add(post, arm, shell, core, light, ring, fill);
-  return { group, body, core, light, ring, fill };
+  // Fuel bar above the lantern (billboarded in main.ts): dark back + gold fill scaled by fuel / max.
+  const fuelBar = new THREE.Group();
+  fuelBar.position.set(1, 3.55, 0);
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.18), new THREE.MeshBasicMaterial({ color: 0x0b0d18, transparent: true, opacity: 0.8 }));
+  const fuelFill = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.1), new THREE.MeshBasicMaterial({ color: PAL.gold, transparent: true }));
+  fuelFill.position.z = 0.01;
+  fuelBar.add(back, fuelFill);
+  group.add(post, arm, shell, core, tear, light, ring, fill, fuelBar);
+  return { group, body, core, light, ring, fill, shell, tear, fuelBar, fuelFill };
 }
 
 export interface PlayerView { group: THREE.Group; lanternLight: THREE.PointLight; lanternGlow: THREE.MeshStandardMaterial }
@@ -141,14 +163,15 @@ export function buildMote(dropped: boolean): THREE.Group {
   return g;
 }
 
-export interface ShadeView { group: THREE.Group; body: THREE.MeshStandardMaterial }
+export interface ShadeView { group: THREE.Group; body: THREE.MeshStandardMaterial; rimMat: THREE.MeshBasicMaterial; eyeMat: THREE.MeshBasicMaterial }
 
 export function buildShade(): ShadeView {
   const group = new THREE.Group();
   const body = new THREE.MeshStandardMaterial({ color: PAL.shadeBody, emissive: PAL.shadeRim, emissiveIntensity: 0.35, flatShading: true, transparent: true, opacity: 0.95 });
   const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(0.75, 1), body);
-  const rim = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 1), new THREE.MeshBasicMaterial({ color: PAL.shadeRim, wireframe: true, transparent: true, opacity: 0.5 }));
-  const eyeMat = new THREE.MeshBasicMaterial({ color: 0xd9b8ff });
+  const rimMat = new THREE.MeshBasicMaterial({ color: PAL.shadeRim, wireframe: true, transparent: true, opacity: 0.5 });
+  const rim = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 1), rimMat);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: PAL.shadeRim }); // rim + eyes: #7A3CFF, or #00B3FF (colour-blind)
   for (const x of [-0.22, 0.22]) {
     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), eyeMat);
     eye.position.set(x, 0.15, 0.65);
@@ -158,7 +181,7 @@ export function buildShade(): ShadeView {
   tail.position.y = -0.75;
   tail.rotation.x = Math.PI;
   group.add(blob, rim, tail);
-  return { group, body };
+  return { group, body, rimMat, eyeMat };
 }
 
 export function buildDrifter(): THREE.Group {

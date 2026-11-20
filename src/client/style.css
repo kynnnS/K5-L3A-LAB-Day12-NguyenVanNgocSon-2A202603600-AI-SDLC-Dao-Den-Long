@@ -8,6 +8,8 @@
   --sky: #0e1430;
   --panel: rgba(14, 20, 48, 0.72);
 }
+/* Ticket-03 colour-blind palette: UI warning #FF5A5F -> #FFFFFF (text also gets a ⚠ icon). */
+body.cb { --danger: #ffffff; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); color: var(--text);
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif; user-select: none; }
@@ -23,11 +25,14 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); 
 .score { color: var(--gold); }
 .timer { font-size: 26px; font-weight: 700; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .timer.danger { color: var(--danger); animation: blink 0.8s steps(2, start) infinite; }
+#hud-lanterns.danger { color: var(--danger); }
+.bc { text-align: center; }
+.carry { font-size: 12px; opacity: .85; margin-top: 4px; font-variant-numeric: tabular-nums; }
 @keyframes blink { to { visibility: hidden; } }
 .flames span { display: inline-block; width: 14px; height: 18px; margin-right: 5px; border-radius: 50% 50% 45% 45%;
   background: radial-gradient(circle at 50% 70%, #ffe9b0, var(--lit) 45%, #e0562b 90%); box-shadow: 0 0 8px var(--lit); }
 .flames span.off { background: #3a3450; box-shadow: none; }
-.motes { display: flex; gap: 5px; }
+.motes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 280px; }
 .motes span { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255, 229, 138, 0.5); }
 .motes span.on { background: radial-gradient(circle, #fff6c2 30%, #ffe58a 70%); box-shadow: 0 0 8px #ffe58a; }
 .cd { --cd: 0; position: relative; width: 64px; height: 64px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -45,6 +50,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); 
 .hint { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); font-size: 12px; opacity: .65; white-space: nowrap; }
 .fps { position: fixed; left: 16px; bottom: 10px; font-size: 11px; opacity: .6; font-variant-numeric: tabular-nums; }
 #flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; background: radial-gradient(circle, transparent 40%, rgba(255, 90, 95, .45)); }
+body.cb #flash { background: radial-gradient(circle, transparent 40%, rgba(255, 255, 255, .45)); }
 #flash.on { opacity: 1; transition: none; }
 #overlay, .modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 40%, rgba(27, 35, 80, .6), rgba(5, 6, 20, .88)); }
 .card { max-width: 480px; margin: 16px; padding: 26px 30px; background: var(--panel); border-radius: 18px; border: 1px solid rgba(242, 193, 78, .4); text-align: center; }
