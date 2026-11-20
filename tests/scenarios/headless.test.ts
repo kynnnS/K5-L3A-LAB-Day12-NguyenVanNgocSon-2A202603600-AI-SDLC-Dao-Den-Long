@@ -88,7 +88,7 @@ describe('performance: a full night (21 600 ticks) must finish in <= 30 s', () =
   for (const night of [1, 2, 3]) {
     it(`night ${night}`, () => {
       const t0 = performance.now();
-      const r = runCli({ seed: 99, night, ticks: 21600, scenario: { player: { flames: 99 } } });
+      const r = runCli({ seed: 99, night, ticks: 21600, scenario: { player: { flames: 999 } } });
       const ms = performance.now() - t0;
       expect(r.code).toBe(0);
       expect(ms).toBeLessThan(30000);
