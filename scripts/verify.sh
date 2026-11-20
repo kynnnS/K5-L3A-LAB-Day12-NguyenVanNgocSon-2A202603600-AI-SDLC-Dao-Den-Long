@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Verification gate + evidence collector.
 #   bash scripts/verify.sh            -> run all checks (no files written)
-#   bash scripts/verify.sh phase-1    -> also save evidence to docs/proof/phase-1/
+#   bash scripts/verify.sh phase-N    -> also save evidence to docs/proof/phase-N/
+# The benchmark needs a visible browser window, so it is run separately: npm run bench (see README).
 # Exit code != 0 if any check fails.
 set -uo pipefail
 cd "$(dirname "$0")/.."
@@ -60,6 +61,31 @@ perf() {
   done
 }
 step performance perf
+
+# Soak (Ticket-04 §2): the contract's soak_cmd, 10 nights, crashes = 0 and mem_end <= 1.2 x mem_start.
+soak() {
+  local d cmd; d="$(mktemp -d)"
+  cmd="$(node -e 'console.log(require("./game.contract.json").soak_cmd)')"
+  echo "soak_cmd: $cmd --seed 7 --nights 10"
+  $cmd --seed 7 --nights 10 --out "$d/soak.json" || return 1
+  cat "$d/soak.json"
+  [ -n "$OUT" ] && cp "$d/soak.json" "$OUT/soak.json"
+  node -e 'const r=require(process.argv[1]); const ok=r.crashes===0 && r.mem_end_mb<=1.2*r.mem_start_mb && r.results.length===r.nights;
+    console.log(`crashes=${r.crashes} mem ${r.mem_start_mb} -> ${r.mem_end_mb} MB (ratio ${(r.mem_end_mb/r.mem_start_mb).toFixed(3)}, limit 1.2)`); process.exit(ok?0:1)' "$d/soak.json"
+}
+step soak soak
+
+# Leaderboard export (Ticket-04 §3): run_cmd --export-leaderboard on a temporary board file.
+lbexport() {
+  local d cmd; d="$(mktemp -d)"
+  cmd="$(node -e 'console.log(require("./game.contract.json").run_cmd)')"
+  printf '{"entries":[{"name":"Mây_1","score":120,"nights_won":1,"achieved_at":"2026-11-20T10:00:00+07:00","seed":3},{"name":"Sơn","score":900,"nights_won":3,"achieved_at":"2026-11-20T11:00:00+07:00","seed":5}]}' >"$d/lb.json"
+  echo "run_cmd: $cmd --export-leaderboard out.json"
+  DDL_LEADERBOARD="$d/lb.json" $cmd --export-leaderboard "$d/out.json" || return 1
+  cat "$d/out.json"
+  node -e 'const e=require(process.argv[1]).entries; process.exit(e.length===2 && e[0].score===900 && e[1].score===120 ? 0 : 1)' "$d/out.json"
+}
+step leaderboard-export lbexport
 
 # Save each scenario fixture's inputs + real CLI output as evidence.
 if [ -n "$OUT" ]; then

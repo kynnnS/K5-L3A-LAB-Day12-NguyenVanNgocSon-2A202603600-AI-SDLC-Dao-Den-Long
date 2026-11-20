@@ -2,6 +2,22 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/). Mỗi phase là một tag git.
 
+## [phase-4] / v1.0.0 — Ticket-04 "Bình minh: phát hành v1.0.0", Contract v1.3
+
+### ⚠ Breaking changes
+
+- **Contract v1.2 → v1.3:** thêm `bench_cmd` (`node build/headless/bench.js`) và `soak_cmd` (`node --expose-gc --jitless build/headless/soak.js`).
+- **`run_cmd`:** `npm start` → `node build/headless/serve.js` (máy chủ của game; nhận `--export-leaderboard out.json`). `npm start` vẫn chạy cùng lệnh này.
+- **Cài đặt** lưu thêm `keymap`, `reducedMotion`, `largeText` (bản lưu cũ vẫn đọc được).
+
+### Added
+
+- **Benchmark:** cảnh chuẩn (Đêm 1, 200 Bóng Mực `wander`, 100 đom đóm, L1–L3 sáng 100 dầu, camera bay vòng 30 m / Y 15 m / 15 s), 3 s khởi động, ghi `bench.json` (avg_fps, p1_low_fps, frame_ms_p95, frames, load_ms, peak_mem_mb, vsync_off, renderer, os).
+- **Soak:** 10 Đêm liên tiếp trong một tiến trình với input ngẫu nhiên có seed; `soak.json`.
+- **Bảng xếp hạng cục bộ:** nhập tên sau Bình Minh hoặc khi thua; top 10; lưu `~/.dao-den-long/leaderboard.json`; màn hình từ menu chính; `--export-leaderboard`.
+- **Dễ tiếp cận:** đổi phím mọi hành động (báo trùng, khôi phục mặc định); phụ đề cho Bóng Mực xuất hiện (kèm mũi tên mép màn hình), gió sắp thổi, 10 s cuối, đèn < 30 dầu; giảm chuyển động; chữ UI ≥ 18 px và tùy chọn chữ lớn ×1.25.
+- `verify.sh` thêm bước `soak` và `leaderboard-export`. Retro: [docs/notes/retro.md](docs/notes/retro.md).
+
 ## [phase-3] — Ticket-03 "Đèn cạn dầu", Contract v1.2
 
 ### ⚠ Breaking changes

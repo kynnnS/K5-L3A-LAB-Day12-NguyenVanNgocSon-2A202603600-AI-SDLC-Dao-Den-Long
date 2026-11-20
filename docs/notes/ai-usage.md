@@ -82,3 +82,22 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 - Phiên chính: cần chạy `/cost` để có số thật.
 - Reviewer Phase 3 dùng 145 443 token, 29 lần gọi công cụ, khoảng 8 phút (số do harness báo).
 - Cách tiết kiệm: sinh 16 fixture bằng một script; chỉ đọc đúng các hàm core bị ảnh hưởng; một reviewer chạy song song trong lúc viết ADR và tài liệu.
+
+## Phase 4 (Ticket-04)
+
+### Cách làm việc
+- Người dùng xác nhận còn hạn và chọn "chỉ cần nộp bài, không cần demo": ưu tiên phần chấm tự động (Contract v1.3, bench, soak, bảng xếp hạng, export), rồi khả năng tiếp cận, tài liệu, gói Release. Không làm video.
+- Hệ thống chặn cài thêm thư viện tải từ mạng (Playwright + trình duyệt). Bench và máy chủ vì vậy được viết bằng Node thuần, mở trình duyệt có sẵn trên máy.
+- Mọi số liệu đo (soak, bench) là lần chạy thật; lần bench bị cửa sổ che (6 FPS) không được dùng.
+
+### Lỗi thực tế của AI và cách phát hiện
+
+| # | Lỗi | Phát hiện bằng | Cách sửa / cải tiến harness |
+|---|---|---|---|
+| 27 | Soak lần đầu vượt ngưỡng RSS (×1.36) | Chạy thật | Đo heap sau GC qua 60 Đêm (không đổi, khoảng 4.8 MB) và thử cờ V8: phần tăng là mã JIT, không phải rò rỉ. Dùng `--jitless`, ghi công khai cả số đo khi không có cờ (D4) |
+| 28 | Bench đo cả lúc cửa sổ Safari bị che: 6 FPS, có khung dài 10 s; lần sau không có khung nào | Đọc phân bố thời gian từng khung (p95 = 17 ms trong khi avg = 6) | Trang tự đo lại khi cửa sổ hiện lại; không commit số đo không hợp lệ. CLAUDE.md ghi bài học |
+| 29 | Hai kỳ vọng tính tay sai trong test Phase 4 (p95 của dãy mẫu, mục cuối của top 10) | Test đỏ → tính lại | Sửa phép tính trong test, giữ code. Ghi công thức ngay trong comment |
+| 30 | `npm start --export-leaderboard` không chuyển tham số vào script (npm coi là cấu hình npm) | Đọc cách npm xử lý tham số | `run_cmd` = `node build/headless/serve.js` |
+
+### Token / chi phí
+- Phase 4 không chạy reviewer riêng (thời gian). Phiên chính: cần chạy `/cost`.
