@@ -1,4 +1,4 @@
-/** Shared game types. Units: metres, seconds; Y is up; ground at Y = 0. */
+/** Shared game types. Units: metres, seconds; Y is up. */
 
 export type Vec3 = [number, number, number];
 
@@ -21,6 +21,8 @@ export interface Tuning {
   pulse_cost: number;
   pulse_radius: number;
   night1_duration_s: number;
+  night2_duration_s: number;
+  night3_duration_s: number;
   flames: number;
   invuln_s: number;
   hit_drop_ratio: number;
@@ -31,21 +33,35 @@ export interface Tuning {
   shade_speed: number;
   shade_hit_radius: number;
   fall_enabled: boolean;
+  dash_speed: number;
+  dash_duration_s: number;
+  dash_cooldown_s: number;
   score: ScoreTuning;
 }
 
-export type GameStatus = 'playing' | 'won' | 'lost';
-export type ShadeState = 'chase' | 'stunned';
+export type GameStatus = 'playing' | 'paused' | 'won' | 'lost';
+export type ShadeState = 'spawning' | 'wander' | 'chase' | 'recoil' | 'stunned';
+export type DrifterState = 'idle' | 'chase' | 'flee';
 
 export interface Player {
   pos: Vec3;
-  velY: number;
+  /** Horizontal velocity actually applied last tick + vertical velocity. */
+  vel: Vec3;
+  grounded: boolean;
+  facing: [number, number]; // unit XZ
   flames: number;
   carried: number;
-  /** First tick at which the player can be hit again. */
-  invulnUntil: number;
-  /** First tick at which a pulse may fire again. */
-  pulseReadyAt: number;
+  invulnTicks: number;
+  dashTicks: number; // remaining dash movement ticks
+  dashDir: [number, number];
+  dashCdTicks: number;
+  pulseCdTicks: number;
+  charmTicks: number;
+  /** Jump-pad launch velocity (XZ), kept until landing. */
+  launch: [number, number] | null;
+  /** > 0 while waiting to respawn after a fall. */
+  respawnTicks: number;
+  fallen: boolean;
 }
 
 export interface Lantern {
@@ -59,13 +75,44 @@ export interface Shade {
   id: string;
   pos: Vec3;
   state: ShadeState;
-  /** Shade stays stunned while tick < stunUntil. */
-  stunUntil: number;
+  stateTicks: number; // remaining ticks for spawning / recoil / stunned
+  pushTicks: number; // remaining pulse knock-back ticks
+  pushDir: [number, number];
+  recoilDir: [number, number];
+  wanderTarget: [number, number] | null;
+  expelling: boolean; // inside a newly lit safe zone: moving out, harmless
 }
 
 export interface Mote {
   id: string;
   pos: Vec3;
+  kind: 'random' | 'dropped';
+  ttlTicks: number | null;
+  /** Index of the standard spawn point it occupies (random motes from the schedule), else -1. */
+  point: number;
+}
+
+export interface Drifter {
+  id: string;
+  pos: Vec3;
+  state: DrifterState;
+  stolen: number;
+  hasStolen: boolean;
+  stateTicks: number; // flee ticks left
+  wanderTarget: [number, number] | null;
+}
+
+export interface Charm {
+  id: string;
+  pos: Vec3;
+  available: boolean;
+  respawnTicks: number;
+}
+
+export interface Wind {
+  active: boolean;
+  dirDeg: number | null;
+  ticksLeft: number;
 }
 
 /** Per-tick player input, already resolved from frames (held values). */
@@ -75,15 +122,25 @@ export interface InputState {
   jump: boolean;
   interact: boolean;
   pulse: boolean;
+  dash: boolean;
+  pause: boolean;
 }
 
 export type GameEvent =
+  | { name: 'night_start'; data: { night: number } }
   | { name: 'mote_picked'; data: { carried: number } }
   | { name: 'deposit'; data: { lantern_id: string; amount: number; deposited: number } }
   | { name: 'lantern_lit'; data: { lantern_id: string } }
   | { name: 'pulse'; data: { stunned_ids: string[] } }
-  | { name: 'player_hit'; data: { by: 'shade' | 'fall'; flames: number; dropped: number } }
+  | { name: 'player_hit'; data: { by: 'shade'; flames: number; dropped: number } }
+  | { name: 'player_hit'; data: { by: 'fall'; flames: number; dropped: number; lost: number } }
   | { name: 'shade_spawned'; data: { id: string } }
+  | { name: 'dash'; data: Record<string, never> }
+  | { name: 'charm_picked'; data: { charm_id: string; charm_ticks: number } }
+  | { name: 'drifter_steal'; data: { drifter_id: string; amount: number; carried: number } }
+  | { name: 'drifter_drop'; data: { drifter_id: string; amount: number } }
+  | { name: 'paused'; data: Record<string, never> }
+  | { name: 'resumed'; data: Record<string, never> }
   | { name: 'game_over'; data: { result: 'won' | 'lost'; reason: 'all_lit' | 'dawn' | 'no_flames' } };
 
 export interface TimedEvent {
@@ -92,21 +149,29 @@ export interface TimedEvent {
 }
 
 export interface GameState {
-  /** Number of steps simulated so far. */
+  night: 1 | 2 | 3;
+  /** Steps run (including paused ticks). */
   tick: number;
+  /** Gameplay steps run (frozen while paused). */
+  simTick: number;
   status: GameStatus;
+  paused: boolean;
   score: number;
-  /** Night time left at tick 0; time_left_s = startTimeLeft - tick / 60. */
   startTimeLeft: number;
   player: Player;
   lanterns: Lantern[];
   shades: Shade[];
   motes: Mote[];
+  drifters: Drifter[];
+  charms: Charm[];
+  wind: Wind;
+  windEnabled: boolean;
   randomMotes: boolean;
   randomShades: boolean;
+  randomDrifters: boolean;
   rngState: number;
   nextMoteId: number;
   nextShadeId: number;
-  shadesSpawned: number;
-  prevButtons: { jump: boolean; interact: boolean; pulse: boolean };
+  nextDrifterId: number;
+  prevButtons: { jump: boolean; interact: boolean; pulse: boolean; dash: boolean; pause: boolean };
 }

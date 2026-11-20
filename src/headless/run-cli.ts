@@ -1,6 +1,6 @@
 /** Loads + validates files for the CLI, then runs the shared headless loop. */
 import { runHeadless } from '../core/run.js';
-import { lanternIds } from '../core/sim.js';
+import { getMap } from '../core/maps.js';
 import { FormatError, parseInputs, parseScenario, type InputFrame, type ScenarioSpec } from '../core/spec.js';
 import { parseTuning } from '../core/tuning.js';
 
@@ -8,6 +8,7 @@ export type RunResult = { ok: true; lines: string[] } | { ok: false; code: numbe
 
 interface Args {
   seed: number;
+  night: number;
   ticks: number;
   snapshotEvery: number;
   scenario?: string;
@@ -33,13 +34,14 @@ export function run(contract: unknown, args: Args, read: (p: string) => string):
   let scenario: ScenarioSpec | undefined;
   let frames: InputFrame[] | undefined;
   try {
-    if (args.scenario) scenario = parseScenario(loadJson(args.scenario, 'scenario', read), lanternIds(tuning));
+    const map = getMap(args.night, tuning);
+    if (args.scenario) scenario = parseScenario(loadJson(args.scenario, 'scenario', read), map.lanterns.map((l) => l.id), map.charms.map((c) => c.id));
     if (args.inputs) frames = parseInputs(loadJson(args.inputs, 'inputs', read));
   } catch (e) {
     if (e instanceof FormatError) return { ok: false, code: 2, message: e.message };
     throw e;
   }
-  const opts = { tuning, seed: args.seed, ticks: args.ticks, snapshotEvery: args.snapshotEvery };
+  const opts = { tuning, seed: args.seed, night: args.night as 1 | 2 | 3, ticks: args.ticks, snapshotEvery: args.snapshotEvery };
   return {
     ok: true,
     lines: runHeadless({ ...opts, ...(scenario ? { scenario } : {}), ...(frames ? { frames } : {}) }),

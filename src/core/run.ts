@@ -7,6 +7,7 @@ import type { Tuning } from './types.js';
 export interface RunOptions {
   tuning: Tuning;
   seed: number;
+  night?: 1 | 2 | 3;
   ticks: number;
   snapshotEvery: number;
   scenario?: ScenarioSpec;
@@ -15,10 +16,13 @@ export interface RunOptions {
 
 /** Runs exactly `ticks` steps (or until the game ends) and returns JSONL lines. */
 export function runHeadless(opts: RunOptions): string[] {
-  const state = createGame(opts.tuning, opts.seed, opts.scenario);
+  const night = opts.night ?? 1;
+  const state = createGame(opts.tuning, opts.seed, night, opts.scenario);
   const readInput = createInputReader(opts.frames ?? []);
   const lines: string[] = [JSON.stringify(snapshotRecord(state))];
-  for (let k = 0; k < opts.ticks && state.status === 'playing'; k++) {
+  // Assumption B5: night_start is reported once, at tick 0, right after the tick-0 snapshot.
+  lines.push(JSON.stringify(eventRecord({ tick: 0, event: { name: 'night_start', data: { night } } })));
+  for (let k = 0; k < opts.ticks && (state.status === 'playing' || state.status === 'paused'); k++) {
     for (const e of step(state, opts.tuning, readInput(k))) lines.push(JSON.stringify(eventRecord(e)));
     if (state.tick % opts.snapshotEvery === 0) lines.push(JSON.stringify(snapshotRecord(state)));
   }

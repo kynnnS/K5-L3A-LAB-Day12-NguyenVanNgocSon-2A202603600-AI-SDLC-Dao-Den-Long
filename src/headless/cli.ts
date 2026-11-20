@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Headless runner (Test Contract v1.0).
- * <cmd> --seed <int> --night 1 [--scenario f] [--inputs f] --ticks <int> --out f.jsonl [--snapshot-every <int>]
+ * Headless runner (Test Contract v1.1).
+ * <cmd> --seed <int> --night <1|2|3> [--scenario f] [--inputs f] --ticks <int> --out f.jsonl [--snapshot-every <int>]
  * Exit codes: 0 ok, 1 usage/runtime error, 2 malformed inputs/scenario file. Errors go to stderr only.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -41,7 +41,7 @@ function parseArgs(argv: string[]): CliArgs {
   for (const k of map.keys()) if (!known.has(k)) throw new UsageError(`unknown option --${k}`);
   for (const req of ['seed', 'night', 'ticks', 'out']) if (!map.has(req)) throw new UsageError(`missing --${req}`);
   const night = parseIntArg('night', map.get('night'), 1);
-  if (night !== 1) throw new UsageError(`--night ${night} is not available (only night 1)`);
+  if (night > 3) throw new UsageError(`--night ${night} is not available (1, 2 or 3)`);
   const args: CliArgs = {
     seed: parseIntArg('seed', map.get('seed'), Number.MIN_SAFE_INTEGER),
     night,
