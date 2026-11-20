@@ -19,12 +19,12 @@ export function runHeadless(opts: RunOptions): string[] {
   const night = opts.night ?? 1;
   const state = createGame(opts.tuning, opts.seed, night, opts.scenario);
   const readInput = createInputReader(opts.frames ?? []);
-  const lines: string[] = [JSON.stringify(snapshotRecord(state))];
+  const lines: string[] = [JSON.stringify(snapshotRecord(state, opts.tuning))];
   // Assumption B5: night_start is reported once, at tick 0, right after the tick-0 snapshot.
   lines.push(JSON.stringify(eventRecord({ tick: 0, event: { name: 'night_start', data: { night } } })));
   for (let k = 0; k < opts.ticks && (state.status === 'playing' || state.status === 'paused'); k++) {
     for (const e of step(state, opts.tuning, readInput(k))) lines.push(JSON.stringify(eventRecord(e)));
-    if (state.tick % opts.snapshotEvery === 0) lines.push(JSON.stringify(snapshotRecord(state)));
+    if (state.tick % opts.snapshotEvery === 0) lines.push(JSON.stringify(snapshotRecord(state, opts.tuning)));
   }
   lines.push(JSON.stringify(endRecord(state)));
   return lines;

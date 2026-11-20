@@ -1,12 +1,12 @@
-/** Contract v1.1 output records (JSONL lines). Coordinates rounded to 3 decimals. */
+/** Contract v1.2 output records (JSONL lines). Coordinates rounded to 3 decimals. */
 import { round3, TICKS_PER_SECOND } from './constants.js';
-import { timeLeft } from './sim.js';
-import type { GameState, TimedEvent, Vec3 } from './types.js';
+import { capacity, fuelOut, timeLeft } from './sim.js';
+import type { GameState, TimedEvent, Tuning, Vec3 } from './types.js';
 
 const r3 = (v: Vec3): Vec3 => [round3(v[0]), round3(v[1]), round3(v[2])];
 const secs = (ticks: number) => round3(ticks / TICKS_PER_SECOND);
 
-export function snapshotRecord(state: GameState): Record<string, unknown> {
+export function snapshotRecord(state: GameState, tuning: Tuning): Record<string, unknown> {
   const p = state.player;
   return {
     type: 'snapshot',
@@ -27,8 +27,9 @@ export function snapshotRecord(state: GameState): Record<string, unknown> {
       dash_cd_s: secs(p.dashCdTicks),
       pulse_cd_s: secs(p.pulseCdTicks),
       charm_s: secs(p.charmTicks),
+      capacity: capacity(state, tuning),
     },
-    lanterns: state.lanterns.map((l) => ({ id: l.id, pos: r3(l.pos), lit: l.lit, deposited: l.deposited })),
+    lanterns: state.lanterns.map((l) => ({ id: l.id, pos: r3(l.pos), lit: l.lit, deposited: l.deposited, fuel: fuelOut(l), ever_lit: l.everLit, relit_count: l.relitCount })),
     shades: state.shades.map((s) => ({ id: s.id, pos: r3(s.pos), state: s.state })),
     motes_active: state.motes.length,
     motes: state.motes.map((m) => ({ id: m.id, pos: r3(m.pos), kind: m.kind, ttl_s: m.ttlTicks === null ? null : secs(m.ttlTicks) })),

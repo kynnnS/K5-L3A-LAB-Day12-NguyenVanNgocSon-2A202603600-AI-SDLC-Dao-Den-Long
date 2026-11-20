@@ -54,10 +54,11 @@ export function checkSchema(lines: Array<Record<string, any>>): string[] {
   const isNum = (x: unknown) => typeof x === 'number' && Math.round(x * 1000) / 1000 === x;
   const isVec = (v: unknown) => Array.isArray(v) && v.length === 3 && v.every(isNum);
   const states = ['playing', 'paused', 'won', 'lost'];
-  const shadeStates = ['spawning', 'wander', 'chase', 'recoil', 'stunned'];
+  const shadeStates = ['spawning', 'wander', 'chase', 'recoil', 'stunned', 'drain']; // v1.2: + drain
   const drifterStates = ['idle', 'chase', 'flee'];
   const eventData: Record<string, string[]> = {
-    night_start: ['night'], mote_picked: ['carried'], deposit: ['lantern_id', 'amount', 'deposited'], lantern_lit: ['lantern_id'],
+    night_start: ['night'], mote_picked: ['carried'], deposit: ['lantern_id', 'amount', 'deposited'], lantern_lit: ['lantern_id', 'relight'],
+    refuel: ['lantern_id', 'amount', 'fuel'], lantern_out: ['lantern_id'], fuel_drain: ['lantern_id', 'shade_id', 'fuel'],
     pulse: ['stunned_ids'], player_hit: ['by', 'flames', 'dropped'], shade_spawned: ['id'], dash: [],
     charm_picked: ['charm_id', 'charm_ticks'], drifter_steal: ['drifter_id', 'amount', 'carried'],
     drifter_drop: ['drifter_id', 'amount'], paused: [], resumed: [], game_over: ['result', 'reason'],
@@ -72,8 +73,11 @@ export function checkSchema(lines: Array<Record<string, any>>): string[] {
       if (typeof l.wind?.active !== 'boolean' || !(l.wind.dir_deg === null || typeof l.wind.dir_deg === 'number')) fails.push(`${at}: wind`);
       const p = l.player ?? {};
       if (!isVec(p.pos) || !isVec(p.vel) || typeof p.grounded !== 'boolean' || typeof p.invuln !== 'boolean'
-        || !Number.isInteger(p.flames) || !Number.isInteger(p.carried) || !isNum(p.dash_cd_s) || !isNum(p.pulse_cd_s) || !isNum(p.charm_s)) fails.push(`${at}: player`);
-      if (!Array.isArray(l.lanterns) || !l.lanterns.every((x: any) => typeof x.id === 'string' && isVec(x.pos) && typeof x.lit === 'boolean' && Number.isInteger(x.deposited))) fails.push(`${at}: lanterns`);
+        || !Number.isInteger(p.flames) || !Number.isInteger(p.carried) || !isNum(p.dash_cd_s) || !isNum(p.pulse_cd_s) || !isNum(p.charm_s)
+        || !Number.isInteger(p.capacity) || p.carried > p.capacity) fails.push(`${at}: player`);
+      if (!Array.isArray(l.lanterns) || !l.lanterns.every((x: any) => typeof x.id === 'string' && isVec(x.pos) && typeof x.lit === 'boolean' && Number.isInteger(x.deposited)
+        // v1.2: fuel 1 decimal (0 when unlit), ever_lit, relit_count
+        && isNum(x.fuel) && Math.round(x.fuel * 10) === x.fuel * 10 && (x.lit || x.fuel === 0) && typeof x.ever_lit === 'boolean' && Number.isInteger(x.relit_count))) fails.push(`${at}: lanterns`);
       if (!Array.isArray(l.shades) || !l.shades.every((x: any) => typeof x.id === 'string' && isVec(x.pos) && shadeStates.includes(x.state))) fails.push(`${at}: shades`);
       if (!Number.isInteger(l.motes_active) || !Array.isArray(l.motes) || l.motes.length !== l.motes_active
         || !l.motes.every((m: any) => typeof m.id === 'string' && isVec(m.pos) && ['random', 'dropped'].includes(m.kind) && (m.ttl_s === null || isNum(m.ttl_s)))) fails.push(`${at}: motes`);
@@ -82,6 +86,7 @@ export function checkSchema(lines: Array<Record<string, any>>): string[] {
     } else if (l.type === 'event') {
       const keys = eventData[l.name];
       if (!Number.isInteger(l.tick) || !keys) fails.push(`${at}: event name/tick`);
+      else if (l.name === 'game_over' && !['dawn_survived', 'dawn', 'no_flames'].includes(l.data?.reason)) fails.push(`${at}: game_over reason (v1.2: no all_lit)`);
       else {
         const want = l.name === 'player_hit' && l.data?.by === 'fall' ? [...keys, 'lost'] : keys;
         if (Object.keys(l.data ?? {}).sort().join() !== [...want].sort().join()) fails.push(`${at}: ${l.name} data keys`);

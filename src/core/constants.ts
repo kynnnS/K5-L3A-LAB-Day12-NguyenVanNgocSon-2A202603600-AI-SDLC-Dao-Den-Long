@@ -73,3 +73,15 @@ export function round3(v: number): number {
   const r = Math.round(v * 1000) / 1000;
   return r === 0 ? 0 : r; // avoid -0
 }
+
+// Ticket-03 (Contract v1.2) non-tuning standard numbers.
+/** Internal fuel unit = 1/60 fuel (integer arithmetic, no float drift). */
+export const FUEL_UNITS = 60;
+export const CAPACITY_PER_LIGHT = 2;
+export const DRAIN_RADIUS = 2; // wander -> drain within 2 m (XZ) of a weak lantern
+export const DRAIN_CHASE_RADIUS = 6; // drain -> chase when Mây is within 6 m
+export const FUEL_DRAIN_EVENT_TICKS = 60;
+export const SCORE_RELIGHT = 40;
+export const SCORE_STUN_DRAIN = 15; // total for a shade that was draining (replaces the +5)
+export const SCORE_DAWN_LANTERN = 50; // + floor(fuel) per lit lantern on a dawn win
+export const round1 = (v: number): number => { const r = Math.round(v * 10) / 10; return r === 0 ? 0 : r; };

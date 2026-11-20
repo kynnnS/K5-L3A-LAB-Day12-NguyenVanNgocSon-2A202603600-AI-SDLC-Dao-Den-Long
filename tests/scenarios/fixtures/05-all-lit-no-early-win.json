@@ -1,7 +1,7 @@
 {
-  "id": "05-win-all-lit",
-  "requirement": "T2-P1 win/score",
-  "description": "4 lanterns pre-lit (no points); deposit 10 into L5 -> won at tick 1: 100 + 100 + floor(299.983)*2=598 + 50*3 = 948",
+  "id": "05-all-lit-no-early-win",
+  "requirement": "T3-3 no early win (replaces 05-win-all-lit)",
+  "description": "Replaces 05-win-all-lit (Ticket-02 'won as soon as all lit' is [THAY THẾ] by Ticket-03). Same setup: 4 lanterns pre-lit (no points); deposit 10 into L5 at tick 1 -> lit (+50 + 100 = 150) but the night goes on: no game_over, state playing at tick 600",
   "night": 1,
   "seed": 1,
   "ticks": 600,
@@ -68,22 +68,47 @@
         "tick": 1,
         "name": "lantern_lit",
         "data": {
-          "lantern_id": "L5"
-        }
-      },
-      {
-        "tick": 1,
-        "name": "game_over",
-        "data": {
-          "result": "won",
-          "reason": "all_lit"
+          "lantern_id": "L5",
+          "relight": false
         }
       }
     ],
+    "event_counts": {
+      "game_over": 0
+    },
+    "snapshots": [
+      {
+        "tick": 600,
+        "state": "playing",
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": true
+          },
+          {
+            "id": "L2",
+            "lit": true
+          },
+          {
+            "id": "L3",
+            "lit": true
+          },
+          {
+            "id": "L4",
+            "lit": true
+          },
+          {
+            "id": "L5",
+            "lit": true,
+            "fuel": 90.0
+          }
+        ]
+      }
+    ],
     "end": {
-      "ticks": 1,
-      "state": "won",
-      "score": 948
+      "ticks": 600,
+      "state": "playing",
+      "score": 150
     }
   }
 }

@@ -6,6 +6,9 @@ const NUMERIC_KEYS = [
   'hit_drop_ratio', 'pulse_stun_s', 'pulse_push_m', 'pulse_cooldown_s', 'safe_radius',
   'shade_speed', 'shade_hit_radius', 'dash_speed', 'dash_duration_s', 'dash_cooldown_s',
   'night2_duration_s', 'night3_duration_s',
+  // Contract v1.2 (Ticket-03)
+  'fuel_max', 'fuel_decay_per_s', 'fuel_per_mote', 'relight_cost', 'win_ratio', 'drain_per_s',
+  'low_fuel_threshold', 'capacity_max',
 ] as const;
 const SCORE_KEYS = ['per_mote', 'per_lantern', 'per_stun', 'per_second_left', 'per_flame_left'] as const;
 

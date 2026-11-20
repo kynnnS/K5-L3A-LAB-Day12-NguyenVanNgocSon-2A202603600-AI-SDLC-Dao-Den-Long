@@ -1,6 +1,6 @@
 /**
  * Parsing + validation of the contract's scenario and inputs files (pure, no I/O).
- * Any violation throws FormatError -> the CLI maps it to exit code 2. Contract v1.1.
+ * Any violation throws FormatError -> the CLI maps it to exit code 2. Contract v1.2.
  */
 import type { DrifterState, InputState, ShadeState, Vec3 } from './types.js';
 
@@ -10,16 +10,17 @@ export interface ScenarioSpec {
   player?: {
     pos?: Vec3; carried?: number; flames?: number;
     invuln_ticks?: number; dash_cd_ticks?: number; pulse_cd_ticks?: number; charm_ticks?: number;
+    successful_lights?: number;
   };
   random_motes?: boolean;
   random_shades?: boolean;
   random_drifters?: boolean;
   wind_enabled?: boolean;
   motes?: Array<{ id?: string; pos: Vec3; kind?: 'random' | 'dropped'; ttl_ticks?: number }>;
-  shades?: Array<{ id?: string; pos: Vec3; state?: ShadeState; state_ticks_left?: number }>;
+  shades?: Array<{ id?: string; pos: Vec3; state?: ShadeState; state_ticks_left?: number; target_lantern_id?: string }>;
   drifters?: Array<{ id?: string; pos: Vec3; state?: DrifterState; stolen?: number; state_ticks_left?: number }>;
   charms?: Array<{ id?: string; pos?: Vec3; available?: boolean; respawn_ticks?: number }>;
-  lanterns?: Array<{ id: string; pos?: Vec3; lit?: boolean; deposited?: number }>;
+  lanterns?: Array<{ id: string; pos?: Vec3; lit?: boolean; deposited?: number; fuel?: number; ever_lit?: boolean }>;
   time_left_s?: number;
 }
 
@@ -35,7 +36,7 @@ export interface InputFrame {
 }
 
 type Obj = Record<string, unknown>;
-const SHADE_STATES: readonly ShadeState[] = ['spawning', 'wander', 'chase', 'recoil', 'stunned'];
+const SHADE_STATES: readonly ShadeState[] = ['spawning', 'wander', 'chase', 'recoil', 'stunned', 'drain'];
 const DRIFTER_STATES: readonly DrifterState[] = ['idle', 'chase', 'flee'];
 
 function isObj(v: unknown): v is Obj {
@@ -92,7 +93,7 @@ export function parseScenario(raw: unknown, lanternIds: readonly string[], charm
     const p = raw.player;
     const pl: NonNullable<ScenarioSpec['player']> = {};
     if (p.pos !== undefined) pl.pos = vec3(p.pos, 'scenario.player.pos');
-    for (const k of ['carried', 'flames', 'invuln_ticks', 'dash_cd_ticks', 'pulse_cd_ticks', 'charm_ticks'] as const) {
+    for (const k of ['carried', 'flames', 'invuln_ticks', 'dash_cd_ticks', 'pulse_cd_ticks', 'charm_ticks', 'successful_lights'] as const) {
       if (p[k] !== undefined) pl[k] = int(p[k], `scenario.player.${k}`);
     }
     out.player = pl;
@@ -124,6 +125,10 @@ export function parseScenario(raw: unknown, lanternIds: readonly string[], charm
       if (id) s.id = id;
       if (o.state !== undefined) s.state = oneOf(o.state, SHADE_STATES, `${w}.state`);
       if (o.state_ticks_left !== undefined) s.state_ticks_left = int(o.state_ticks_left, `${w}.state_ticks_left`);
+      if (o.target_lantern_id !== undefined) {
+        if (typeof o.target_lantern_id !== 'string' || !lanternIds.includes(o.target_lantern_id)) throw new FormatError(`${w}.target_lantern_id: expected one of ${lanternIds.join(', ')}`);
+        s.target_lantern_id = o.target_lantern_id;
+      }
       return s;
     });
     uniqueIds(out.shades, 'shades');
@@ -165,10 +170,12 @@ export function parseScenario(raw: unknown, lanternIds: readonly string[], charm
       const w = `scenario.lanterns[${i}]`;
       if (!isObj(l)) throw new FormatError(`${w}: expected object`);
       if (typeof l.id !== 'string' || !lanternIds.includes(l.id)) throw new FormatError(`${w}.id: expected one of ${lanternIds.join(', ')}`);
-      const entry: { id: string; pos?: Vec3; lit?: boolean; deposited?: number } = { id: l.id };
+      const entry: NonNullable<ScenarioSpec['lanterns']>[number] = { id: l.id };
       if (l.pos !== undefined) entry.pos = vec3(l.pos, `${w}.pos`);
       if (l.lit !== undefined) entry.lit = bool(l.lit, `${w}.lit`);
       if (l.deposited !== undefined) entry.deposited = int(l.deposited, `${w}.deposited`);
+      if (l.fuel !== undefined) entry.fuel = num(l.fuel, `${w}.fuel`, 0);
+      if (l.ever_lit !== undefined) entry.ever_lit = bool(l.ever_lit, `${w}.ever_lit`);
       return entry;
     });
   }

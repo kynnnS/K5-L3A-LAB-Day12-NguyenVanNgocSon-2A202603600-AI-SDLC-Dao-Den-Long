@@ -1,7 +1,7 @@
 {
   "id": "21-wind",
   "requirement": "T2-P2 night 3 wind",
-  "description": "Night 3 (start (0,0,-30)): gust at tick 1800 for 300 ticks; 2 m/s -> 10 m displacement (checked in headless.test.ts)",
+  "description": "Night 3 (start (0,0,-30)): gust at tick 1800 for 300 ticks; 2 m/s -> 10 m displacement (checked in headless.test.ts). Ticket-03: night 3 lasts 300 s -> time_left at sim tick 1800 = 300 - 30 = 270",
   "night": 3,
   "seed": 9,
   "ticks": 2100,
@@ -37,7 +37,7 @@
         "wind": {
           "active": true
         },
-        "time_left_s": 330
+        "time_left_s": 270
       },
       {
         "tick": 2100,

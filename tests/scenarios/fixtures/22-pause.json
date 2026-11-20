@@ -1,7 +1,7 @@
 {
   "id": "22-pause",
   "requirement": "T3 pause",
-  "description": "Pause pressed at step 10 -> ticks 11..30 paused (sim_tick frozen at 10, time frozen); resumed at tick 31",
+  "description": "Pause pressed at step 10 -> ticks 11..30 paused (sim_tick frozen at 10, time frozen); resumed at tick 31. Ticket-03: night 1 lasts 240 s -> 240 - 10/60 = 239.833, 240 - 20/60 = 239.667",
   "night": 1,
   "seed": 1,
   "ticks": 40,
@@ -57,7 +57,7 @@
         "tick": 20,
         "state": "paused",
         "sim_tick": 10,
-        "time_left_s": 299.833,
+        "time_left_s": 239.833,
         "player": {
           "pos": [
             0,
@@ -75,7 +75,7 @@
         "tick": 40,
         "state": "playing",
         "sim_tick": 20,
-        "time_left_s": 299.667,
+        "time_left_s": 239.667,
         "player": {
           "pos": [
             0,

@@ -15,15 +15,18 @@ const L5 = ['L1', 'L2', 'L3', 'L4', 'L5'];
 const ev = (e: ReturnType<typeof runSteps>, name: string) => e.filter((x) => x.event.name === name);
 
 describe('T1 contract v1.1 + standard numbers (Ticket-02 Part 1 / Part 4)', () => {
-  it('declares v1.1 and the exact standard tuning', () => {
-    expect(contract.contract_version).toBe('1.1');
+  // Updated for Ticket-03: v1.1 -> v1.2, night durations 240/270/300, fuel keys, per_mote 5, no time bonus.
+  it('declares v1.2 and the exact standard tuning', () => {
+    expect(contract.contract_version).toBe('1.2');
     expect(contract.tuning).toEqual({
       player_speed: 6, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1,
-      interact_radius: 2, pulse_cost: 3, pulse_radius: 5, night1_duration_s: 300, flames: 3, invuln_s: 1.5,
+      interact_radius: 2, pulse_cost: 3, pulse_radius: 5, night1_duration_s: 240, flames: 3, invuln_s: 1.5,
       hit_drop_ratio: 0.5, pulse_stun_s: 2, pulse_push_m: 4, pulse_cooldown_s: 3, safe_radius: 6,
       shade_speed: 4, shade_hit_radius: 1, fall_enabled: true, dash_speed: 14, dash_duration_s: 0.2,
-      dash_cooldown_s: 1.5, night2_duration_s: 330, night3_duration_s: 360,
-      score: { per_mote: 10, per_lantern: 100, per_stun: 5, per_second_left: 2, per_flame_left: 50 },
+      dash_cooldown_s: 1.5, night2_duration_s: 270, night3_duration_s: 300,
+      fuel_max: 100, fuel_decay_per_s: 1, fuel_per_mote: 10, relight_cost: 5, win_ratio: 0.6, drain_per_s: 5,
+      low_fuel_threshold: 30, capacity_max: 20,
+      score: { per_mote: 5, per_lantern: 100, per_stun: 5, per_second_left: 0, per_flame_left: 50 },
     });
   });
 });
@@ -106,19 +109,20 @@ describe('T5 pickup + lanterns + safe zone', () => {
     expect(names(runSteps(s, 1))).toEqual(['mote_picked']);
     expect(s.motes.length).toBe(2);
   });
-  it('partial deposits are remembered; +10 per deposited mote, +100 when lit', () => {
+  // Updated for Ticket-03: +5 per mote (was +10); lantern_lit carries relight:false.
+  it('partial deposits are remembered; +5 per deposited mote, +100 when first lit', () => {
     const s = game({ player: { pos: [0, 0, 24], carried: 4 } });
     runSteps(s, 2, [{ tick: 0, interact: true }]);
     expect(s.lanterns[0]).toMatchObject({ deposited: 4, lit: false });
-    expect(s.score).toBe(40);
+    expect(s.score).toBe(20);
     s.player.carried = 10;
     const e = runSteps(s, 2, [{ tick: 0, interact: false }, { tick: 3, interact: true }]);
     expect(e.map((x) => x.event)).toEqual([
       { name: 'deposit', data: { lantern_id: 'L1', amount: 6, deposited: 10 } },
-      { name: 'lantern_lit', data: { lantern_id: 'L1' } },
+      { name: 'lantern_lit', data: { lantern_id: 'L1', relight: false } },
     ]);
     expect(s.player.carried).toBe(4);
-    expect(s.score).toBe(40 + 60 + 100);
+    expect(s.score).toBe(20 + 30 + 100);
   });
   it('equal distance -> smaller id', () => {
     const s = game({ player: { carried: 3 }, lanterns: [{ id: 'L3', pos: [1, 0, 0] }, { id: 'L2', pos: [-1, 0, 0] }] });
@@ -262,11 +266,14 @@ describe('T8 falling off the island', () => {
 });
 
 describe('T9 win / lose priority', () => {
-  it('last lantern lit on the dawn tick -> won; score = deposits + lantern + floor(left)*2 + 50*flames', () => {
+  // Replaced for Ticket-03 (was: all lit -> won 'all_lit', score with floor(left) x 2). Same setup,
+  // new rule: dawn_survived; dawn bonus = per lit lantern 50 + floor(real fuel), 50 per flame, no time bonus.
+  it('lantern lit on the dawn tick counts -> dawn_survived; dawn bonus from real fuel', () => {
     const s = game({ player: { pos: [0, 0, 24], carried: 10 }, lanterns: ['L2', 'L3', 'L4', 'L5'].map((id) => ({ id, lit: true })), time_left_s: 1 / 60 });
     const e = runSteps(s, 5, [{ tick: 0, interact: true }]);
-    expect(e.at(-1)!.event).toEqual({ name: 'game_over', data: { result: 'won', reason: 'all_lit' } });
-    expect(s.score).toBe(100 + 100 + 0 * 2 + 50 * 3);
+    expect(e.at(-1)!.event).toEqual({ name: 'game_over', data: { result: 'won', reason: 'dawn_survived' } });
+    // L2..L5: 100 - 1/60 after step 2 -> floor 99; L1 lit in step 5 -> 100
+    expect(s.score).toBe(10 * 5 + 100 + 4 * (50 + 99) + (50 + 100) + 50 * 3);
   });
   it('no flames beats dawn in the same tick', () => {
     const s = game({ player: { flames: 1 }, shades: [{ id: 'A', pos: [0.5, 1, 0] }], time_left_s: 1 / 60 });
@@ -285,7 +292,7 @@ describe('T10 pause', () => {
     expect(names(e).filter((n) => n === 'paused' || n === 'resumed')).toEqual(['paused', 'resumed']);
     expect(s.tick).toBe(400);
     expect(s.simTick).toBe(300); // paused on ticks 11..110
-    expect(timeLeft(s)).toBeCloseTo(300 - 300 / 60, 9);
+    expect(timeLeft(s)).toBeCloseTo(240 - 300 / 60, 9); // Ticket-03: night 1 = 240 s (was 300)
     expect(ev(e, 'shade_spawned').map((x) => x.tick)).toEqual([400, 400]); // sim tick 300 = tick 400
   });
 });

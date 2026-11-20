@@ -1,7 +1,7 @@
 {
   "id": "02-collect-and-light",
-  "requirement": "P1-C6 / T2-P1 lantern",
-  "description": "10 motes at z=2..20 picked at ticks 10,30,..,190 (z >= m-1); interact at L1 from z=23 -> deposit 10 (+100), lit (+100) = 200",
+  "requirement": "P1-C6 / T2-P1 lantern / T3-1,5 (re-derived for Ticket-03)",
+  "description": "10 motes at z=2..20 picked at ticks 10,30,..,190 (z >= m-1); interact at L1 from z=23 -> deposit 10 (+5 each = 50), first light (+100) = 150. Ticket-03: lantern_lit gains relight:false, score per mote 10 -> 5",
   "night": 1,
   "seed": 1,
   "ticks": 300,
@@ -122,7 +122,8 @@
         "tick": 241,
         "name": "lantern_lit",
         "data": {
-          "lantern_id": "L1"
+          "lantern_id": "L1",
+          "relight": false
         }
       }
     ],
@@ -132,7 +133,7 @@
     "end": {
       "ticks": 300,
       "state": "playing",
-      "score": 200
+      "score": 150
     }
   }
 }
