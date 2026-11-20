@@ -23,35 +23,39 @@ npm start          # mở http://localhost:4173 trong trình duyệt
 | Kéo chuột / ← → | Xoay camera (độ nhạy chỉnh trong Cài đặt) |
 | Space | Nhảy (chỉ khi đứng trên đất) |
 | Shift | Lướt 14 m/s trong 0.2 s (hồi chiêu 1.5 s) |
-| E | Nạp đom đóm vào đèn chưa sáng gần nhất (trong 2 m) |
+| E | Ở đèn gần nhất trong 2 m: nạp để thắp (10 đom đóm, thắp lại chỉ 5) hoặc châm dầu cho đèn đang sáng |
 | F | Tỏa Sáng: tốn 3 đom đóm, làm choáng Bóng Mực trong 5 m (hồi chiêu 3 s) |
 | Esc / P | Tạm dừng: Tiếp tục / Chơi lại Đêm / Cài đặt / Về menu (chuyển sang tab khác cũng tự tạm dừng) |
 | Enter | Xác nhận trên các màn hình menu |
 
-## Luật chơi (số chuẩn Ticket-02)
+## Luật chơi (Ticket-02 + Ticket-03 "Đèn cạn dầu")
 
-- **3 Đêm:** Đảo Bến (5 đèn, 300 s), Đảo Cau (2 đảo nối bằng cầu tre và bục nhảy, 6 đèn, 330 s), Đảo Chuông (3 tầng, dốc, bục nhảy, tháp chuông, gió mạnh, 7 đèn, 360 s).
-- Đi qua đom đóm (≤ 1 m) để tự nhặt, mang tối đa 10 con. Mỗi đèn cần 10 đom đóm, nạp nhiều lần được.
-- **Bóng Mực** đuổi khi Mây ở trong 12 m và bỏ đuổi ngoài 18 m. Bị chạm: −1 Ngọn Lửa, đánh rơi một nửa số đom đóm (nhặt lại được trong 8 s), bất tử 1.5 s.
-- Đèn đã sáng tạo vùng an toàn 6 m mà Bóng Mực không vào được.
+- **3 Đêm:** Đảo Bến (5 đèn, 240 s), Đảo Cau (2 đảo nối bằng cầu tre và bục nhảy, 6 đèn, 270 s), Đảo Chuông (3 tầng, dốc, bục nhảy, tháp chuông, gió mạnh, 7 đèn, 300 s).
+- **Mục tiêu:** còn sống tới bình minh với ít nhất 60% số đèn đang sáng: Đêm 1 cần 3/5, Đêm 2 cần 4/6, Đêm 3 cần 5/7. Thắp đủ đèn sớm **không** kết thúc Đêm.
+- Đi qua đom đóm (≤ 1 m) để tự nhặt. Túi đựng 10 con, mỗi lần thắp thành công (kể cả thắp lại) thêm 2, tối đa 20.
+- **Dầu đèn:** đèn vừa thắp có 100 dầu, hao 1 dầu/giây. Bấm E ở đèn đang sáng để châm: mỗi đom đóm thêm 10 dầu. Hết dầu thì đèn tắt; thắp lại chỉ cần 5 đom đóm.
+- Đèn sáng có từ 30 dầu trở lên tạo vùng an toàn 6 m mà Bóng Mực không vào được. Dưới 30 dầu, đèn nhấp nháy và **mất vùng an toàn**.
+- **Bóng Mực** đuổi khi Mây ở trong 12 m và bỏ đuổi ngoài 18 m. Lúc lang thang, nó tìm đèn yếu (dầu < 30) để **hút dầu** (5 dầu/giây mỗi con). Tới gần trong 6 m hoặc Tỏa Sáng để đuổi nó đi. Bị chạm: −1 Ngọn Lửa, đánh rơi một nửa số đom đóm (nhặt lại được trong 8 s), bất tử 1.5 s.
 - **Gió Lạc** (Đêm 2–3) cướp tối đa 3 đom đóm khi Mây mang từ 5 con trở lên. Tỏa Sáng vào nó để nó thả đồ ra.
 - **Bùa Gió** (đỏ viền vàng) cho 10 s chạy 7.2 m/s và lướt không hồi chiêu.
 - Rơi khỏi đảo: −1 Ngọn Lửa, mất toàn bộ đom đóm, hồi sinh ở điểm xuất phát.
-- Thắng khi thắp hết đèn. Thua khi hết 3 Ngọn Lửa hoặc khi bình minh đến. Thua thì chơi lại Đêm đó.
+- Thua khi hết 3 Ngọn Lửa (ngay lập tức) hoặc khi bình minh đến mà không đủ đèn sáng. Thua thì chơi lại Đêm đó.
+- **Bảng màu dễ phân biệt** (Cài đặt): Bóng Mực viền/mắt #00B3FF, cảnh báo UI màu trắng kèm ⚠. Đèn tắt luôn bị xẹp và rách giấy để nhận ra mà không cần màu.
 
-## Cách tính điểm (chuẩn hóa)
+## Cách tính điểm (Ticket-03)
 
 | Sự kiện | Điểm |
 |---|---|
-| Mỗi đom đóm **nạp** vào đèn | +10 |
-| Thắp 1 đèn | +100 |
-| Mỗi Bóng Mực trúng Tỏa Sáng (mỗi lần) | +5 |
-| Khi thắng: mỗi giây còn lại (làm tròn xuống) | +2 |
-| Khi thắng: mỗi Ngọn Lửa còn lại | +50 |
+| Mỗi đom đóm nạp vào đèn (thắp, thắp lại hoặc châm dầu) | +5 |
+| Thắp đèn lần đầu | +100 |
+| Thắp lại đèn đã tắt | +40 |
+| Mỗi Bóng Mực trúng Tỏa Sáng | +5 (tổng +15 nếu nó đang hút dầu) |
+| Khi thắng lúc bình minh: mỗi đèn đang sáng | +50 + phần nguyên của dầu còn lại |
+| Khi thắng lúc bình minh: mỗi Ngọn Lửa còn lại | +50 |
 
-Tổng điểm của game là tổng điểm các Đêm đã thắng.
+Không còn thưởng thời gian. Tổng điểm của game là tổng điểm các Đêm đã thắng (chơi lại không cộng trùng).
 
-## Chế độ headless (Test Contract v1.1)
+## Chế độ headless (Test Contract v1.2)
 
 Khai báo trong [game.contract.json](game.contract.json). Sau `npm ci && npm run build`:
 
@@ -61,18 +65,18 @@ node build/headless/cli.js --seed 1 --night 1 --ticks 600 --out out.jsonl \
 ```
 
 - `--night` nhận 1, 2, 3. Mã thoát: `0` thành công · `1` sai tham số · `2` file inputs/scenario sai định dạng. Lỗi in ra stderr, stdout để trống.
-- Tuning đúng số chuẩn của Ticket-02. Core đọc trực tiếp từ `game.contract.json`.
-- Các giả định cho chỗ ticket chưa rõ (B1–B14, ví dụ điểm xuất phát Đêm 3 là (0,0,−30)) có trong [docs/notes/phase-2.md](docs/notes/phase-2.md).
+- Tuning đúng số chuẩn của Ticket-02 và Ticket-03 (`fuel_max`, `win_ratio`, `capacity_max`…). Core đọc trực tiếp từ `game.contract.json`.
+- Giả định cho chỗ ticket chưa rõ: B1–B20 trong [docs/notes/phase-2.md](docs/notes/phase-2.md), C1–C17 trong [docs/notes/phase-3.md](docs/notes/phase-3.md). Quyết định thiết kế Phase 3: [ADR-003](docs/architecture/ADR-003-lantern-fuel-and-dawn-survival.md). Thay đổi phá vỡ tương thích: [CHANGELOG.md](CHANGELOG.md).
 
 ## Kiểm thử và bằng chứng
 
 ```bash
-npm test                         # unit + 28 scenario chạy qua CLI thật (3 Đêm)
-bash scripts/verify.sh phase-2   # typecheck, test, build, tất định, hiệu năng + lưu bằng chứng
+npm test                         # unit + 44 scenario chạy qua CLI thật (3 Đêm)
+bash scripts/verify.sh phase-3   # typecheck, test, build, tất định, hiệu năng + lưu bằng chứng
 ```
 
-- Bằng chứng: [Phase 1](docs/proof/phase-1/) · [Phase 2](docs/proof/phase-2/)
-- Giả định, acceptance criteria và truy vết: [Phase 1](docs/notes/phase-1.md) · [Phase 2](docs/notes/phase-2.md)
+- Bằng chứng: [Phase 1](docs/proof/phase-1/) · [Phase 2](docs/proof/phase-2/) · [Phase 3](docs/proof/phase-3/)
+- Giả định, acceptance criteria và truy vết: [Phase 1](docs/notes/phase-1.md) · [Phase 2](docs/notes/phase-2.md) · [Phase 3](docs/notes/phase-3.md)
 - Nhật ký dùng AI: [docs/notes/ai-usage.md](docs/notes/ai-usage.md)
 
 ## Kiến trúc
@@ -91,7 +95,7 @@ Tất cả chỉ nằm ở client, không đổi đầu ra headless:
 - **Lời Ông Đăng** cho từng Đêm và màn Bình Minh khép lại câu chuyện.
 - **Âm thanh tự sinh** bằng WebAudio (nhạc đêm ngũ cung và các hiệu ứng). Không dùng asset ngoài nên không có rủi ro bản quyền.
 - Đèn nhỏ trên nón lá của Mây sáng mạnh hơn khi mang nhiều đom đóm. Đèn đang nạp dở có cột sáng tiến độ.
-- Đèn đã sáng có vòng vàng đánh dấu vùng an toàn. Lá bay báo trước gió mạnh.
+- Đèn đã sáng có vòng vàng đánh dấu vùng an toàn (tắt khi dầu < 30). Lá bay báo trước gió mạnh. Mũi tên chỉ cả đèn tắt lẫn đèn sắp cạn dầu.
 - Bộ đếm FPS (góc dưới trái) để tự đo hiệu năng.
 
 ## Harness AI
