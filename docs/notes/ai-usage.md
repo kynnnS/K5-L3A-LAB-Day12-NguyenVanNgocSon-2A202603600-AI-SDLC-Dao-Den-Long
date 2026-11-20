@@ -75,8 +75,10 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 | 22 | Thêm `capacity` vào snapshot nhưng `snapshotRecord` không nhận tuning (gọi hàm `tuningOf` không tồn tại) | Đọc lại diff trước khi typecheck | Truyền `tuning` từ `run.ts` |
 | 23 | Ghi đè `hud.ts` sau khi chính mình vừa sửa bằng script, nên công cụ ghi từ chối vì file đã đổi | Lỗi của công cụ Write | Đọc lại rồi ghi. Không mất dữ liệu |
 | 24 | Đổi kiểu `Settings` (thêm `colorblind`) làm test cài đặt cũ không còn typecheck | `npm run typecheck` | Cập nhật test và thêm test cho cài đặt cũ thiếu khóa mới |
+| 25 | Bước 2 hút dầu mọi con ở trạng thái `drain`, kể cả con scenario đứng cạnh đèn khỏe hoặc ở xa (chỉ thoát `drain` ở bước 8, sau khi đã hút) | Reviewer độc lập (m1) | Bước 2 kiểm thêm "đèn yếu và trong 2 m"; unit test |
+| 26 | Làm tròn dầu scenario tới đơn vị gần nhất có thể vượt ngưỡng 30 | Reviewer độc lập (m2) | Làm tròn xuống; unit test |
 
 ### Token / chi phí
 - Phiên chính: cần chạy `/cost` để có số thật.
-- Reviewer Phase 3: xem mục đánh giá trong [phase-3.md](phase-3.md).
+- Reviewer Phase 3 dùng 145 443 token, 29 lần gọi công cụ, khoảng 8 phút (số do harness báo).
 - Cách tiết kiệm: sinh 16 fixture bằng một script; chỉ đọc đúng các hàm core bị ảnh hưởng; một reviewer chạy song song trong lúc viết ADR và tài liệu.

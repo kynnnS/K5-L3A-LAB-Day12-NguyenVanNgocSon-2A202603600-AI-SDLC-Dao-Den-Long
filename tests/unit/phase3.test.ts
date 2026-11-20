@@ -177,6 +177,37 @@ describe('P3-2 drain', () => {
   });
 });
 
+describe('P3 review fixes (independent review of Phase 3)', () => {
+  it('m1: a scenario drain shade at a healthy (>= 30) or distant (> 2 m) lantern drains nothing', () => {
+    const full = game({ player: FAR, lanterns: [{ id: 'L1', lit: true, fuel: 50 }], shades: [{ id: 'A', pos: [0, 1, 24], state: 'drain', target_lantern_id: 'L1' }] });
+    runSteps(full, 1);
+    expect(L(full, 'L1').fuel).toBe(3000 - 1); // decay only
+    expect(full.shades[0]!.state).not.toBe('drain');
+    const far = game({ player: FAR, lanterns: [{ id: 'L1', lit: true, fuel: 20 }], shades: [{ id: 'A', pos: [0, 1, 22], state: 'drain', target_lantern_id: 'L1' }] });
+    runSteps(far, 1);
+    expect(L(far, 'L1').fuel).toBe(1200 - 1);
+  });
+  it('m2: scenario fuel just below 30 stays below 30 (floor to 1/60 units): no safe zone', () => {
+    const s = game({ player: FAR, lanterns: [{ id: 'L1', lit: true, fuel: 29.995 }], shades: [{ id: 'A', pos: [0, 1, 23.5] }] });
+    expect(L(s, 'L1').fuel).toBe(1799);
+    runSteps(s, 1);
+    expect(s.shades[0]).toMatchObject({ state: 'drain', expelling: false }); // weak: no zone, 1.5 m -> drain
+  });
+  it('drain -> chase exactly at 6.0 m', () => {
+    const s = game({ player: { pos: [0, 0, 30] }, lanterns: [{ id: 'L1', lit: true, fuel: 20 }], shades: [{ id: 'A', pos: [0, 1, 24], state: 'drain', target_lantern_id: 'L1' }] });
+    runSteps(s, 1);
+    expect(s.shades[0]!.state).toBe('chase');
+  });
+  it('relight with a shade waiting inside 6 m: zone back, shade expelled and harmless', () => {
+    const s = game({ player: { pos: [0, 0, 24], carried: 5 }, lanterns: [{ id: 'L1', ever_lit: true }], shades: [{ id: 'A', pos: [0, 1, 27], state: 'recoil', state_ticks_left: 1 }] });
+    const e = runSteps(s, 1, [{ tick: 0, interact: true }]);
+    expect(names(e)).toEqual(['deposit', 'lantern_lit']);
+    expect(s.shades[0]!.expelling).toBe(true);
+    expect(ev(runSteps(s, 30), 'player_hit')).toEqual([]);
+    expect(distXZ(s.shades[0]!.pos, [0, 0, 25])).toBeGreaterThanOrEqual(6);
+  });
+});
+
 describe('P3-3 dawn rules', () => {
   const lit = (ids: string[]) => ids.map((id) => ({ id, lit: true }));
   const dawn = (night: 1 | 2 | 3, ids: string[], extra = {}) => {

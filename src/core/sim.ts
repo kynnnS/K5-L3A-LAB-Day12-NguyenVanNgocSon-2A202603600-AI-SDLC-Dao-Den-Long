@@ -178,7 +178,9 @@ export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, s
     if (lantern.deposited >= (lantern.everLit ? tuning.relight_cost : tuning.lantern_cost)) lantern.lit = true;
     if (lantern.lit) {
       if (l.ever_lit === undefined) lantern.everLit = true;
-      lantern.fuel = Math.min(gctx.fuel.max, Math.round((l.fuel ?? tuning.fuel_max) * FUEL_UNITS));
+      // C1: floor to whole 1/60 units (1e-6 absorbs float noise such as 29.9 x 60 = 1793.9999…), so input
+      // below 30 can never round up into a safe zone.
+      lantern.fuel = Math.min(gctx.fuel.max, Math.floor((l.fuel ?? tuning.fuel_max) * FUEL_UNITS + 1e-6));
     }
   }
 
@@ -398,7 +400,9 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
   for (const s of [...state.shades].sort((a, b) => idCompare(a.id, b.id))) {
     if (s.state !== 'drain') continue;
     const l = state.lanterns.find((x) => x.id === s.targetLanternId);
-    if (!l || !l.lit) continue;
+    // Only a weak lantern (fuel < 30) within 2 m is drained (a scenario drain shade at a healthy or
+    // distant lantern takes nothing and leaves drain in step 6/8 of this tick).
+    if (!l || !l.lit || l.fuel >= ctx.fuel.low || distXZ(s.pos, l.pos) > DRAIN_RADIUS + EPS) continue;
     l.fuel -= ctx.fuel.drain;
     s.drainTicks += 1;
     drains.push([s, l]);

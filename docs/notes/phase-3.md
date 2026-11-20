@@ -23,7 +23,7 @@ Kế hoạch theo ưu tiên (đã làm theo đúng thứ tự): P0 mô hình đ�
 
 | # | Chỗ chưa rõ | Giả định |
 |---|---|---|
-| C1 | Biểu diễn dầu | Số nguyên đơn vị 1/60 (100 dầu = 6000). Dầu từ scenario làm tròn tới đơn vị gần nhất, chặn ở 100. Chỉ làm tròn 1 chữ số khi xuất |
+| C1 | Biểu diễn dầu | Số nguyên đơn vị 1/60 (100 dầu = 6000). Dầu từ scenario làm tròn **xuống** tới đơn vị 1/60 (để giá trị < 30 không thành 30), chặn ở 100. Chỉ làm tròn 1 chữ số khi xuất |
 | C2 | Đèn vừa thắp khi nào bắt đầu hao | Bước 2 chỉ trừ đèn đang sáng lúc đầu tick. Đèn thắp ở bước 5 bắt đầu hao từ tick sau (ở snapshot tick thắp: 100.0) |
 | C3 | "fuel_drain ghi mỗi 60 tick khi đang hút" | Mỗi Bóng Mực đếm số tick đã hút kể từ lúc vào `drain`; phát ở tick hút thứ 60, 120, … Trường `fuel` là dầu sau khi trừ của tick đó (≥ 0). Phát trước `lantern_out` nếu cùng tick |
 | C4 | Scenario đèn | `ever_lit` mặc định bằng `lit`. `fuel` chỉ có nghĩa khi đèn sáng (đèn tắt luôn 0). `lit: true` không có `fuel` → 100. `deposited` ≥ chi phí (10, hoặc 5 nếu `ever_lit`) thì đèn sáng như luật v1.0 |
@@ -103,6 +103,14 @@ Nguồn: [SUMMARY.md](../proof/phase-3/SUMMARY.md) (`bash scripts/verify.sh phas
 ## 6. Đánh giá Phase 3
 
 - **Đạt:** mọi luật kiểm được bằng headless của Ticket-03 đều có test hoặc fixture tính tay và PASS qua CLI thật. Chỉ 8 test cũ đỏ, đều ở đúng chỗ luật bị thay, và đã được cập nhật hoặc thay có ghi lý do.
-- **Review độc lập:** một agent reviewer đã được giao đối chiếu core với Ticket-03 (chạy song song, chỉ đọc). Kết quả **chưa về** lúc chốt bằng chứng Phase 3, vì phiên làm việc phải dừng. Phát hiện nào hợp lệ sẽ được sửa ở commit sau và ghi bổ sung ở đây.
+- **Review độc lập** (agent reviewer chạy CLI thật với tình huống tự tính tay, không sửa file, 145 443 token): không có lỗi nghiêm trọng hay lớn, 2 lỗi nhỏ, đều đã sửa **trước khi phát hành tag `phase-3`**:
+
+| # | Phát hiện | Xử lý | Test |
+|---|---|---|---|
+| m1 | Bóng Mực `drain` đặt bằng scenario ở đèn còn ≥ 30 dầu hoặc cách > 2 m vẫn hút 1 tick (bước 2 chỉ kiểm `drain` + đèn sáng) | Sửa: bước 2 chỉ hút đèn yếu trong 2 m | unit "m1: a scenario drain shade at a healthy…" |
+| m2 | Dầu scenario 29.995–29.999 làm tròn lên đúng 30, được vùng an toàn | Sửa C1: làm tròn **xuống** đơn vị 1/60 | unit "m2: scenario fuel just below 30…" |
+| — | Ghi chú của reviewer: wander đổi so với Phase 2 (C8), `deposited` của đèn scenario là 0 (C5), luật "đèn đầy" không xảy ra với tuning chuẩn (C6) | Đã là giả định có ghi; giữ nguyên | — |
+| — | Lỗ hổng test: ranh giới đúng 6.0 m, thắp lại khi Bóng Mực đang chờ trong 6 m | Thêm test | unit "drain -> chase exactly at 6.0 m", "relight with a shade waiting…" |
+
 - **Chưa kiểm:** phần nhìn và nghe (đèn nhấp nháy, xẹp/rách, màu mù màu, HUD, FPS). Máy làm lab không cho chụp màn hình tự động.
 - **Bài học:** biểu diễn dầu bằng số nguyên 1/60 giúp mọi kỳ vọng tính tay khớp chính xác ngay lần đầu (49/49 test mới PASS mà không phải chỉnh). Chạy test cũ ngay sau khi sửa core là cách nhanh nhất để thấy thay đổi đã khoanh đúng vùng.
