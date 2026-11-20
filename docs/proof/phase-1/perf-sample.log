@@ -1,0 +1,10 @@
+# Headless performance sample 2026-11-20 15:04:21 +0700 @ 8f985c5
+machine: Apple M5, Darwin arm64, node v24.22.3
+ticks=3600 real 0.08
+ticks=3600 user 0.03
+ticks=3600 sys 0.01
+ticks=3600 lines=     365 end={"type":"end","ticks":3600,"state":"playing","score":0}
+ticks=18000 real 0.04
+ticks=18000 user 0.05
+ticks=18000 sys 0.00
+ticks=18000 lines=    1807 end={"type":"end","ticks":18000,"state":"lost","score":0}
