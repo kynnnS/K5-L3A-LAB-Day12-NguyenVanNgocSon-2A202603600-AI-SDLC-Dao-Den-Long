@@ -1,0 +1,41 @@
+{
+  "events": [
+    {
+      "tick": 11,
+      "name": "dash",
+      "data": {}
+    }
+  ],
+  "snapshots": [
+    {
+      "tick": 11,
+      "player": {
+        "pos": [
+          0,
+          0.861,
+          0.233
+        ],
+        "vel": [
+          0,
+          3.667,
+          14
+        ],
+        "grounded": false
+      }
+    },
+    {
+      "tick": 22,
+      "player": {
+        "pos": [
+          0,
+          0.861,
+          2.8
+        ],
+        "grounded": false
+      }
+    }
+  ],
+  "end": {
+    "ticks": 33
+  }
+}

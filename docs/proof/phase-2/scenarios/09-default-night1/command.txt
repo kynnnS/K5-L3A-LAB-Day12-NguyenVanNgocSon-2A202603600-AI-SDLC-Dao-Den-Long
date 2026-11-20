@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 2026 --night 1 --ticks 790 --snapshot-every 395 --out docs/proof/phase-2/scenarios/09-default-night1/output.jsonl
+exit=0

@@ -1,0 +1,9 @@
+night 1 run A sha256=193c25475b9260819f5fe58d39bfdbc28ef87ac81d9cd1b0980657b29f3b938a lines=179
+night 1 run B sha256=193c25475b9260819f5fe58d39bfdbc28ef87ac81d9cd1b0980657b29f3b938a lines=179
+night 1 IDENTICAL
+night 2 run A sha256=9c24eb4f22bd972626b2743c479b3bfb73f463d2d94022c6cb4769aad4a4a5ce lines=140
+night 2 run B sha256=9c24eb4f22bd972626b2743c479b3bfb73f463d2d94022c6cb4769aad4a4a5ce lines=140
+night 2 IDENTICAL
+night 3 run A sha256=a0bcbb70d9e212915bf962f7819b48ad7e3d405df0f84d816db332db614e2dae lines=195
+night 3 run B sha256=a0bcbb70d9e212915bf962f7819b48ad7e3d405df0f84d816db332db614e2dae lines=195
+night 3 IDENTICAL

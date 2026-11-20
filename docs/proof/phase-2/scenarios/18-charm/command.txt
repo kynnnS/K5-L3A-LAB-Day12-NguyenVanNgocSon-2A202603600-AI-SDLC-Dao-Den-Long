@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 2 --ticks 61 --snapshot-every 61 --out docs/proof/phase-2/scenarios/18-charm/output.jsonl --scenario docs/proof/phase-2/scenarios/18-charm/scenario.json --inputs docs/proof/phase-2/scenarios/18-charm/inputs.json
+exit=0

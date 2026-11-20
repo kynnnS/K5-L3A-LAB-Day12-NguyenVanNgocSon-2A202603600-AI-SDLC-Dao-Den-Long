@@ -58,8 +58,35 @@ Phần **giữ nguyên** từ Phase 1: mô hình tick (snapshot 0, sự kiện g
 
 ## 4. Ma trận truy vết
 
-Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) và [traceability.md](../proof/phase-2/traceability.md) (cập nhật sau lần chạy kiểm chứng cuối).
+Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash scripts/verify.sh phase-2` tại commit de880e4: 6/6 PASS, 77/77 test). Bằng chứng từng fixture: [../proof/phase-2/scenarios/](../proof/phase-2/scenarios/README.md).
+
+| Yêu cầu Ticket-02 | Test / fixture | Bằng chứng | Trạng thái |
+|---|---|---|---|
+| P1 số chuẩn (di chuyển, nhảy, nhặt 1 m, nạp 2 m, đèn 10) | unit T1–T3, fixture 01, 02, 10, 12 | scenarios/01, 02, 10, 12 | PASS |
+| P1 Tỏa Sáng 3D, đẩy 4 m trong 15 tick, choáng 2 s | unit T5, fixture 03, 11 | scenarios/03, 11 | PASS |
+| P1 bị đánh: rơi đom đóm, bất tử 90 tick, recoil | unit T6, fixture 04, 07, 14 | scenarios/04, 07, 14 | PASS |
+| P1 vùng an toàn 6 m, đẩy ra ≤ 30 tick | unit T7, fixture 08 | scenarios/08 | PASS |
+| P1 sinh Bóng Mực / đom đóm theo lịch | unit T8, fixture 09, 13 | scenarios/09, 13 | PASS |
+| P1 thắng/thua, thứ tự ưu tiên, điểm | unit T9, fixture 05, 06, 07 | scenarios/05, 06, 07 | PASS |
+| P1 rơi khỏi đảo, hồi sinh | unit, fixture 15, 28 | scenarios/15, 28 | PASS |
+| P1 thứ tự 12 bước trong tick | unit (cướp trước hit), fixture 19 | scenarios/19 | PASS |
+| P2 bản đồ Đêm 2 (cầu, bục nhảy, Đảo B) | fixture 18, 23, 27, 28 | scenarios/18, 23, 27, 28 | PASS |
+| P2 bản đồ Đêm 3 (tầng, dốc, vách, bục) | fixture 21, 24, 25, 26 | scenarios/21, 24–26 | PASS |
+| P3 Lướt | unit, fixture 16, 17 | scenarios/16, 17 | PASS |
+| P3 Gió Lạc | unit T11, fixture 19, 20 | scenarios/19, 20 | PASS |
+| P3 Bùa Gió | unit T12, fixture 18 | scenarios/18 | PASS |
+| P3 Tạm dừng (logic) | unit T10, fixture 22 | scenarios/22 | PASS |
+| P3 Gió mạnh Đêm 3 (logic, đẩy 10 m) | unit T13, fixture 21 | scenarios/21 | PASS |
+| Contract v1.1: CLI `--night`, mã thoát, schema snapshot/sự kiện | headless.test.ts (exit code, schema) | unit-and-scenario-tests.log | PASS |
+| Tất định 3 Đêm | verify.sh `determinism` | determinism.log | PASS |
+| Hiệu năng: 21 600 tick ≤ 30 s mỗi Đêm | verify.sh `performance` (87 / 104 / 134 ms, Apple M5) | performance.log | PASS |
+| P3 Chuỗi 3 Đêm, menu tạm dừng, Cài đặt (localStorage), âm thanh, HUD, cảnh báo gió | Chơi thủ công | Chưa có ảnh chụp | NOT VERIFIED |
+| Bảng màu HEX, ánh sáng môi trường | Đọc code (`PAL`, `main.ts`) | — | PASS (đọc code), hình ảnh NOT VERIFIED |
+| FPS ≥ 30 ở 1280×720 | Đồng hồ FPS trong game | Chưa đo | NOT VERIFIED |
 
 ## 5. Đánh giá Phase 2
 
-Mục này được cập nhật sau lần kiểm chứng và review cuối.
+- **Đạt:** mọi yêu cầu kiểm được bằng headless đều có test hoặc fixture tính tay và PASS qua CLI thật. Tất định và hiệu năng đạt với biên rất rộng (khoảng 0.13 s so với ngưỡng 30 s).
+- **Chưa kiểm:** phần giao diện (chuỗi Đêm, menu, cài đặt, âm thanh, HUD, FPS) chỉ kiểm được bằng tay. Máy làm lab không có công cụ tự động hóa trình duyệt, nên các mục này để NOT VERIFIED cho tới khi có ảnh chụp trong `docs/proof/phase-2/screenshots/`.
+- **Review độc lập:** một agent reviewer chạy song song, đối chiếu code với Ticket-02. Kết quả chưa về khi tạo tag `phase-2`. Lỗi hợp lệ nào nó tìm ra sẽ được sửa bằng commit mới sau tag (không gắn lại tag) và ghi ở đây.
+- **Bài học:** hàm mẫu của test tắt mọi thứ, kể cả gió. Các phép tính off-by-one (recoil 60 + 1, tick k + 1) phải tính tay trước khi viết test. Cả hai đã ghi vào `CLAUDE.md`.

@@ -1,0 +1,36 @@
+{
+  "snapshots": [
+    {
+      "tick": 1500,
+      "wind": {
+        "active": false,
+        "dir_deg": null
+      },
+      "player": {
+        "pos": [
+          0,
+          0,
+          -30
+        ]
+      }
+    },
+    {
+      "tick": 1800,
+      "wind": {
+        "active": true
+      },
+      "time_left_s": 330
+    },
+    {
+      "tick": 2100,
+      "wind": {
+        "active": false,
+        "dir_deg": null
+      }
+    }
+  ],
+  "end": {
+    "ticks": 2100,
+    "state": "playing"
+  }
+}

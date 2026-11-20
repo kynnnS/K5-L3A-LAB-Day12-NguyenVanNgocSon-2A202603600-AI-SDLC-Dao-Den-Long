@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 5 --snapshot-every 1 --out docs/proof/phase-2/scenarios/12-multi-pickup-capacity/output.jsonl --scenario docs/proof/phase-2/scenarios/12-multi-pickup-capacity/scenario.json
+exit=0

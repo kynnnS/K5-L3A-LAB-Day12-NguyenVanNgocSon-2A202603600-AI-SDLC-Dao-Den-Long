@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 100 --snapshot-every 31 --out docs/proof/phase-2/scenarios/04-hit-and-drop/output.jsonl --scenario docs/proof/phase-2/scenarios/04-hit-and-drop/scenario.json
+exit=0

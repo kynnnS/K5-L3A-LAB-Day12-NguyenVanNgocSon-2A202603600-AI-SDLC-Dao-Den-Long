@@ -1,0 +1,33 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "deposit",
+      "data": {
+        "lantern_id": "L5",
+        "amount": 10,
+        "deposited": 10
+      }
+    },
+    {
+      "tick": 1,
+      "name": "lantern_lit",
+      "data": {
+        "lantern_id": "L5"
+      }
+    },
+    {
+      "tick": 1,
+      "name": "game_over",
+      "data": {
+        "result": "won",
+        "reason": "all_lit"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 1,
+    "state": "won",
+    "score": 948
+  }
+}

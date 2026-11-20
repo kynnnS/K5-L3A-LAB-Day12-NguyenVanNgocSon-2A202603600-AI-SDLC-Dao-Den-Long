@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 100 --snapshot-every 10 --out docs/proof/phase-2/scenarios/07-lose-no-flames/output.jsonl --scenario docs/proof/phase-2/scenarios/07-lose-no-flames/scenario.json
+exit=0
