@@ -432,6 +432,74 @@ describe('Phase 2 review fixes', () => {
   });
 });
 
+describe('Phase 1-2 hardening (review test gaps)', () => {
+  it('night 2: shades 2 at 300 then every 420 up to 8; drifters at 1200 and 2400 (max 2)', () => {
+    const s = createGame(T, 5, 2, { player: { flames: 999 } });
+    const e = runSteps(s, 3300);
+    expect(ev(e, 'shade_spawned').map((x) => x.tick)).toEqual([300, 300, 720, 1140, 1560, 1980, 2400, 2820]);
+    expect(s.shades.length).toBe(8); // 3240 skipped: cap 8
+    expect(s.nextDrifterId - 1).toBe(2); // D1 at 1200, D2 at 2400, none at 3600 window
+  });
+  it('night 3: shades 2 at 300 then every 360 up to 10', () => {
+    const s = createGame(T, 5, 3, { player: { flames: 999 } });
+    const e = runSteps(s, 3600);
+    expect(ev(e, 'shade_spawned').map((x) => x.tick)).toEqual([300, 300, 660, 1020, 1380, 1740, 2100, 2460, 2820, 3180]);
+    expect(s.shades.length).toBe(10); // 3540 skipped: cap 10
+  });
+  it('spawned shades appear >= 15 m from Mây (all nights)', () => {
+    for (const n of [1, 2, 3] as const) {
+      const s = createGame(T, 9, n, { player: { flames: 999 } });
+      for (let k = 0; k < 2000; k++) {
+        const before = new Set(s.shades.map((x) => x.id));
+        const at = [...s.player.pos] as [number, number, number];
+        runSteps(s, 1);
+        for (const sh of s.shades) if (!before.has(sh.id)) expect(distXZ(sh.pos, at)).toBeGreaterThanOrEqual(15);
+      }
+    }
+  });
+  it('night 3 shades chase at 4.5 m/s (night 1: 4 m/s)', () => {
+    const n3 = game({ player: { pos: [0, 0, -30] }, shades: [{ id: 'A', pos: [10, 0, -30], state: 'chase' }] }, 3);
+    runSteps(n3, 1);
+    expect(n3.shades[0]!.pos[0]).toBeCloseTo(10 - 4.5 / 60, 9);
+    const n1 = game({ shades: [{ id: 'A', pos: [10, 0, 0], state: 'chase' }] }, 1);
+    runSteps(n1, 1);
+    expect(n1.shades[0]!.pos[0]).toBeCloseTo(10 - 4 / 60, 9);
+  });
+  it('scenario countdowns: N ticks left -> state ends in the snapshot of tick N', () => {
+    const s = game({ player: { pos: [-30, 0, 0] }, shades: [{ id: 'A', pos: [0, 0, 0], state: 'stunned', state_ticks_left: 5 }] });
+    runSteps(s, 4);
+    expect(s.shades[0]!.state).toBe('stunned');
+    runSteps(s, 1);
+    expect(s.shades[0]!.state).toBe('wander');
+    // invuln_ticks 3: protected at ticks 1-2, hit on tick 3
+    const h = game({ player: { invuln_ticks: 3 }, shades: [{ id: 'A', pos: [0.5, 1, 0], state: 'stunned', state_ticks_left: 1 }] });
+    const e = runSteps(h, 3);
+    expect(ev(e, 'player_hit').map((x) => x.tick)).toEqual([3]);
+    // charm_ticks 2: 7.2 m/s on ticks 1-1, normal speed from tick 2 (counter hits 0 in step 2)
+    const c = game({ player: { charm_ticks: 2 } });
+    runSteps(c, 2, [{ tick: 0, move: [0, 1] }]);
+    expect(c.player.pos[2]).toBeCloseTo(7.2 / 60 + 6 / 60, 9);
+  });
+  it('motes dropped at the island edge land on ground (B14 re-roll), inside the 1.5-2.5 m ring', () => {
+    for (let seed = 1; seed <= 20; seed++) {
+      const s = game({ player: { pos: [39.5, 0, 0], carried: 10 }, shades: [{ id: 'A', pos: [39.5, 1, 0.5] }] }, 1, seed);
+      runSteps(s, 1);
+      expect(s.motes.length).toBe(5);
+      for (const m of s.motes) {
+        expect(groundHeight(getMap(1, T), m.pos[0], m.pos[2])).not.toBeNull();
+        const r = distXZ(m.pos, [39.5, 0, 0]);
+        expect(r).toBeGreaterThanOrEqual(1.5);
+        expect(r).toBeLessThanOrEqual(2.5);
+      }
+    }
+  });
+  it('chasing shade slides around the night 3 bell tower instead of sticking (B20)', () => {
+    const s = game({ player: { pos: [1, 6, 5], flames: 99 }, shades: [{ id: 'A', pos: [0, 6, -5], state: 'chase' }] }, 3);
+    const e = runSteps(s, 400);
+    expect(ev(e, 'player_hit').length).toBeGreaterThan(0); // reached Mây behind the tower
+  });
+});
+
 describe('T15 spawns + determinism', () => {
   it('night 1: 20 motes on distinct standard points; +1 every 240; shades 2 at 300 then every 480', () => {
     const s = createGame(T, 11, 1);

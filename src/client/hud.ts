@@ -13,6 +13,11 @@ export class Hud {
     $('hud-motes').innerHTML = Array.from({ length: tuning.carry_capacity }, () => '<span></span>').join('');
   }
 
+  /** New attempt: the 10 s countdown beeps start again. */
+  reset(): void {
+    this.lastSecond = -1;
+  }
+
   show(on: boolean): void {
     $('hud').classList.toggle('hidden', !on);
   }

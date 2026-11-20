@@ -242,10 +242,19 @@ function dropMotes(state: GameState, ctx: Ctx, center: Vec3, n: number, ring: bo
     let x = center[0];
     let z = center[2];
     if (ring) {
-      const a = random(state) * Math.PI * 2;
-      const r = DROP_RING_MIN + random(state) * (DROP_RING_MAX - DROP_RING_MIN);
-      x += Math.cos(a) * r;
-      z += Math.sin(a) * r;
+      // B14: re-roll (seeded, max 8 tries) so a dropped mote lands on ground, not over the cloud sea.
+      for (let tries = 0; tries < 8; tries++) {
+        const a = random(state) * Math.PI * 2;
+        const r = DROP_RING_MIN + random(state) * (DROP_RING_MAX - DROP_RING_MIN);
+        x = center[0] + Math.cos(a) * r;
+        z = center[2] + Math.sin(a) * r;
+        if (groundHeight(ctx.map, x, z) !== null) break;
+      }
+      // Still over the void: first of 12 fixed directions (30° apart) at r = 2 m that has ground.
+      for (let k = 0; k < 12 && groundHeight(ctx.map, x, z) === null; k++) {
+        x = center[0] + Math.cos((k * Math.PI) / 6) * 2;
+        z = center[2] + Math.sin((k * Math.PI) / 6) * 2;
+      }
     }
     const g = groundHeight(ctx.map, x, z);
     state.motes.push({
@@ -631,7 +640,21 @@ function moveShade(state: GameState, ctx: Ctx, s: Shade): void {
     if (s.state === 'chase') {
       const stepLen = ctx.map.shadeSpeed * DT;
       const [ux, uz] = unit(p.pos[0] - s.pos[0], p.pos[2] - s.pos[2]);
-      pushBody(state, ctx, s.pos, ux, uz, Math.min(d, stepLen), false);
+      const len = Math.min(d, stepLen);
+      const free = (vx: number, vz: number) => !shadeBlocked(state, ctx, s.pos[0] + vx * len, s.pos[2] + vz * len, s.pos[1], false);
+      let dir: [number, number] | null = free(ux, uz) ? [ux, uz] : null;
+      // B20: blocked by the tower / island edge -> steer around it: the smallest turn (15° steps,
+      // up to ±90°, + first) that gives a free full step. Otherwise stop at the obstacle.
+      for (let k = 1; !dir && k <= 6; k++) {
+        for (const sg of [1, -1]) {
+          const a = (sg * k * 15 * Math.PI) / 180;
+          const vx = ux * Math.cos(a) - uz * Math.sin(a);
+          const vz = ux * Math.sin(a) + uz * Math.cos(a);
+          if (free(vx, vz)) { dir = [vx, vz]; break; }
+        }
+      }
+      if (dir) { s.pos[0] += dir[0] * len; s.pos[2] += dir[1] * len; }
+      else pushBody(state, ctx, s.pos, ux, uz, len, false);
     } else {
       if (!s.wanderTarget || Math.hypot(s.wanderTarget[0] - s.pos[0], s.wanderTarget[1] - s.pos[2]) < 0.3) {
         s.wanderTarget = pickWanderTarget(state, ctx, s.pos);

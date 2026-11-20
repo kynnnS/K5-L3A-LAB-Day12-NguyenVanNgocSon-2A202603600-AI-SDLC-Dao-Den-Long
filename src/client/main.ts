@@ -65,9 +65,15 @@ const wonScores: number[] = [0, 0, 0];
 let state: GameState | undefined;
 let forcePauseTicks = 0; // menu buttons toggle pause through the same input edge as Esc/P
 
+const settingsOpen = () => !$('settings').classList.contains('hidden');
 const input = new InputController(canvas, (code) => {
   audio.unlock();
-  if (code === 'Enter' && mode !== 'playing') ($('ov-primary') as HTMLButtonElement).click();
+  if (code === 'Enter' && mode !== 'playing' && !settingsOpen()) ($('ov-primary') as HTMLButtonElement).click();
+});
+
+// Leaving the tab while playing pauses the night (same input edge as Esc/P).
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && mode === 'playing' && state && !state.paused && forcePauseTicks === 0) forcePauseTicks = 2;
 });
 input.sensitivity = settings.sensitivity;
 
@@ -135,6 +141,8 @@ function startNight() {
   }
   input.reset();
   input.camYawDeg = 0;
+  hud.reset();
+  forcePauseTicks = 0;
   accumulator = 0;
   mode = 'playing';
   $('overlay').classList.add('hidden');
@@ -175,6 +183,7 @@ const vol = $('set-volume') as HTMLInputElement;
 const sens = $('set-sens') as HTMLInputElement;
 vol.value = String(settings.volume);
 sens.value = String(settings.sensitivity);
+vol.oninput = () => audio.setVolume(Number(vol.value)); // live preview; saved on "Lưu"
 function openSettings() { $('settings').classList.remove('hidden'); }
 $('set-close').onclick = () => {
   settings.volume = Number(vol.value);
@@ -279,10 +288,7 @@ function sync(s: GameState, time: number) {
   }
 
   // Wind warning (2 s before each gust) and gust: blowing leaves around Mây.
-  const map = getMap(s.night, tuning);
-  const phase = s.simTick % WIND_PERIOD_TICKS;
-  const warning = s.windEnabled && map.wind && phase >= WIND_PERIOD_TICKS - WIND_WARNING_TICKS;
-  if (warning && phase === WIND_PERIOD_TICKS - WIND_WARNING_TICKS && s.status === 'playing') { audio.play('wind'); hud.toast('Gió sắp nổi!'); }
+  const warning = windWarning(s);
   const lm = leaves.material as THREE.PointsMaterial;
   lm.opacity = s.wind.active ? 0.9 : warning ? 0.5 : 0;
   leaves.position.set(p.pos[0], p.pos[1] + 3, p.pos[2]);
@@ -292,6 +298,11 @@ function sync(s: GameState, time: number) {
   const yaw = (input.camYawDeg * Math.PI) / 180;
   camera.position.lerp(new THREE.Vector3(p.pos[0] - Math.sin(yaw) * 9, p.pos[1] + 5.5, p.pos[2] - Math.cos(yaw) * 9), 0.15);
   camera.lookAt(p.pos[0], p.pos[1] + 1.2, p.pos[2]);
+}
+
+/** True during the 2 s before each Night 3 gust (Ticket-02 warning). */
+function windWarning(s: GameState): boolean {
+  return s.windEnabled && !!getMap(s.night, tuning).wind && s.simTick % WIND_PERIOD_TICKS >= WIND_PERIOD_TICKS - WIND_WARNING_TICKS;
 }
 
 // ---------- main loop (fixed timestep) + FPS meter ----------
@@ -305,9 +316,13 @@ function frame(now: number) {
     accumulator += elapsed;
     while (accumulator >= DT && mode === 'playing') {
       const inp = state.paused ? input.idle() : input.read();
+      if (settingsOpen()) inp.pause = false; // Esc must not resume the night under the settings box
       if (forcePauseTicks > 0) { inp.pause = forcePauseTicks === 2; forcePauseTicks--; }
       const wasGrounded = state.player.grounded;
+      const wasWarning = windWarning(state);
       onEvents(step(state, tuning, inp));
+      // Warning cue once per gust, on the simulation tick it starts (not per rendered frame).
+      if (!wasWarning && windWarning(state) && state.status === 'playing') { audio.play('wind'); hud.toast('Gió sắp nổi!'); }
       if (wasGrounded && !state.player.grounded && state.player.vel[1] > 6 && !state.player.launch) audio.play('jump');
       accumulator -= DT;
     }

@@ -18,6 +18,7 @@ export class InputController {
     window.addEventListener('blur', () => this.keys.clear());
     canvas.addEventListener('pointerdown', (e) => { this.dragging = true; canvas.setPointerCapture(e.pointerId); });
     canvas.addEventListener('pointerup', () => { this.dragging = false; });
+    canvas.addEventListener('pointercancel', () => { this.dragging = false; });
     canvas.addEventListener('pointermove', (e) => { if (this.dragging) this.camYawDeg -= e.movementX * 0.3 * this.sensitivity; });
   }
 

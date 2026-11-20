@@ -52,6 +52,8 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 | 17 | Dòng `end` ghi `paused`, ngoài tập giá trị PRD cho phép | Reviewer độc lập | Ghi `playing`; unit test |
 | 18 | Bóng Mực scenario `y = 0`, mặc định recoil 59 tick, hướng lướt khi bị phóng | Reviewer độc lập | Sửa + unit test cho từng lỗi |
 | 19 | `git push` bị từ chối vì token thiếu quyền `workflow` (repo có `.github/workflows/ci.yml`) | Lỗi từ GitHub | Người dùng cấp quyền qua `gh auth refresh -s workflow`; không xóa `ci.yml` khỏi lịch sử |
+| 20 | Lần đầu cho Bóng Mực trượt theo trục X/Z: với trụ tròn nó trượt tới đúng hoành độ của Mây rồi kẹt | Unit test đỏ + in vị trí từng 40 tick | Đổi sang rẽ hướng 15°…90°. Bài học: thử thuật toán tránh vật cản với vật cản tròn, không chỉ tường thẳng |
+| 21 | Chọn lại góc 8 lần vẫn có lúc trượt hết (xác suất ≈ 0.55⁸ mỗi đom đóm) | Test 20 seed đỏ | Thêm phương án dự phòng tất định 12 hướng |
 
 ### Token / chi phí
 - Reviewer Phase 1 dùng 96 656 token (số do harness báo). Reviewer Phase 2 dùng 152 934 token, 40 lần gọi công cụ, khoảng 10 phút (số do harness báo).

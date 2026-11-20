@@ -39,12 +39,13 @@ Phần **giữ nguyên** từ Phase 1: mô hình tick (snapshot 0, sự kiện g
 | B11 | Gió Lạc | Bị loại bỏ thì xóa khỏi mảng `drifters`. Điểm sinh dùng điểm sinh của Bóng Mực. Chỉ con đang `chase` mới cướp. Pulse trúng con đang `idle` thì không có tác dụng. Gió Lạc bay (không bị mép đảo/vách/vùng an toàn chặn) |
 | B12 | Điểm xuất phát Đêm 2/3 | Đêm 2: (0,0,0). Đêm 3: (0,0,−30), vì (0,0,0) nằm trong tháp chuông. Hướng mặt ban đầu là +Z |
 | B13 | Lướt khi đang được bục nhảy phóng | Lướt ghi đè vận tốc ngang trong 12 tick và giữ độ cao. Sau đó vận tốc phóng tiếp tục cho tới khi chạm đất |
-| B14 | Đom đóm rơi ở chỗ không có mặt đất | Lấy độ cao mặt đất tại điểm đó; nếu không có mặt đất thì dùng độ cao của Mây (đom đóm có thể nằm trên biển mây, không nhặt được: hạn chế đã biết) |
+| B14 | Đom đóm rơi ở chỗ không có mặt đất | Từ sau tag `phase-2`: chọn lại góc trên vành 1.5–2.5 m (theo seed, tối đa 8 lần); vẫn không có đất thì lấy hướng đầu tiên trong 12 hướng cố định (cách 30°, r = 2 m) có mặt đất. Trước đó: đom đóm có thể nằm trên biển mây |
 | B15 | "Hướng đang di chuyển" khi lướt | Đang được bục nhảy phóng thì lướt theo hướng vận tốc phóng; ngoài ra theo hướng phím (đổi tức thì, B1); đứng yên thì theo hướng mặt |
 | B16 | `move` có thành phần ngoài [−1, 1] | Chấp nhận và chuẩn hóa về độ dài 1 (không coi là file lỗi) |
 | B17 | Dòng `end` khi lần chạy dừng lúc đang tạm dừng | PRD chỉ cho `playing`/`won`/`lost` ở dòng `end`, nên ghi `playing`; snapshot vẫn ghi `paused` |
 | B18 | "Điểm trống" khi sinh đom đóm | Điểm chuẩn bị chiếm nếu có bất kỳ đom đóm nào (thường, từ scenario hay rơi) đứng trên nó (XZ ≤ 10⁻⁶ m) |
 | B19 | Đẩy lùi "dừng nếu gặp vật cản" | Dừng **đúng tại** vật cản (chia đôi bước để tìm phần đi được), không dừng sớm cả bước |
+| B20 | Bóng Mực đuổi gặp tháp chuông / mép đảo (ticket không nói) | Rẽ góc nhỏ nhất (bước 15°, tối đa ±90°, xét chiều + trước) có bước đi trọn; không có thì dừng tại vật cản. Thêm sau tag `phase-2` |
 
 ## 3. Acceptance criteria cho từng mục Phần 3
 
@@ -104,6 +105,19 @@ Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash script
 | m4 | Bóng Mực scenario ở `recoil` chỉ đi 59 tick | Sửa: mặc định 60 + 1 như khi gây hit | unit "scenario shade in recoil…" |
 | m5 | Lướt khi đang bị phóng dùng hướng phím | Sửa (B15) | unit "dash during a pad launch…" |
 | m6 | `move` ngoài [−1, 1] không báo lỗi | Ghi giả định B16 | — |
-| m7 | Bóng Mực đuổi không trượt quanh vật cản (kẹt ở tháp/mép) | Hạn chế đã biết, ticket không yêu cầu | — |
-| m8 | Đom đóm rơi có thể nằm trên biển mây | Hạn chế đã biết (B14) | — |
+| m7 | Bóng Mực đuổi không trượt quanh vật cản (kẹt ở tháp/mép) | Sửa sau tag `phase-2` (B20) | unit "chasing shade slides around the night 3 bell tower" |
+| m8 | Đom đóm rơi có thể nằm trên biển mây | Sửa sau tag `phase-2` (B14) | unit "motes dropped at the island edge land on ground" |
 - **Bài học:** hàm mẫu của test tắt mọi thứ, kể cả gió. Các phép tính off-by-one (recoil 60 + 1, tick k + 1) phải tính tay trước khi viết test. Cả hai đã ghi vào `CLAUDE.md`.
+
+## 6. Hoàn thiện sau tag `phase-2` (trước Phase 3)
+
+Các tag `phase-1`, `phase-2` đã phát hành nên **không gắn lại**. Những bản sửa dưới đây nằm trên `main` và sẽ có trong tag `phase-3`. Bằng chứng: [../proof/phase-2-hardening/](../proof/phase-2-hardening/SUMMARY.md).
+
+| Nhóm | Thay đổi | Kiểm chứng |
+|---|---|---|
+| Core | Bóng Mực đuổi rẽ quanh tháp chuông / mép đảo (B20); đom đóm rơi luôn nằm trên mặt đất (B14) | 2 unit test mới |
+| Lỗ hổng test do reviewer nêu | Lịch sinh Bóng Mực Đêm 2 (420 tick, trần 8) và Đêm 3 (360, trần 10); Gió Lạc 1200/2400; khoảng cách sinh ≥ 15 m cả 3 Đêm; tốc độ đuổi 4.5 m/s ở Đêm 3; ngữ nghĩa `state_ticks_left`, `invuln_ticks`, `charm_ticks` | 5 unit test mới |
+| Client | Cảnh báo gió xét theo tick mô phỏng (trước đây theo khung hình: kêu lặp khi tạm dừng, kêu đôi ở 120 Hz, có thể bị bỏ lỡ khi FPS thấp); Esc không còn cho game chạy tiếp bên dưới hộp Cài đặt; Enter không bấm nút phía sau hộp Cài đặt; âm đếm ngược đặt lại mỗi lượt chơi; tự tạm dừng khi rời tab; xem trước âm lượng khi kéo; `pointercancel` | Typecheck + build; chơi thủ công NOT VERIFIED |
+| Cài đặt | Lưu / đọc `localStorage`, giới hạn giá trị, dữ liệu hỏng, chế độ riêng tư | `tests/unit/settings.test.ts` (4 test) |
+
+Vẫn **NOT VERIFIED**: mọi kiểm tra bằng mắt và tai (chuỗi 3 Đêm, HUD, âm thanh, FPS ≥ 30). Máy làm lab chỉ có Safari, không có công cụ tự động hóa trình duyệt, và không cấp quyền chụp màn hình (`screencapture`: "could not create image from display").

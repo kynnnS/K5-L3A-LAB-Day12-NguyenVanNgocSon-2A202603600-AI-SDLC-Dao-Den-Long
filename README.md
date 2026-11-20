@@ -25,7 +25,7 @@ npm start          # mở http://localhost:4173 trong trình duyệt
 | Shift | Lướt 14 m/s trong 0.2 s (hồi chiêu 1.5 s) |
 | E | Nạp đom đóm vào đèn chưa sáng gần nhất (trong 2 m) |
 | F | Tỏa Sáng: tốn 3 đom đóm, làm choáng Bóng Mực trong 5 m (hồi chiêu 3 s) |
-| Esc / P | Tạm dừng: Tiếp tục / Chơi lại Đêm / Cài đặt / Về menu |
+| Esc / P | Tạm dừng: Tiếp tục / Chơi lại Đêm / Cài đặt / Về menu (chuyển sang tab khác cũng tự tạm dừng) |
 | Enter | Xác nhận trên các màn hình menu |
 
 ## Luật chơi (số chuẩn Ticket-02)
