@@ -1,0 +1,26 @@
+{
+  "absent_events": [
+    "player_hit"
+  ],
+  "snapshots": [
+    {
+      "tick": 900,
+      "shades": [
+        {
+          "id": "S1",
+          "pos": [
+            0,
+            1,
+            18.999
+          ],
+          "state": "chase"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 900,
+    "state": "playing",
+    "score": 0
+  }
+}

@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 600 --snapshot-every 10 --out docs/proof/phase-1/scenarios/05-win-all-lit/output.jsonl --scenario docs/proof/phase-1/scenarios/05-win-all-lit/scenario.json --inputs docs/proof/phase-1/scenarios/05-win-all-lit/inputs.json
+exit=0

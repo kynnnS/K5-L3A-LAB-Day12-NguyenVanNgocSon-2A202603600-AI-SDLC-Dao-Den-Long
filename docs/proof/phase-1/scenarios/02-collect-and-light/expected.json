@@ -1,0 +1,43 @@
+{
+  "events": [
+    {
+      "tick": 15,
+      "name": "mote_picked",
+      "data": {
+        "carried": 1
+      }
+    },
+    {
+      "name": "mote_picked",
+      "data": {
+        "carried": 5
+      }
+    },
+    {
+      "tick": 241,
+      "name": "deposit",
+      "data": {
+        "lantern_id": "L1",
+        "amount": 5,
+        "deposited": 5
+      }
+    },
+    {
+      "tick": 241,
+      "name": "lantern_lit",
+      "data": {
+        "lantern_id": "L1"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 300,
+    "state": "playing",
+    "score": 150
+  },
+  "event_counts": {
+    "mote_picked": 5,
+    "deposit": 1,
+    "lantern_lit": 1
+  }
+}

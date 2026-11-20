@@ -1,0 +1,24 @@
+{
+  "events": [
+    {
+      "tick": 35,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 2,
+        "dropped": 2
+      }
+    }
+  ],
+  "absent_events": [
+    "game_over"
+  ],
+  "end": {
+    "ticks": 120,
+    "state": "playing",
+    "score": 0
+  },
+  "event_counts": {
+    "player_hit": 1
+  }
+}

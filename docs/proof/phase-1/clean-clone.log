@@ -1,15 +1,14 @@
-# Clean clone check 2026-11-20 15:05:22 +0700
-commit: 8f985c5
+# Clean clone check 2026-11-20 15:25:48 +0700
+commit: 0fe083b
 $ npm ci
-npm warn install-scripts
-npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+added 48 packages, and audited 49 packages in 781ms
 $ npm run build
 > tsc -p tsconfig.headless.json
-✓ built in 288ms
+✓ built in 295ms
 $ node build/headless/cli.js --seed 5 --night 1 --ticks 120 --out out.jsonl
 exit=0 lines=      14
 {"type":"end","ticks":120,"state":"playing","score":0}
-assets
-index.html
+$ npm test
+      Tests  51 passed (51)
 $ npm start (vite preview) -> HTTP check
 GET / -> HTTP 200

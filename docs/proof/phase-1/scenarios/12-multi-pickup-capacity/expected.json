@@ -1,0 +1,35 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "mote_picked",
+      "data": {
+        "carried": 9
+      }
+    },
+    {
+      "tick": 1,
+      "name": "mote_picked",
+      "data": {
+        "carried": 10
+      }
+    }
+  ],
+  "event_counts": {
+    "mote_picked": 2
+  },
+  "snapshots": [
+    {
+      "tick": 1,
+      "motes_active": 2,
+      "player": {
+        "carried": 10
+      },
+      "score": 20
+    }
+  ],
+  "end": {
+    "ticks": 5,
+    "score": 20
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 2,
+        "dropped": 2
+      }
+    },
+    {
+      "tick": 121,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 1,
+        "dropped": 1
+      }
+    },
+    {
+      "tick": 241,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "tick": 241,
+      "name": "game_over",
+      "data": {
+        "result": "lost",
+        "reason": "no_flames"
+      }
+    }
+  ],
+  "event_counts": {
+    "player_hit": 3
+  },
+  "end": {
+    "ticks": 241,
+    "state": "lost",
+    "score": 0
+  }
+}

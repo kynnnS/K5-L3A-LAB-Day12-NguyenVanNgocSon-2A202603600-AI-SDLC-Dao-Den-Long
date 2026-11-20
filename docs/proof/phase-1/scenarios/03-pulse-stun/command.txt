@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 60 --snapshot-every 1 --out docs/proof/phase-1/scenarios/03-pulse-stun/output.jsonl --scenario docs/proof/phase-1/scenarios/03-pulse-stun/scenario.json --inputs docs/proof/phase-1/scenarios/03-pulse-stun/inputs.json
+exit=0

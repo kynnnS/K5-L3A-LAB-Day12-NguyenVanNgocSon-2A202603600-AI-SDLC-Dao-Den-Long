@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 900 --snapshot-every 100 --out docs/proof/phase-1/scenarios/08-safe-zone/output.jsonl --scenario docs/proof/phase-1/scenarios/08-safe-zone/scenario.json
+exit=0

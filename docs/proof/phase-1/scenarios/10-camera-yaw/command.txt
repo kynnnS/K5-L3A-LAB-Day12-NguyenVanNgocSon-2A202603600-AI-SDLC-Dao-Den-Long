@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 120 --snapshot-every 60 --out docs/proof/phase-1/scenarios/10-camera-yaw/output.jsonl --scenario docs/proof/phase-1/scenarios/10-camera-yaw/scenario.json --inputs docs/proof/phase-1/scenarios/10-camera-yaw/inputs.json
+exit=0

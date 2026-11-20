@@ -1,0 +1,31 @@
+{
+  "snapshots": [
+    {
+      "tick": 300,
+      "player": {
+        "pos": [
+          0,
+          0,
+          30
+        ]
+      }
+    },
+    {
+      "tick": 600,
+      "player": {
+        "pos": [
+          0,
+          0,
+          60
+        ]
+      }
+    }
+  ],
+  "absent_events": [
+    "player_hit"
+  ],
+  "end": {
+    "ticks": 600,
+    "state": "playing"
+  }
+}

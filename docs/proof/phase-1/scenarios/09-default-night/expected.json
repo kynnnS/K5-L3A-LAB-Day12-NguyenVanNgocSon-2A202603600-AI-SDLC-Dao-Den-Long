@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "tick": 600,
+      "name": "shade_spawned",
+      "data": {
+        "id": "S1"
+      }
+    },
+    {
+      "tick": 1234,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 2,
+        "dropped": 0
+      }
+    },
+    {
+      "tick": 1354,
+      "name": "player_hit",
+      "data": {
+        "flames": 1
+      }
+    },
+    {
+      "tick": 1474,
+      "name": "player_hit",
+      "data": {
+        "flames": 0
+      }
+    },
+    {
+      "tick": 1474,
+      "name": "game_over",
+      "data": {
+        "result": "lost",
+        "reason": "no_flames"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 1474,
+    "state": "lost",
+    "score": 0
+  }
+}

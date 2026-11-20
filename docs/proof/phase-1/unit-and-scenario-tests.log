@@ -1,0 +1,60 @@
+
+ RUN  v5.1.1 /Users/kynnn/K5-L3A-LAB-Day12-NguyenVanNgocSon-2A202603600-AI-SDLC-Dao-Den-Long
+
+ ✓ tests/unit/core.test.ts > C1 contract file > declares v1.0 with all tuning keys and 5 lanterns 1ms
+ ✓ tests/unit/core.test.ts > C3 tick model > starts at origin with tuning values; time_left = duration - steps/60 1ms
+ ✓ tests/unit/core.test.ts > C3 tick model > --ticks N runs exactly N steps; snapshot every K starting at 0; end is last 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > moves player_speed m/s along +Z at yaw 0 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > rotates input by cam_yaw_deg (90deg: z input -> +X, x input -> -Z) 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > normalises vectors longer than 1 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > jump leaves the ground and lands back at y = 0 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > has no world boundary (fall_enabled=false, A8): 12 s walk = 12 * player_speed 0ms
+ ✓ tests/unit/core.test.ts > C5 movement > normalises the raw vector (no per-component clamp): [2,1] keeps its direction 0ms
+ ✓ tests/unit/core.test.ts > C6 pickup, deposit, light > picks a mote exactly at pickup_radius (<= r) and scores per_mote 0ms
+ ✓ tests/unit/core.test.ts > C6 pickup, deposit, light > respects carry_capacity 0ms
+ ✓ tests/unit/core.test.ts > C6 pickup, deposit, light > interact deposits into nearest unlit lantern and lights it at lantern_cost 0ms
+ ✓ tests/unit/core.test.ts > C6 pickup, deposit, light > partial deposit does not light; interact needs a false->true edge 0ms
+ ✓ tests/unit/core.test.ts > C6 pickup, deposit, light > no deposit when out of interact_radius 0ms
+ ✓ tests/unit/core.test.ts > C7 pulse > costs pulse_cost, stuns and pushes shades in radius, scores per_stun 0ms
+ ✓ tests/unit/core.test.ts > C7 pulse > pushes the full pulse_push_m even near the island edge 0ms
+ ✓ tests/unit/core.test.ts > C7 pulse > stunned shade does not move for pulse_stun_s, then chases again 0ms
+ ✓ tests/unit/core.test.ts > C7 pulse > fails silently without enough light or during cooldown 0ms
+ ✓ tests/unit/core.test.ts > C8 hits > shade touch costs a flame, drops floor(carried*ratio), then invulnerability 0ms
+ ✓ tests/unit/core.test.ts > C9 lantern safe zone > shades never come within safe_radius of a lit lantern 1ms
+ ✓ tests/unit/core.test.ts > C9 lantern safe zone > scenario setup emits no events/points (pre-lit lantern not scored) 0ms
+ ✓ tests/unit/core.test.ts > C10 win / lose > lighting the last lantern wins with time + flame bonus and stops 0ms
+ ✓ tests/unit/core.test.ts > C10 win / lose > losing the last flame -> lost/no_flames 0ms
+ ✓ tests/unit/core.test.ts > C10 win / lose > time running out -> lost/dawn at exactly time_left_s * 60 0ms
+ ✓ tests/unit/core.test.ts > C11 determinism > same seed -> identical output; different seed -> different motes 5ms
+ ✓ tests/unit/core.test.ts > C11 determinism > random shades spawn with shade_spawned events and sequential auto ids 2ms
+ ✓ tests/unit/core.test.ts > C2 input / scenario validation > rejects malformed inputs and scenarios with FormatError 0ms
+ ✓ tests/unit/core.test.ts > C2 input / scenario validation > input frames hold values until changed; defaults before first frame 0ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 01-contract-example [C3,C5,C6] 26ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 02-collect-and-light [C6] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 03-pulse-stun [C7] 22ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 04-hit-and-drop [C8] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 05-win-all-lit [C10] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 06-lose-dawn [C10] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 07-lose-no-flames [C8,C10] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 08-safe-zone [C9] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 09-default-night [C3,C4,C11] 25ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 10-camera-yaw [C5] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 11-pulse-no-shades [C7] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 12-multi-pickup-capacity [C6] 21ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 13-id-generation [C11,D] 22ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 14-multi-shade-hit [C8,C10] 23ms
+ ✓ tests/scenarios/headless.test.ts > scenario fixtures (real CLI) > 15-no-world-boundary [C5,A8] 23ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > malformed inputs JSON -> exit 2 with stderr 22ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > non-increasing frame ticks -> exit 2 21ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > malformed scenario -> exit 2 47ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > unsupported night -> non-zero, message on stderr 21ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > missing required args -> exit 1, message on stderr, empty stdout 86ms
+ ✓ tests/scenarios/headless.test.ts > C2 CLI exit codes and errors > --ticks 0 -> only snapshot 0 + end 21ms
+ ✓ tests/scenarios/headless.test.ts > C11 determinism (real CLI) > same seed/scenario/inputs -> byte-identical output 65ms
+ ✓ tests/scenarios/headless.test.ts > C11 determinism (real CLI) > default snapshot interval is 10 22ms
+
+ Test Files  2 passed (2)
+      Tests  51 passed (51)
+   Start at  15:25:26
+   Duration  710ms (tests 96%, import 2%, transform 1%, worker 1%)
+

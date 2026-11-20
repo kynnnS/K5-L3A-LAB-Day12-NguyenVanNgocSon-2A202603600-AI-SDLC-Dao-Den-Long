@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 600 --snapshot-every 300 --out docs/proof/phase-1/scenarios/15-no-world-boundary/output.jsonl --scenario docs/proof/phase-1/scenarios/15-no-world-boundary/scenario.json --inputs docs/proof/phase-1/scenarios/15-no-world-boundary/inputs.json
+exit=0

@@ -1,0 +1,34 @@
+{
+  "player": {
+    "carried": 4
+  },
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [],
+  "shades": [
+    {
+      "id": "A",
+      "pos": [
+        0.5,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "B",
+      "pos": [
+        0,
+        1,
+        0.5
+      ]
+    },
+    {
+      "id": "C",
+      "pos": [
+        -0.5,
+        1,
+        0
+      ]
+    }
+  ]
+}

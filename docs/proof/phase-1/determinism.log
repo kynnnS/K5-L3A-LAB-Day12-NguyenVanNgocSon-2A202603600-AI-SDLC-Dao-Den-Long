@@ -1,0 +1,3 @@
+run A sha256=42edac160192b93d0457d9527cfac963bbb9ea0e4f59e691836fdad57e41da0d lines=     607
+run B sha256=42edac160192b93d0457d9527cfac963bbb9ea0e4f59e691836fdad57e41da0d lines=     607
+IDENTICAL

@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 4 --night 1 --ticks 180 --snapshot-every 180 --out docs/proof/phase-1/scenarios/13-id-generation/output.jsonl --scenario docs/proof/phase-1/scenarios/13-id-generation/scenario.json
+exit=0
