@@ -52,9 +52,10 @@ export function buildIsland(): { group: THREE.Group; grass: THREE.MeshStandardMa
 
 export function buildCloudSea(): THREE.Group {
   const group = new THREE.Group();
-  const sea = new THREE.Mesh(new THREE.CircleGeometry(400, 48), new THREE.MeshStandardMaterial({ color: 0x241a46, roughness: 1 }));
+  // Walkable cloud floor just below the island top (core has no world boundary, assumption A8).
+  const sea = new THREE.Mesh(new THREE.CircleGeometry(400, 48), new THREE.MeshStandardMaterial({ color: 0x2f2558, roughness: 1 }));
   sea.rotation.x = -Math.PI / 2;
-  sea.position.y = -9;
+  sea.position.y = -0.15;
   group.add(sea);
   const puffMat = flat(0x3a2f66, { transparent: true, opacity: 0.85 });
   let s = 99;
@@ -63,7 +64,7 @@ export function buildCloudSea(): THREE.Group {
     const a = rnd() * Math.PI * 2;
     const r = ISLAND_RADIUS + 8 + rnd() * 90;
     const puff = new THREE.Mesh(new THREE.IcosahedronGeometry(3 + rnd() * 6, 0), puffMat);
-    puff.position.set(Math.sin(a) * r, -9 + rnd() * 2, Math.cos(a) * r);
+    puff.position.set(Math.sin(a) * r, -1.2 + rnd() * 0.8, Math.cos(a) * r);
     puff.scale.y = 0.45;
     group.add(puff);
   }
