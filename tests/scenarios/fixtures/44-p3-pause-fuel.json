@@ -1,0 +1,101 @@
+{
+  "id": "44-p3-pause-fuel",
+  "requirement": "T3-1/T3-2 + T2 pause",
+  "description": "Paused from tick 1: fuel decay, drain and fuel_drain are frozen; L1 stays at 20.0, sim_tick 0, time 240",
+  "night": 1,
+  "seed": 1,
+  "ticks": 100,
+  "snapshot_every": 100,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0,
+          1,
+          24
+        ],
+        "state": "drain",
+        "target_lantern_id": "L1"
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 20
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "pause": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "paused",
+        "data": {}
+      }
+    ],
+    "event_counts": {
+      "fuel_drain": 0
+    },
+    "snapshots": [
+      {
+        "tick": 100,
+        "state": "paused",
+        "sim_tick": 0,
+        "time_left_s": 240,
+        "lanterns": [
+          {
+            "id": "L1",
+            "fuel": 20.0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ],
+        "shades": [
+          {
+            "id": "S1",
+            "state": "drain"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 100,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

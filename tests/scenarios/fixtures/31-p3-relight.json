@@ -1,0 +1,125 @@
+{
+  "id": "31-p3-relight",
+  "requirement": "T3-1 relight + T3-4 capacity + T3-5 score",
+  "description": "L1 unlit with ever_lit -> relight costs 5: deposit 5, lantern_lit relight true, fuel 100, relit_count 1; score 5 x 5 + 40 = 65; capacity 10 + 2 = 12",
+  "night": 1,
+  "seed": 1,
+  "ticks": 1,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        24
+      ],
+      "carried": 10
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": false,
+        "ever_lit": true
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "interact": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "deposit",
+        "data": {
+          "lantern_id": "L1",
+          "amount": 5,
+          "deposited": 5
+        }
+      },
+      {
+        "tick": 1,
+        "name": "lantern_lit",
+        "data": {
+          "lantern_id": "L1",
+          "relight": true
+        }
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 0,
+        "player": {
+          "capacity": 10
+        },
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": false,
+            "fuel": 0,
+            "ever_lit": true,
+            "relit_count": 0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      },
+      {
+        "tick": 1,
+        "player": {
+          "carried": 5,
+          "capacity": 12
+        },
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": true,
+            "fuel": 100,
+            "ever_lit": true,
+            "relit_count": 1
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "playing",
+      "score": 65
+    }
+  }
+}

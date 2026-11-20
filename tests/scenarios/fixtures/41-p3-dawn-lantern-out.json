@@ -1,0 +1,59 @@
+{
+  "id": "41-p3-dawn-lantern-out",
+  "requirement": "T3-3 tick order (out right after step 2, before win check)",
+  "description": "3 lit, but L1 has 1 unit (1/60) of fuel: it goes out in step 2 of the dawn tick -> 2/5 -> lost (dawn)",
+  "night": 1,
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 0.016666666666666666
+      },
+      {
+        "id": "L2",
+        "lit": true
+      },
+      {
+        "id": "L3",
+        "lit": true
+      }
+    ],
+    "time_left_s": 0.016666666666666666
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "lantern_out",
+        "data": {
+          "lantern_id": "L1"
+        }
+      },
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "dawn"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

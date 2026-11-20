@@ -1,0 +1,82 @@
+{
+  "id": "34-p3-pulse-drain",
+  "requirement": "T3-2 drain -> stunned + T3-5 score 15",
+  "description": "Pulse (3D 4.005 m <= 5) hits S1 while it drains -> stunned; total +15 for a draining shade",
+  "night": 1,
+  "seed": 1,
+  "ticks": 2,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0,
+          1,
+          24
+        ],
+        "state": "drain",
+        "target_lantern_id": "L1"
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        28
+      ],
+      "carried": 3
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 20
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "pulse": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "pulse",
+        "data": {
+          "stunned_ids": [
+            "S1"
+          ]
+        }
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 1,
+        "shades": [
+          {
+            "id": "S1",
+            "state": "stunned"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 2,
+      "state": "playing",
+      "score": 15
+    }
+  }
+}

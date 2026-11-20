@@ -1,0 +1,74 @@
+{
+  "id": "33-p3-wander-to-drain",
+  "requirement": "T3-2 weak lantern target + safe zone lost below 30",
+  "description": "L1 fuel 29.9 (< 30: no safe zone); wander S1 3 m away walks to it at 4/60 m/tick: 3 - k/15 <= 2 at k = 15 -> drain on tick 15 at (0,1,23)",
+  "night": 1,
+  "seed": 1,
+  "ticks": 20,
+  "snapshot_every": 5,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0,
+          1,
+          22
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 29.9
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 10,
+        "shades": [
+          {
+            "id": "S1",
+            "state": "wander"
+          }
+        ]
+      },
+      {
+        "tick": 15,
+        "shades": [
+          {
+            "id": "S1",
+            "state": "drain",
+            "pos": [
+              0,
+              1,
+              23
+            ]
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 20,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

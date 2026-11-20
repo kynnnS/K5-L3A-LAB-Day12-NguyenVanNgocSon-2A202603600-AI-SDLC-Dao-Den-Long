@@ -1,0 +1,149 @@
+{
+  "id": "32-p3-drain-cycle",
+  "requirement": "T3-2 drain + fuel_drain",
+  "description": "S1 drains L1 (fuel 20 = 1200 units): 1 decay + 5 drain = 6 units/tick -> fuel_drain at 60 (14.0), 120 (8.0), 180 (2.0); 0 at tick 200 -> lantern_out, S1 back to wander",
+  "night": 1,
+  "seed": 1,
+  "ticks": 210,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0,
+          1,
+          24
+        ],
+        "state": "drain",
+        "target_lantern_id": "L1"
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 20
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 60,
+        "name": "fuel_drain",
+        "data": {
+          "lantern_id": "L1",
+          "shade_id": "S1",
+          "fuel": 14
+        }
+      },
+      {
+        "tick": 120,
+        "name": "fuel_drain",
+        "data": {
+          "lantern_id": "L1",
+          "shade_id": "S1",
+          "fuel": 8
+        }
+      },
+      {
+        "tick": 180,
+        "name": "fuel_drain",
+        "data": {
+          "lantern_id": "L1",
+          "shade_id": "S1",
+          "fuel": 2
+        }
+      },
+      {
+        "tick": 200,
+        "name": "lantern_out",
+        "data": {
+          "lantern_id": "L1"
+        }
+      }
+    ],
+    "event_counts": {
+      "fuel_drain": 3,
+      "lantern_out": 1
+    },
+    "snapshots": [
+      {
+        "tick": 190,
+        "shades": [
+          {
+            "id": "S1",
+            "state": "drain"
+          }
+        ],
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": true,
+            "fuel": 1.0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      },
+      {
+        "tick": 200,
+        "shades": [
+          {
+            "id": "S1",
+            "state": "wander"
+          }
+        ],
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": false,
+            "fuel": 0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 210,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

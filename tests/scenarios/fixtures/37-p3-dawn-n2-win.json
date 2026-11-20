@@ -1,0 +1,55 @@
+{
+  "id": "37-p3-dawn-n2-win",
+  "requirement": "T3-3 dawn win/lose",
+  "description": "Night 2: 4/6 lit at dawn (need ceil(0.6 x 6) = 4) -> won. Win bonus: per lit lantern 50 + floor(100 - 1/60) = 149, + 50 x 3 flames",
+  "night": 2,
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true
+      },
+      {
+        "id": "L2",
+        "lit": true
+      },
+      {
+        "id": "L3",
+        "lit": true
+      },
+      {
+        "id": "L4",
+        "lit": true
+      }
+    ],
+    "time_left_s": 0.016666666666666666
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "won",
+          "reason": "dawn_survived"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "won",
+      "score": 746
+    }
+  }
+}

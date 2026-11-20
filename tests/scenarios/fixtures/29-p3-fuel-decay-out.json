@@ -1,0 +1,102 @@
+{
+  "id": "29-p3-fuel-decay-out",
+  "requirement": "T3-1 fuel decay + lantern_out",
+  "description": "L1 lit with fuel 2 = 120 units, decay 1 unit/tick: 60 units (1.0) at tick 60, 0 at tick 120 -> lantern_out at 120; out = lit false, fuel 0, deposited 0, ever_lit true",
+  "night": 1,
+  "seed": 1,
+  "ticks": 130,
+  "snapshot_every": 60,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        -30
+      ]
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "deposited": 10,
+        "fuel": 2
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 120,
+        "name": "lantern_out",
+        "data": {
+          "lantern_id": "L1"
+        }
+      }
+    ],
+    "event_counts": {
+      "lantern_out": 1
+    },
+    "snapshots": [
+      {
+        "tick": 60,
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": true,
+            "fuel": 1.0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      },
+      {
+        "tick": 120,
+        "lanterns": [
+          {
+            "id": "L1",
+            "lit": false,
+            "fuel": 0,
+            "deposited": 0,
+            "ever_lit": true,
+            "relit_count": 0
+          },
+          {
+            "id": "L2"
+          },
+          {
+            "id": "L3"
+          },
+          {
+            "id": "L4"
+          },
+          {
+            "id": "L5"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 130,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

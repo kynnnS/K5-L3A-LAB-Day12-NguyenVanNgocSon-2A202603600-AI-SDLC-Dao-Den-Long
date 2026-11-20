@@ -1,0 +1,73 @@
+{
+  "id": "42-p3-dawn-no-flames",
+  "requirement": "T3-3 no_flames first",
+  "description": "3/5 lit (enough) but the last flame is lost on the dawn tick -> lost (no_flames), no dawn bonus",
+  "night": 1,
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0.5,
+          1,
+          0
+        ],
+        "state": "chase"
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "flames": 1
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true
+      },
+      {
+        "id": "L2",
+        "lit": true
+      },
+      {
+        "id": "L3",
+        "lit": true
+      }
+    ],
+    "time_left_s": 0.016666666666666666
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 0,
+          "dropped": 0
+        }
+      },
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "no_flames"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

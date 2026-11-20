@@ -1,0 +1,65 @@
+{
+  "id": "43-p3-capacity-cap",
+  "requirement": "T3-4 capacity",
+  "description": "successful_lights 4 -> capacity 18; relight L1 -> 5 lights -> 20; scenario successful_lights is honoured, cap 20",
+  "night": 1,
+  "seed": 1,
+  "ticks": 1,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        24
+      ],
+      "carried": 10,
+      "successful_lights": 4
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": false,
+        "ever_lit": true
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "interact": true
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 0,
+        "player": {
+          "capacity": 18
+        }
+      },
+      {
+        "tick": 1,
+        "player": {
+          "capacity": 20,
+          "carried": 5
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "playing",
+      "score": 65
+    }
+  }
+}

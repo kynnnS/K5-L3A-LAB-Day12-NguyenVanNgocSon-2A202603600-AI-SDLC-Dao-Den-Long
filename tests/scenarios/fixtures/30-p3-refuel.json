@@ -1,0 +1,72 @@
+{
+  "id": "30-p3-refuel",
+  "requirement": "T3-1 refuel",
+  "description": "L1 fuel 50 = 3000 -> 2999 after step 2; used = min(10, ceil(3001/600) = 6) = 6; 2999 + 3600 capped at 6000 (100.0); +5 x 6 = 30",
+  "night": 1,
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 5,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        24
+      ],
+      "carried": 10
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true,
+        "fuel": 50
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "interact": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "refuel",
+        "data": {
+          "lantern_id": "L1",
+          "amount": 6,
+          "fuel": 100
+        }
+      }
+    ],
+    "event_counts": {
+      "refuel": 1
+    },
+    "snapshots": [
+      {
+        "tick": 5,
+        "player": {
+          "carried": 4,
+          "capacity": 10
+        }
+      }
+    ],
+    "end": {
+      "ticks": 5,
+      "state": "playing",
+      "score": 30
+    }
+  }
+}
