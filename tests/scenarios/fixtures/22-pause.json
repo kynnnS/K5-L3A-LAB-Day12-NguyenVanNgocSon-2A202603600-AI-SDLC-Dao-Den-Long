@@ -1,0 +1,93 @@
+{
+  "id": "22-pause",
+  "requirement": "T3 pause",
+  "description": "Pause pressed at step 10 -> ticks 11..30 paused (sim_tick frozen at 10, time frozen); resumed at tick 31",
+  "night": 1,
+  "seed": 1,
+  "ticks": 40,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ]
+      },
+      {
+        "tick": 10,
+        "pause": true
+      },
+      {
+        "tick": 11,
+        "pause": false
+      },
+      {
+        "tick": 30,
+        "pause": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 11,
+        "name": "paused",
+        "data": {}
+      },
+      {
+        "tick": 31,
+        "name": "resumed",
+        "data": {}
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 20,
+        "state": "paused",
+        "sim_tick": 10,
+        "time_left_s": 299.833,
+        "player": {
+          "pos": [
+            0,
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "tick": 30,
+        "state": "paused",
+        "sim_tick": 10
+      },
+      {
+        "tick": 40,
+        "state": "playing",
+        "sim_tick": 20,
+        "time_left_s": 299.667,
+        "player": {
+          "pos": [
+            0,
+            0,
+            2
+          ]
+        }
+      }
+    ],
+    "end": {
+      "ticks": 40,
+      "state": "playing"
+    }
+  }
+}

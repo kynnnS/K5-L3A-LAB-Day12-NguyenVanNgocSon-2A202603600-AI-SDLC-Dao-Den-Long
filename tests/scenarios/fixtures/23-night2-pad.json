@@ -1,0 +1,43 @@
+{
+  "id": "23-night2-pad",
+  "requirement": "T2-P2 night 2 pad",
+  "description": "Pad (20,0,18): launch at tick 1 (vy 14, 24 m/s toward B); y=(14n-n(n+1)/6)/60 hits 0 at n=83 -> lands tick 84 at ~(51.24,0,6.75) on island B",
+  "night": 2,
+  "seed": 1,
+  "ticks": 84,
+  "snapshot_every": 84,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        20,
+        0,
+        18
+      ]
+    }
+  },
+  "expect": {
+    "absent_events": [
+      "player_hit"
+    ],
+    "snapshots": [
+      {
+        "tick": 84,
+        "player": {
+          "grounded": true
+        }
+      }
+    ],
+    "end": {
+      "ticks": 84,
+      "state": "playing"
+    }
+  }
+}

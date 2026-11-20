@@ -1,0 +1,77 @@
+{
+  "id": "12-multi-pickup-capacity",
+  "requirement": "T2-P1 pickup",
+  "description": "4 motes within 1 m with carried 8/10 -> exactly 2 picked in tick 1",
+  "night": 1,
+  "seed": 1,
+  "ticks": 5,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0.9,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0.9
+      ],
+      [
+        -0.9,
+        0,
+        0
+      ]
+    ],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 8
+    }
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "mote_picked",
+        "data": {
+          "carried": 9
+        }
+      },
+      {
+        "tick": 1,
+        "name": "mote_picked",
+        "data": {
+          "carried": 10
+        }
+      }
+    ],
+    "event_counts": {
+      "mote_picked": 2
+    },
+    "snapshots": [
+      {
+        "tick": 1,
+        "motes_active": 2,
+        "player": {
+          "carried": 10
+        }
+      }
+    ],
+    "end": {
+      "ticks": 5,
+      "score": 0
+    }
+  }
+}

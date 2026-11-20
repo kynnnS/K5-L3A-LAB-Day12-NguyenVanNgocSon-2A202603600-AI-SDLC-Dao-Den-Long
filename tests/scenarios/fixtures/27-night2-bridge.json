@@ -1,0 +1,58 @@
+{
+  "id": "27-night2-bridge",
+  "requirement": "T2-P2 night 2 bridge",
+  "description": "Walk from (25,0,0) across the bamboo bridge to (50,0,0) on island B, no fall",
+  "night": 2,
+  "seed": 1,
+  "ticks": 250,
+  "snapshot_every": 250,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        25,
+        0,
+        0
+      ]
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          1,
+          0
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "absent_events": [
+      "player_hit"
+    ],
+    "snapshots": [
+      {
+        "tick": 250,
+        "player": {
+          "pos": [
+            50,
+            0,
+            0
+          ],
+          "grounded": true
+        }
+      }
+    ],
+    "end": {
+      "ticks": 250
+    }
+  }
+}

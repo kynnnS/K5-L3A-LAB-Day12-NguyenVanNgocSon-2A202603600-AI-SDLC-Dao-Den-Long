@@ -1,0 +1,116 @@
+{
+  "id": "01-contract-example",
+  "requirement": "P1-C3,C5,C6 (regression, standard numbers)",
+  "description": "Contract v1.0 example with standard numbers: pickup radius 1.0 -> mote at z=5 picked at z>=4.0 = tick 40; carried 1 < pulse cost 3 -> no pulse; L1 at 25 out of range",
+  "night": 1,
+  "seed": 1,
+  "ticks": 240,
+  "snapshot_every": 10,
+  "scenario": {
+    "player": {
+      "pos": [
+        0,
+        0,
+        0
+      ],
+      "carried": 0,
+      "flames": 3
+    },
+    "random_motes": false,
+    "random_shades": false,
+    "motes": [
+      [
+        0,
+        0,
+        5
+      ]
+    ],
+    "shades": [
+      {
+        "pos": [
+          10,
+          0,
+          0
+        ]
+      }
+    ],
+    "lanterns": [
+      {
+        "id": "L1",
+        "pos": [
+          0,
+          0,
+          25
+        ],
+        "deposited": 0
+      }
+    ],
+    "time_left_s": 300
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ],
+        "cam_yaw_deg": 0
+      },
+      {
+        "tick": 120,
+        "move": [
+          0,
+          0
+        ],
+        "interact": true
+      },
+      {
+        "tick": 121,
+        "interact": false
+      },
+      {
+        "tick": 200,
+        "pulse": true
+      },
+      {
+        "tick": 201,
+        "pulse": false
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 40,
+        "name": "mote_picked",
+        "data": {
+          "carried": 1
+        }
+      }
+    ],
+    "absent_events": [
+      "deposit",
+      "pulse"
+    ],
+    "snapshots": [
+      {
+        "tick": 120,
+        "time_left_s": 298,
+        "player": {
+          "pos": [
+            0,
+            0,
+            12
+          ],
+          "carried": 1
+        }
+      }
+    ],
+    "end": {
+      "ticks": 240,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

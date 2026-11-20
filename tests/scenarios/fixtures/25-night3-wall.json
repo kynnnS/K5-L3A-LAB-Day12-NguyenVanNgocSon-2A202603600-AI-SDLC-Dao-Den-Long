@@ -1,0 +1,55 @@
+{
+  "id": "25-night3-wall",
+  "requirement": "T2-P2 night 3 cliffs",
+  "description": "Walking +Z from (0,0,-10.05) stops at the tier-2 cliff (r=8): z stays -8.05",
+  "night": 3,
+  "seed": 1,
+  "ticks": 60,
+  "snapshot_every": 60,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        -10.05
+      ]
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 60,
+        "player": {
+          "pos": [
+            0,
+            0,
+            -8.05
+          ],
+          "grounded": true
+        }
+      }
+    ],
+    "end": {
+      "ticks": 60
+    }
+  }
+}

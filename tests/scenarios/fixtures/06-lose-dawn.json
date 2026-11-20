@@ -1,0 +1,37 @@
+{
+  "id": "06-lose-dawn",
+  "requirement": "T2-P1 win/lose",
+  "description": "time_left_s 2 -> lost/dawn at tick 120",
+  "night": 1,
+  "seed": 1,
+  "ticks": 1000,
+  "snapshot_every": 50,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "time_left_s": 2
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 120,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "dawn"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 120,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

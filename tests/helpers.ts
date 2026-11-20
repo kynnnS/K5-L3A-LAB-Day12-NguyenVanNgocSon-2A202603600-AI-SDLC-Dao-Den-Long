@@ -11,18 +11,21 @@ export const ROOT = new URL('..', import.meta.url).pathname;
 export const contract = JSON.parse(readFileSync(join(ROOT, 'game.contract.json'), 'utf8'));
 export const T = parseTuning(contract);
 
-export const IDLE: InputState = { move: [0, 0], camYawDeg: 0, jump: false, interact: false, pulse: false };
+export const IDLE: InputState = { move: [0, 0], camYawDeg: 0, jump: false, interact: false, pulse: false, dash: false, pause: false };
 
-/** Isolated scenario: no random spawns unless overridden. */
-export function game(spec: ScenarioSpec = {}, seed = 1): GameState {
-  return createGame(T, seed, { random_motes: false, random_shades: false, motes: [], shades: [], ...spec });
+/** Isolated scenario: no random spawns, no charms/drifters/wind unless overridden. */
+export function game(spec: ScenarioSpec = {}, night: 1 | 2 | 3 = 1, seed = 1): GameState {
+  return createGame(T, seed, night, {
+    random_motes: false, random_shades: false, random_drifters: false, wind_enabled: false,
+    motes: [], shades: [], drifters: [], charms: [], ...spec,
+  });
 }
 
 /** Runs n steps with frames, returns all events. */
 export function runSteps(state: GameState, n: number, frames: InputFrame[] = []): TimedEvent[] {
   const read = createInputReader(frames);
   const events: TimedEvent[] = [];
-  for (let k = 0; k < n && state.status === 'playing'; k++) events.push(...step(state, T, read(state.tick)));
+  for (let k = 0; k < n && (state.status === 'playing' || state.status === 'paused'); k++) events.push(...step(state, T, read(state.tick)));
   return events;
 }
 
@@ -39,6 +42,7 @@ export interface CliResult {
 /** Runs the real built CLI (build/headless/cli.js) like the grader would. */
 export function runCli(opts: {
   seed?: number;
+  night?: number;
   ticks: number;
   scenario?: unknown;
   inputs?: unknown;
@@ -49,7 +53,7 @@ export function runCli(opts: {
 }): CliResult {
   const dir = mkdtempSync(join(tmpdir(), 'ddl-'));
   const out = join(dir, 'out.jsonl');
-  const args = ['build/headless/cli.js', '--seed', String(opts.seed ?? 1), '--night', '1', '--ticks', String(opts.ticks), '--out', out];
+  const args = ['build/headless/cli.js', '--seed', String(opts.seed ?? 1), '--night', String(opts.night ?? 1), '--ticks', String(opts.ticks), '--out', out];
   if (opts.snapshotEvery !== undefined) args.push('--snapshot-every', String(opts.snapshotEvery));
   if (opts.scenario !== undefined || opts.rawScenario !== undefined) {
     writeFileSync(join(dir, 's.json'), opts.rawScenario ?? JSON.stringify(opts.scenario));

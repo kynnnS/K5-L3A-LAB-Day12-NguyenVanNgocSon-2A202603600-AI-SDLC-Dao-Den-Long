@@ -1,0 +1,55 @@
+{
+  "id": "24-night3-ramp",
+  "requirement": "T2-P2 night 3 ramp",
+  "description": "Walk up the 30\u00b0 ramp from r=31 for 9 m -> r=22 on tier 1 (y=3) at (19.053,3,11)",
+  "night": 3,
+  "seed": 1,
+  "ticks": 90,
+  "snapshot_every": 90,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        26.847,
+        0,
+        15.5
+      ]
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          -0.866025,
+          -0.5
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 90,
+        "player": {
+          "pos": [
+            19.053,
+            3,
+            11
+          ],
+          "grounded": true
+        }
+      }
+    ],
+    "end": {
+      "ticks": 90
+    }
+  }
+}

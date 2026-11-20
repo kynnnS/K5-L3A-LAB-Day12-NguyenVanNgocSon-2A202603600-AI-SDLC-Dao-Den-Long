@@ -1,0 +1,94 @@
+{
+  "id": "14-multi-shade-hit",
+  "requirement": "T2-P1 hit (multi-event tick)",
+  "description": "3 shades on M\u00e2y: one flame per tick; invuln 90 -> hits at 1, 91, 181 (drops 2,1,0) -> lost at 181",
+  "night": 1,
+  "seed": 1,
+  "ticks": 1000,
+  "snapshot_every": 60,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "A",
+        "pos": [
+          0.5,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "B",
+        "pos": [
+          0,
+          1,
+          0.5
+        ]
+      },
+      {
+        "id": "C",
+        "pos": [
+          -0.5,
+          1,
+          0
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 4
+    }
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 2,
+          "dropped": 2
+        }
+      },
+      {
+        "tick": 91,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 1,
+          "dropped": 1
+        }
+      },
+      {
+        "tick": 181,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 0,
+          "dropped": 0
+        }
+      },
+      {
+        "tick": 181,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "no_flames"
+        }
+      }
+    ],
+    "event_counts": {
+      "player_hit": 3
+    },
+    "end": {
+      "ticks": 181,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

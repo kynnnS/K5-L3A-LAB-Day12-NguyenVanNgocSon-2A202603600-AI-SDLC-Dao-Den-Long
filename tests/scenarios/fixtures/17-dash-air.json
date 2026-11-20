@@ -1,0 +1,72 @@
+{
+  "id": "17-dash-air",
+  "requirement": "T3 dash",
+  "description": "Jump at tick 1, dash at tick 11: altitude held at y(10)=(70-110/6)/60=0.861 for the 12 dash ticks; vy frozen at 7-10/3",
+  "night": 1,
+  "seed": 1,
+  "ticks": 33,
+  "snapshot_every": 11,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "jump": true
+      },
+      {
+        "tick": 10,
+        "dash": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 11,
+        "name": "dash",
+        "data": {}
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 11,
+        "player": {
+          "pos": [
+            0,
+            0.861,
+            0.233
+          ],
+          "vel": [
+            0,
+            3.667,
+            14
+          ],
+          "grounded": false
+        }
+      },
+      {
+        "tick": 22,
+        "player": {
+          "pos": [
+            0,
+            0.861,
+            2.8
+          ],
+          "grounded": false
+        }
+      }
+    ],
+    "end": {
+      "ticks": 33
+    }
+  }
+}

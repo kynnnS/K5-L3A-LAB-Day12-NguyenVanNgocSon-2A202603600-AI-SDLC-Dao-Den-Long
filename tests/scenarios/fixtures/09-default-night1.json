@@ -1,0 +1,52 @@
+{
+  "id": "09-default-night1",
+  "requirement": "T2-P1 spawns",
+  "description": "Default Night 1, idle player: S1,S2 at tick 300 (spawning), S3 at 780; motes 20 + 1 at 240/480/720 = 23 (no shade can travel the 25 m needed to reach the player by then)",
+  "night": 1,
+  "seed": 2026,
+  "ticks": 790,
+  "snapshot_every": 395,
+  "expect": {
+    "events": [
+      {
+        "tick": 300,
+        "name": "shade_spawned",
+        "data": {
+          "id": "S1"
+        }
+      },
+      {
+        "tick": 300,
+        "name": "shade_spawned",
+        "data": {
+          "id": "S2"
+        }
+      },
+      {
+        "tick": 780,
+        "name": "shade_spawned",
+        "data": {
+          "id": "S3"
+        }
+      }
+    ],
+    "event_counts": {
+      "shade_spawned": 3,
+      "player_hit": 0
+    },
+    "snapshots": [
+      {
+        "tick": 0,
+        "motes_active": 20
+      },
+      {
+        "tick": 790,
+        "motes_active": 23
+      }
+    ],
+    "end": {
+      "ticks": 790,
+      "state": "playing"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "08-safe-zone",
+  "requirement": "T2-P1 safe zone",
+  "description": "Player at lit L1 (0,0,25); shade 11 m away chases and is blocked just outside 6 m (z = 18.999)",
+  "night": 1,
+  "seed": 1,
+  "ticks": 300,
+  "snapshot_every": 100,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0,
+          1,
+          14
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        0,
+        0,
+        25
+      ]
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true
+      }
+    ]
+  },
+  "expect": {
+    "absent_events": [
+      "player_hit"
+    ],
+    "snapshots": [
+      {
+        "tick": 300,
+        "shades": [
+          {
+            "id": "S1",
+            "pos": [
+              0,
+              1,
+              18.999
+            ],
+            "state": "chase"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 300,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

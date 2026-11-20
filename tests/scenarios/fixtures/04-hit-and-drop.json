@@ -1,0 +1,90 @@
+{
+  "id": "04-hit-and-drop",
+  "requirement": "T2-P1 hit",
+  "description": "Shade at 3.03 m chases at 4/60 m/tick -> within 1 m at tick 31; drops floor(4/2)=2 dropped motes (ttl 480 = 8 s), shade recoils",
+  "night": 1,
+  "seed": 1,
+  "ticks": 100,
+  "snapshot_every": 31,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          3.03,
+          1,
+          0
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 4
+    }
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 31,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 2,
+          "dropped": 2
+        }
+      }
+    ],
+    "event_counts": {
+      "player_hit": 1
+    },
+    "snapshots": [
+      {
+        "tick": 31,
+        "motes_active": 2,
+        "player": {
+          "carried": 2,
+          "invuln": true
+        },
+        "motes": [
+          {
+            "kind": "dropped",
+            "ttl_s": 8
+          },
+          {
+            "kind": "dropped",
+            "ttl_s": 8
+          }
+        ],
+        "shades": [
+          {
+            "id": "S1",
+            "state": "recoil"
+          }
+        ]
+      },
+      {
+        "tick": 62,
+        "motes": [
+          {
+            "kind": "dropped",
+            "ttl_s": 7.483
+          },
+          {
+            "kind": "dropped",
+            "ttl_s": 7.483
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 100,
+      "state": "playing"
+    }
+  }
+}

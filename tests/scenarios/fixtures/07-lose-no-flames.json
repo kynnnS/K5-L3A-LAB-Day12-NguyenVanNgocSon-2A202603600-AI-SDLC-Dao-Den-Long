@@ -1,0 +1,57 @@
+{
+  "id": "07-lose-no-flames",
+  "requirement": "T2-P1 hit + win/lose",
+  "description": "1 flame, shade 0.5 m away -> hit at tick 1 (drop floor(3/2)=1) -> lost/no_flames",
+  "night": 1,
+  "seed": 1,
+  "ticks": 100,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "pos": [
+          0.5,
+          1,
+          0
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "flames": 1,
+      "carried": 3
+    }
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 0,
+          "dropped": 1
+        }
+      },
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "no_flames"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}

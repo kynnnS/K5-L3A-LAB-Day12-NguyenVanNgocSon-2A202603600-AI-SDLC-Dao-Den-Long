@@ -1,0 +1,124 @@
+{
+  "id": "20-drifter-pulse-drop",
+  "requirement": "T3 drifter",
+  "description": "Night 2: pulse hits a fleeing drifter with 3 stolen -> drops 3 at (3,0,0) (ttl 8 s), flees 120 more ticks then removed at tick 121",
+  "night": 2,
+  "seed": 1,
+  "ticks": 121,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [
+      {
+        "id": "D1",
+        "pos": [
+          3,
+          1,
+          0
+        ],
+        "state": "flee",
+        "stolen": 3
+      }
+    ],
+    "charms": [],
+    "player": {
+      "carried": 3
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "pulse": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "pulse",
+        "data": {
+          "stunned_ids": []
+        }
+      },
+      {
+        "tick": 1,
+        "name": "drifter_drop",
+        "data": {
+          "drifter_id": "D1",
+          "amount": 3
+        }
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 1,
+        "motes": [
+          {
+            "pos": [
+              3,
+              0,
+              0
+            ],
+            "kind": "dropped",
+            "ttl_s": 8
+          },
+          {
+            "pos": [
+              3,
+              0,
+              0
+            ],
+            "kind": "dropped",
+            "ttl_s": 8
+          },
+          {
+            "pos": [
+              3,
+              0,
+              0
+            ],
+            "kind": "dropped",
+            "ttl_s": 8
+          }
+        ],
+        "drifters": [
+          {
+            "id": "D1",
+            "pos": [
+              3.117,
+              1,
+              0
+            ],
+            "state": "flee",
+            "stolen": 0
+          }
+        ],
+        "player": {
+          "carried": 0
+        }
+      },
+      {
+        "tick": 120,
+        "drifters": [
+          {
+            "id": "D1"
+          }
+        ]
+      },
+      {
+        "tick": 121,
+        "drifters": []
+      }
+    ],
+    "end": {
+      "ticks": 121
+    }
+  }
+}

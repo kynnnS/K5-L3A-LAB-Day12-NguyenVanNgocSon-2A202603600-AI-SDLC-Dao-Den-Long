@@ -1,0 +1,58 @@
+{
+  "id": "11-pulse-no-shades",
+  "requirement": "T2-P1 pulse",
+  "description": "Pulse with nothing in range still fires: stunned_ids [], costs 3, cooldown 3 s",
+  "night": 1,
+  "seed": 1,
+  "ticks": 10,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 3
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "pulse": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "pulse",
+        "data": {
+          "stunned_ids": []
+        }
+      }
+    ],
+    "event_counts": {
+      "pulse": 1
+    },
+    "snapshots": [
+      {
+        "tick": 1,
+        "player": {
+          "carried": 0,
+          "pulse_cd_s": 3
+        },
+        "score": 0
+      }
+    ],
+    "end": {
+      "ticks": 10,
+      "score": 0
+    }
+  }
+}

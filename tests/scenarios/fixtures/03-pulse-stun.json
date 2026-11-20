@@ -1,0 +1,124 @@
+{
+  "id": "03-pulse-stun",
+  "requirement": "T2-P1 pulse",
+  "description": "Pulse (cost 3) hits S1 (3D 3.007 m) and S2 (4.904 m); push 4 m over ticks 1..15; still stunned at tick 120; +5 each",
+  "night": 1,
+  "seed": 1,
+  "ticks": 120,
+  "snapshot_every": 15,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          3,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "S2",
+        "pos": [
+          0,
+          1,
+          -4.9
+        ]
+      }
+    ],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 4
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "pulse": true
+      },
+      {
+        "tick": 1,
+        "pulse": false
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "pulse",
+        "data": {
+          "stunned_ids": [
+            "S1",
+            "S2"
+          ]
+        }
+      }
+    ],
+    "event_counts": {
+      "pulse": 1
+    },
+    "snapshots": [
+      {
+        "tick": 15,
+        "player": {
+          "carried": 1
+        },
+        "shades": [
+          {
+            "id": "S1",
+            "pos": [
+              7,
+              1,
+              0
+            ],
+            "state": "stunned"
+          },
+          {
+            "id": "S2",
+            "pos": [
+              0,
+              1,
+              -8.9
+            ],
+            "state": "stunned"
+          }
+        ]
+      },
+      {
+        "tick": 120,
+        "shades": [
+          {
+            "id": "S1",
+            "pos": [
+              7,
+              1,
+              0
+            ],
+            "state": "stunned"
+          },
+          {
+            "id": "S2",
+            "pos": [
+              0,
+              1,
+              -8.9
+            ],
+            "state": "stunned"
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 120,
+      "state": "playing",
+      "score": 10
+    }
+  }
+}

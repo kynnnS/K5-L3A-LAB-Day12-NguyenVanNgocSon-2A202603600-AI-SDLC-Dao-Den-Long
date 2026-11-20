@@ -1,0 +1,96 @@
+{
+  "id": "16-dash",
+  "requirement": "T3 dash",
+  "description": "Dash (idle -> facing +Z) at tick 1: 12 ticks x 14/60 = 2.8 m; press at 30 ignored (cooldown 90 from start); press at 90 -> dash at tick 91",
+  "night": 1,
+  "seed": 1,
+  "ticks": 150,
+  "snapshot_every": 6,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "dash": true
+      },
+      {
+        "tick": 20,
+        "dash": false
+      },
+      {
+        "tick": 30,
+        "dash": true
+      },
+      {
+        "tick": 40,
+        "dash": false
+      },
+      {
+        "tick": 90,
+        "dash": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "dash",
+        "data": {}
+      },
+      {
+        "tick": 91,
+        "name": "dash",
+        "data": {}
+      }
+    ],
+    "event_counts": {
+      "dash": 2
+    },
+    "snapshots": [
+      {
+        "tick": 12,
+        "player": {
+          "pos": [
+            0,
+            0,
+            2.8
+          ],
+          "dash_cd_s": 1.317
+        }
+      },
+      {
+        "tick": 18,
+        "player": {
+          "pos": [
+            0,
+            0,
+            2.8
+          ]
+        }
+      },
+      {
+        "tick": 102,
+        "player": {
+          "pos": [
+            0,
+            0,
+            5.6
+          ]
+        }
+      }
+    ],
+    "end": {
+      "ticks": 150
+    }
+  }
+}

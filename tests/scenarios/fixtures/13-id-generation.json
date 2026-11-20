@@ -1,0 +1,94 @@
+{
+  "id": "13-id-generation",
+  "requirement": "P1-C11 ids",
+  "description": "Auto ids skip scenario ids: unnamed shades around S1 -> S2,S3; respawn at tick 240 after explicit M1 -> M2",
+  "night": 1,
+  "seed": 4,
+  "ticks": 240,
+  "snapshot_every": 240,
+  "scenario": {
+    "random_motes": true,
+    "random_shades": false,
+    "random_drifters": false,
+    "motes": [
+      {
+        "id": "M1",
+        "pos": [
+          30,
+          0,
+          0
+        ]
+      }
+    ],
+    "shades": [
+      {
+        "pos": [
+          35,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "S1",
+        "pos": [
+          -35,
+          1,
+          0
+        ]
+      },
+      {
+        "pos": [
+          0,
+          1,
+          -35
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 0,
+        "shades": [
+          {
+            "id": "S2"
+          },
+          {
+            "id": "S1"
+          },
+          {
+            "id": "S3"
+          }
+        ],
+        "motes": [
+          {
+            "id": "M1",
+            "pos": [
+              30,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 240,
+        "motes": [
+          {
+            "id": "M1"
+          },
+          {
+            "id": "M2",
+            "kind": "random",
+            "ttl_s": null
+          }
+        ],
+        "motes_active": 2
+      }
+    ],
+    "end": {
+      "ticks": 240,
+      "state": "playing"
+    }
+  }
+}

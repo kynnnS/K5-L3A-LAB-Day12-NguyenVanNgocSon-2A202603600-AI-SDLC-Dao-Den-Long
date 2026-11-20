@@ -1,0 +1,54 @@
+{
+  "id": "28-night2-bridge-side-fall",
+  "requirement": "T2-P2 night 2 bridge (no railing)",
+  "description": "Step off the bridge side (z 2.05 at tick 6) -> fall hit at tick 66, lost 0",
+  "night": 2,
+  "seed": 1,
+  "ticks": 70,
+  "snapshot_every": 70,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "pos": [
+        35,
+        0,
+        1.45
+      ]
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 66,
+        "name": "player_hit",
+        "data": {
+          "by": "fall",
+          "flames": 2,
+          "dropped": 0,
+          "lost": 0
+        }
+      }
+    ],
+    "end": {
+      "ticks": 70
+    }
+  }
+}

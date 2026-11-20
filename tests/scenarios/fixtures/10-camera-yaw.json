@@ -1,0 +1,67 @@
+{
+  "id": "10-camera-yaw",
+  "requirement": "P1-C5 movement",
+  "description": "move [0,1] with cam_yaw_deg 90 goes +X 6 m; [1,1] normalised (6 m/s)",
+  "night": 1,
+  "seed": 1,
+  "ticks": 120,
+  "snapshot_every": 60,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ],
+        "cam_yaw_deg": 90
+      },
+      {
+        "tick": 60,
+        "move": [
+          1,
+          1
+        ],
+        "cam_yaw_deg": 0
+      }
+    ]
+  },
+  "expect": {
+    "snapshots": [
+      {
+        "tick": 60,
+        "player": {
+          "pos": [
+            6,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "tick": 120,
+        "player": {
+          "pos": [
+            10.243,
+            0,
+            4.243
+          ]
+        }
+      }
+    ],
+    "end": {
+      "ticks": 120,
+      "state": "playing"
+    }
+  }
+}

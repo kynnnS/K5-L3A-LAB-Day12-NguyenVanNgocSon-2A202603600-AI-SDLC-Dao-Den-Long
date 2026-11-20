@@ -1,0 +1,80 @@
+{
+  "id": "19-drifter-steal-before-hit",
+  "requirement": "T3 drifter + tick order",
+  "description": "Night 2: drifter steals min(3,6) before the shade hit in the same tick; hit drops floor(3/2)=1",
+  "night": 2,
+  "seed": 1,
+  "ticks": 1,
+  "snapshot_every": 1,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          0.3,
+          1,
+          0.3
+        ]
+      }
+    ],
+    "drifters": [
+      {
+        "id": "D1",
+        "pos": [
+          0.5,
+          1,
+          0
+        ]
+      }
+    ],
+    "charms": [],
+    "player": {
+      "carried": 6
+    }
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "drifter_steal",
+        "data": {
+          "drifter_id": "D1",
+          "amount": 3,
+          "carried": 3
+        }
+      },
+      {
+        "tick": 1,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 2,
+          "dropped": 1
+        }
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 1,
+        "player": {
+          "carried": 2
+        },
+        "drifters": [
+          {
+            "id": "D1",
+            "state": "flee",
+            "stolen": 3
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 1
+    }
+  }
+}

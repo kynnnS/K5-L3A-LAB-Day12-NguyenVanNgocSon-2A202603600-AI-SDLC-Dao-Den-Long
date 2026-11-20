@@ -14,7 +14,7 @@ for (const file of readdirSync(fixDir).filter((f) => f.endsWith('.json')).sort()
   const f = JSON.parse(readFileSync(join(fixDir, file), 'utf8'));
   const dir = join(outDir, f.id);
   mkdirSync(dir, { recursive: true });
-  const args = ['build/headless/cli.js', '--seed', String(f.seed), '--night', '1', '--ticks', String(f.ticks),
+  const args = ['build/headless/cli.js', '--seed', String(f.seed), '--night', String(f.night ?? 1), '--ticks', String(f.ticks),
     '--snapshot-every', String(f.snapshot_every), '--out', join(dir, 'output.jsonl')];
   if (f.scenario) { writeFileSync(join(dir, 'scenario.json'), JSON.stringify(f.scenario, null, 2)); args.push('--scenario', join(dir, 'scenario.json')); }
   if (f.inputs) { writeFileSync(join(dir, 'inputs.json'), JSON.stringify(f.inputs, null, 2)); args.push('--inputs', join(dir, 'inputs.json')); }

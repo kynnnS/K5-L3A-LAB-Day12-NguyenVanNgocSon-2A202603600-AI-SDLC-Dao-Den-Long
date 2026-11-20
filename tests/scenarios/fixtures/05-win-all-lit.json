@@ -1,0 +1,89 @@
+{
+  "id": "05-win-all-lit",
+  "requirement": "T2-P1 win/score",
+  "description": "4 lanterns pre-lit (no points); deposit 10 into L5 -> won at tick 1: 100 + 100 + floor(299.983)*2=598 + 50*3 = 948",
+  "night": 1,
+  "seed": 1,
+  "ticks": 600,
+  "snapshot_every": 10,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [],
+    "player": {
+      "carried": 10
+    },
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true
+      },
+      {
+        "id": "L2",
+        "lit": true
+      },
+      {
+        "id": "L3",
+        "lit": true
+      },
+      {
+        "id": "L4",
+        "lit": true
+      },
+      {
+        "id": "L5",
+        "pos": [
+          0,
+          0,
+          1.5
+        ]
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "interact": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "deposit",
+        "data": {
+          "lantern_id": "L5",
+          "amount": 10,
+          "deposited": 10
+        }
+      },
+      {
+        "tick": 1,
+        "name": "lantern_lit",
+        "data": {
+          "lantern_id": "L5"
+        }
+      },
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "won",
+          "reason": "all_lit"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "won",
+      "score": 948
+    }
+  }
+}

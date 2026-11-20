@@ -1,0 +1,77 @@
+{
+  "id": "18-charm",
+  "requirement": "T3 wind charm",
+  "description": "Night 2: C1 at (35,0,0) picked at tick 1 (walk from 34.5); then 7.2 m/s for ticks 2..61: x = 34.6 + 7.2 = 41.8 (bridge); charm 540 ticks left, respawn 2640 ticks",
+  "night": 2,
+  "seed": 1,
+  "ticks": 61,
+  "snapshot_every": 61,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "random_drifters": false,
+    "wind_enabled": false,
+    "motes": [],
+    "shades": [],
+    "drifters": [],
+    "charms": [
+      {
+        "id": "C1"
+      }
+    ],
+    "player": {
+      "pos": [
+        34.5,
+        0,
+        0
+      ]
+    }
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          1,
+          0
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "charm_picked",
+        "data": {
+          "charm_id": "C1",
+          "charm_ticks": 600
+        }
+      }
+    ],
+    "snapshots": [
+      {
+        "tick": 61,
+        "player": {
+          "pos": [
+            41.8,
+            0,
+            0
+          ],
+          "charm_s": 9
+        },
+        "charms": [
+          {
+            "id": "C1",
+            "available": false,
+            "respawn_s": 44
+          }
+        ]
+      }
+    ],
+    "end": {
+      "ticks": 61,
+      "state": "playing"
+    }
+  }
+}
