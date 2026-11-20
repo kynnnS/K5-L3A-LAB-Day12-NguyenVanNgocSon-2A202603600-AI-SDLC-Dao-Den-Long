@@ -1,0 +1,32 @@
+{
+  "name": "dao-den-long",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dao Den Long (Lantern Island) - 3D game with a deterministic headless runtime",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:headless && npm run build:web",
+    "build:headless": "tsc -p tsconfig.headless.json",
+    "build:web": "vite build",
+    "start": "vite preview --port 4173 --open",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build:headless && vitest run",
+    "check": "npm run typecheck && npm test && npm run build:web",
+    "verify": "bash scripts/verify.sh",
+    "headless": "node build/headless/cli.js"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/three": "^0.187.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  }
+}
