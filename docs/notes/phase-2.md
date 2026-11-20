@@ -63,7 +63,7 @@ Phần **giữ nguyên** từ Phase 1: mô hình tick (snapshot 0, sự kiện g
 
 ## 4. Ma trận truy vết
 
-Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash scripts/verify.sh phase-2` tại commit de880e4: 6/6 PASS, 77/77 test). Bằng chứng từng fixture: [../proof/phase-2/scenarios/](../proof/phase-2/scenarios/README.md).
+Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash scripts/verify.sh phase-2` tại commit 8ff1e67, sau khi sửa lỗi review: 6/6 PASS, 83/83 test). Bằng chứng từng fixture: [../proof/phase-2/scenarios/](../proof/phase-2/scenarios/README.md).
 
 | Yêu cầu Ticket-02 | Test / fixture | Bằng chứng | Trạng thái |
 |---|---|---|---|
@@ -84,7 +84,7 @@ Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash script
 | P3 Gió mạnh Đêm 3 (logic, đẩy 10 m) | unit T13, fixture 21 | scenarios/21 | PASS |
 | Contract v1.1: CLI `--night`, mã thoát, schema snapshot/sự kiện | headless.test.ts (exit code, schema) | unit-and-scenario-tests.log | PASS |
 | Tất định 3 Đêm | verify.sh `determinism` | determinism.log | PASS |
-| Hiệu năng: 21 600 tick ≤ 30 s mỗi Đêm | verify.sh `performance` (87 / 104 / 134 ms, Apple M5) | performance.log | PASS |
+| Hiệu năng: 21 600 tick ≤ 30 s mỗi Đêm | verify.sh `performance` (90 / 108 / 136 ms, Apple M5) | performance.log | PASS |
 | P3 Chuỗi 3 Đêm, menu tạm dừng, Cài đặt (localStorage), âm thanh, HUD, cảnh báo gió | Chơi thủ công | Chưa có ảnh chụp | NOT VERIFIED |
 | Bảng màu HEX, ánh sáng môi trường | Đọc code (`PAL`, `main.ts`) | — | PASS (đọc code), hình ảnh NOT VERIFIED |
 | FPS ≥ 30 ở 1280×720 | Đồng hồ FPS trong game | Chưa đo | NOT VERIFIED |

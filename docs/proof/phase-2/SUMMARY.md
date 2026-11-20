@@ -1,7 +1,7 @@
 # Verification summary (phase-2)
 
-- commit: de880e4
-- date: 2026-11-20 16:05:11 +0700
+- commit: 8ff1e67
+- date: 2026-11-20 16:10:38 +0700
 - node: v24.22.3, os: Darwin arm64
 - command: bash scripts/verify.sh phase-2
 
