@@ -71,8 +71,8 @@ Nguồn: [SUMMARY.md](../proof/phase-4/SUMMARY.md) (`bash scripts/verify.sh phas
 |---|---|---|---|
 | §1 Cảnh bench (200 / 100 / L1–L3 / tắt sinh, sát thương, nhặt, dầu, kết thúc) | unit P4-1 | unit-and-scenario-tests.log | PASS |
 | §1 Công thức avg / p1_low / p95 | unit P4-1 (dãy tính tay) | unit-and-scenario-tests.log | PASS |
-| §1 Lệnh bench chạy thật, ghi `bench.json` | Chạy `bench_cmd` | [bench-attempts.md](../proof/phase-4/bench-attempts.md) | **NOT VERIFIED**: hai lần chạy đều bị cửa sổ Safari ẩn nên không hợp lệ; cần chạy lại khi cửa sổ hiển thị |
-| §1 Ngưỡng avg ≥ 60, p1 ≥ 30, load ≤ 10 000 | Máy chấm của giảng viên | — | NOT VERIFIED (đo trên máy chấm) |
+| §1 Lệnh bench chạy thật, ghi `bench.json` | Chạy `bench_cmd` (Safari, cửa sổ hiển thị) | [bench.json](../../bench.json), [bench-attempts.md](../proof/phase-4/bench-attempts.md) | PASS: avg 60 (giới hạn vsync của Safari), p1_low 55.6, p95 17 ms, load 736 ms, 1801 khung. Hai lần chạy trước không hợp lệ (cửa sổ ẩn), đã ghi lại |
+| §1 Ngưỡng avg ≥ 60, p1 ≥ 30, load ≤ 10 000 | Máy chấm của giảng viên | Máy làm bài: 60 / 55.6 / 736 | Đạt trên máy làm bài; máy chấm NOT VERIFIED |
 | §2 Soak: 0 crash, RSS ≤ 1.2× | unit P4-2 + `verify.sh › soak` | [soak.json](../../soak.json), soak.log, [memory-diagnosis.log](../proof/phase-4/memory-diagnosis.log) | PASS (×1.07 với `--jitless`; ×1.35 nếu không có cờ, xem D4) |
 | §3 Tên, top 10, thứ tự, ISO 8601, lưu đĩa, export | unit P4-3 + `verify.sh › leaderboard-export` | leaderboard-export.log | PASS |
 | §3 Nhập tên sau Bình Minh / khi thua; màn hình từ menu | Đọc code (`main.ts`) | — | Code PASS, giao diện NOT VERIFIED |
@@ -84,11 +84,11 @@ Nguồn: [SUMMARY.md](../proof/phase-4/SUMMARY.md) (`bash scripts/verify.sh phas
 | §6 Contract v1.3 | unit T1; 44 fixture v1.0–v1.2 vẫn PASS | unit-and-scenario-tests.log | PASS |
 | §7 Retro | [retro.md](retro.md) | — | PASS |
 | §7 Video demo | — | — | Không làm (quyết định của người làm bài) |
-| DoD: `bench.json` + `soak.json` tự chạy được commit | soak.json đã commit | — | soak PASS; bench NOT VERIFIED (như trên) |
+| DoD: `bench.json` + `soak.json` tự chạy được commit | Cả hai đã commit | bench.json, soak.json | PASS |
 
 ## 6. Đánh giá Phase 4
 
 - **Đạt:** Contract v1.3, soak, bảng xếp hạng (cả lưu đĩa và export), đổi phím, cùng toàn bộ hồi quy Phase 1–3 (159/159 test, 44 fixture CLI) đều có test và PASS.
 - **Không phá phase trước:** cảnh bench chỉ bật bằng cờ nội bộ `bench`, không thể bật từ scenario, nên đầu ra headless của v1.0–v1.2 giữ nguyên (mọi fixture cũ PASS).
-- **Chưa đạt hoặc chưa kiểm:** chưa có `bench.json` hợp lệ (cửa sổ Safari bị ẩn khi đo). Phần nhìn và nghe chưa kiểm bằng mắt. Không có video.
+- **Chưa đạt hoặc chưa kiểm:** bench chỉ đo được với Safari (vsync bật, không có RSS); hai lần đo đầu không hợp lệ vì cửa sổ ẩn. Phần nhìn và nghe chưa kiểm bằng mắt. Không có video.
 - **Bài học:** đo bộ nhớ phải phân biệt heap sống với RSS (JIT); đo FPS phải bảo đảm cửa sổ hiển thị. Cả hai đã ghi vào CLAUDE.md và trở thành điều kiện trong code (trang tự đo lại khi cửa sổ ẩn).
