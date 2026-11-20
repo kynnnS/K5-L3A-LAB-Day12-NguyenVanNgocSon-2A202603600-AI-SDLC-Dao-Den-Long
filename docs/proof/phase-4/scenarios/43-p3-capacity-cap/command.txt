@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 1 --snapshot-every 1 --out docs/proof/phase-4/scenarios/43-p3-capacity-cap/output.jsonl --scenario docs/proof/phase-4/scenarios/43-p3-capacity-cap/scenario.json --inputs docs/proof/phase-4/scenarios/43-p3-capacity-cap/inputs.json
+exit=0

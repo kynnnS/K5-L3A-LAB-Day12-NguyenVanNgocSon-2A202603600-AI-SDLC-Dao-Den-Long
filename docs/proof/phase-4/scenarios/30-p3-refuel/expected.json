@@ -1,0 +1,30 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "refuel",
+      "data": {
+        "lantern_id": "L1",
+        "amount": 6,
+        "fuel": 100
+      }
+    }
+  ],
+  "event_counts": {
+    "refuel": 1
+  },
+  "snapshots": [
+    {
+      "tick": 5,
+      "player": {
+        "carried": 4,
+        "capacity": 10
+      }
+    }
+  ],
+  "end": {
+    "ticks": 5,
+    "state": "playing",
+    "score": 30
+  }
+}

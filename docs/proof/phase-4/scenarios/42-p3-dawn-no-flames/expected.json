@@ -1,0 +1,26 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "tick": 1,
+      "name": "game_over",
+      "data": {
+        "result": "lost",
+        "reason": "no_flames"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 1,
+    "state": "lost",
+    "score": 0
+  }
+}

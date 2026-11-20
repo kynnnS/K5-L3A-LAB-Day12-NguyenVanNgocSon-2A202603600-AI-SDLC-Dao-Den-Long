@@ -1,0 +1,19 @@
+run_cmd: node build/headless/serve.js --export-leaderboard out.json
+{
+  "entries": [
+    {
+      "name": "Sơn",
+      "score": 900,
+      "nights_won": 3,
+      "achieved_at": "2026-11-20T11:00:00+07:00",
+      "seed": 5
+    },
+    {
+      "name": "Mây_1",
+      "score": 120,
+      "nights_won": 1,
+      "achieved_at": "2026-11-20T10:00:00+07:00",
+      "seed": 3
+    }
+  ]
+}

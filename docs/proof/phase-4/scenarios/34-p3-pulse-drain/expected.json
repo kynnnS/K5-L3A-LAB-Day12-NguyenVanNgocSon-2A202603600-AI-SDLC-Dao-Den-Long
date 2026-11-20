@@ -1,0 +1,29 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "pulse",
+      "data": {
+        "stunned_ids": [
+          "S1"
+        ]
+      }
+    }
+  ],
+  "snapshots": [
+    {
+      "tick": 1,
+      "shades": [
+        {
+          "id": "S1",
+          "state": "stunned"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 2,
+    "state": "playing",
+    "score": 15
+  }
+}

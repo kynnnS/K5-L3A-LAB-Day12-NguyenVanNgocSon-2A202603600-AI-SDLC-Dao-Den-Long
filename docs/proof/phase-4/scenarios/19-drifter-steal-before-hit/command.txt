@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 2 --ticks 1 --snapshot-every 1 --out docs/proof/phase-4/scenarios/19-drifter-steal-before-hit/output.jsonl --scenario docs/proof/phase-4/scenarios/19-drifter-steal-before-hit/scenario.json
+exit=0

@@ -1,0 +1,22 @@
+{
+  "snapshots": [
+    {
+      "tick": 0,
+      "player": {
+        "capacity": 18
+      }
+    },
+    {
+      "tick": 1,
+      "player": {
+        "capacity": 20,
+        "carried": 5
+      }
+    }
+  ],
+  "end": {
+    "ticks": 1,
+    "state": "playing",
+    "score": 65
+  }
+}

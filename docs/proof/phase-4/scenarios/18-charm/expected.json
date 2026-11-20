@@ -1,0 +1,36 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "charm_picked",
+      "data": {
+        "charm_id": "C1",
+        "charm_ticks": 600
+      }
+    }
+  ],
+  "snapshots": [
+    {
+      "tick": 61,
+      "player": {
+        "pos": [
+          41.8,
+          0,
+          0
+        ],
+        "charm_s": 9
+      },
+      "charms": [
+        {
+          "id": "C1",
+          "available": false,
+          "respawn_s": 44
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 61,
+    "state": "playing"
+  }
+}

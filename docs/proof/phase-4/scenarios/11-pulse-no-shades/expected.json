@@ -1,0 +1,28 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "pulse",
+      "data": {
+        "stunned_ids": []
+      }
+    }
+  ],
+  "event_counts": {
+    "pulse": 1
+  },
+  "snapshots": [
+    {
+      "tick": 1,
+      "player": {
+        "carried": 0,
+        "pulse_cd_s": 3
+      },
+      "score": 0
+    }
+  ],
+  "end": {
+    "ticks": 10,
+    "score": 0
+  }
+}

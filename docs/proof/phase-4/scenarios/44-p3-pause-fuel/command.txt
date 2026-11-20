@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 100 --snapshot-every 100 --out docs/proof/phase-4/scenarios/44-p3-pause-fuel/output.jsonl --scenario docs/proof/phase-4/scenarios/44-p3-pause-fuel/scenario.json --inputs docs/proof/phase-4/scenarios/44-p3-pause-fuel/inputs.json
+exit=0

@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 130 --snapshot-every 60 --out docs/proof/phase-4/scenarios/29-p3-fuel-decay-out/output.jsonl --scenario docs/proof/phase-4/scenarios/29-p3-fuel-decay-out/scenario.json
+exit=0

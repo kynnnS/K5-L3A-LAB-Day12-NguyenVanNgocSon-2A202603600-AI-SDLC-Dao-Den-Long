@@ -1,0 +1,18 @@
+# Soak memory diagnosis (2026-11-20 19:49 +0700, v24.22.3, Apple M5)
+# Same soak (seed 7, 10 nights) with different V8 flags; RSS read after a full GC.
+flags='' -> {"nights":10,"crashes":0,"results":["lost","lost","lost","lost","lost","lost","lost","lost","lost","lost"],"mem_start_mb":50.4,"mem_end_mb":68,"duration_s":0.1}
+flags='--max-semi-space-size=1' -> {"nights":10,"crashes":0,"results":["lost","lost","lost","lost","lost","lost","lost","lost","lost","lost"],"mem_start_mb":50.1,"mem_end_mb":66,"duration_s":0.1}
+flags='--no-opt' -> {"nights":10,"crashes":0,"results":["lost","lost","lost","lost","lost","lost","lost","lost","lost","lost"],"mem_start_mb":50.2,"mem_end_mb":63.6,"duration_s":0.1}
+flags='--jitless' -> {"nights":10,"crashes":0,"results":["lost","lost","lost","lost","lost","lost","lost","lost","lost","lost"],"mem_start_mb":47.3,"mem_end_mb":50.8,"duration_s":0.4}
+
+# Live JS heap (heapUsed after gc) vs RSS over 60 nights, default flags:
+start rss=49.3 heapUsed=4.19 heapTotal=7.1 ext=2.0
+1 lost 860 rss=52.6 heapUsed=4.52 heapTotal=6.8 ext=1.9
+2 lost 6727 rss=63.4 heapUsed=4.64 heapTotal=7.8 ext=1.9
+3 lost 3402 rss=66.5 heapUsed=4.75 heapTotal=9.8 ext=1.9
+10 lost 1245 rss=67.8 heapUsed=4.76 heapTotal=10.1 ext=1.9
+20 lost 2592 rss=72.3 heapUsed=4.82 heapTotal=10.3 ext=1.9
+30 lost 1785 rss=76.6 heapUsed=4.85 heapTotal=10.6 ext=1.9
+40 lost 2780 rss=76.6 heapUsed=4.85 heapTotal=10.6 ext=1.9
+50 lost 3362 rss=80.7 heapUsed=4.86 heapTotal=14.1 ext=1.9
+60 lost 1282 rss=80.8 heapUsed=4.91 heapTotal=14.1 ext=1.9

@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 2 --snapshot-every 1 --out docs/proof/phase-4/scenarios/34-p3-pulse-drain/output.jsonl --scenario docs/proof/phase-4/scenarios/34-p3-pulse-drain/scenario.json --inputs docs/proof/phase-4/scenarios/34-p3-pulse-drain/inputs.json
+exit=0

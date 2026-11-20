@@ -1,0 +1,68 @@
+{
+  "events": [
+    {
+      "tick": 120,
+      "name": "lantern_out",
+      "data": {
+        "lantern_id": "L1"
+      }
+    }
+  ],
+  "event_counts": {
+    "lantern_out": 1
+  },
+  "snapshots": [
+    {
+      "tick": 60,
+      "lanterns": [
+        {
+          "id": "L1",
+          "lit": true,
+          "fuel": 1
+        },
+        {
+          "id": "L2"
+        },
+        {
+          "id": "L3"
+        },
+        {
+          "id": "L4"
+        },
+        {
+          "id": "L5"
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "lanterns": [
+        {
+          "id": "L1",
+          "lit": false,
+          "fuel": 0,
+          "deposited": 0,
+          "ever_lit": true,
+          "relit_count": 0
+        },
+        {
+          "id": "L2"
+        },
+        {
+          "id": "L3"
+        },
+        {
+          "id": "L4"
+        },
+        {
+          "id": "L5"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 130,
+    "state": "playing",
+    "score": 0
+  }
+}

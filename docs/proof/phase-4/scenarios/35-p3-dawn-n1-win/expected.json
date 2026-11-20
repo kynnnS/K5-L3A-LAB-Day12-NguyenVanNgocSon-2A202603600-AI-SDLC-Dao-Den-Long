@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "game_over",
+      "data": {
+        "result": "won",
+        "reason": "dawn_survived"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 1,
+    "state": "won",
+    "score": 597
+  }
+}

@@ -1,0 +1,4 @@
+machine: Apple M5, Darwin arm64, node v24.22.3
+night 1: ticks=21600 wall=94 ms end={"type":"end","ticks":14400,"state":"lost","score":0}
+night 2: ticks=21600 wall=112 ms end={"type":"end","ticks":16200,"state":"lost","score":0}
+night 3: ticks=21600 wall=150 ms end={"type":"end","ticks":18000,"state":"lost","score":0}

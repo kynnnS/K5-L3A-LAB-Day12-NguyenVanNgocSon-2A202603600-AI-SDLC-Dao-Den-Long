@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "tick": 120,
+      "name": "game_over",
+      "data": {
+        "result": "lost",
+        "reason": "dawn"
+      }
+    }
+  ],
+  "end": {
+    "ticks": 120,
+    "state": "lost",
+    "score": 0
+  }
+}

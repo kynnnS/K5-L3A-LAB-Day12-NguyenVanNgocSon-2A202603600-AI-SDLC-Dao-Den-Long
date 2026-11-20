@@ -1,0 +1,3 @@
+soak_cmd: node --expose-gc --jitless build/headless/soak.js --seed 7 --nights 10
+{"nights":10,"crashes":0,"results":["lost","lost","lost","lost","lost","lost","lost","lost","lost","lost"],"mem_start_mb":47.3,"mem_end_mb":50.8,"duration_s":0.4}
+crashes=0 mem 47.3 -> 50.8 MB (ratio 1.074, limit 1.2)

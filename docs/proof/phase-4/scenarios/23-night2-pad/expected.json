@@ -1,0 +1,17 @@
+{
+  "absent_events": [
+    "player_hit"
+  ],
+  "snapshots": [
+    {
+      "tick": 84,
+      "player": {
+        "grounded": true
+      }
+    }
+  ],
+  "end": {
+    "ticks": 84,
+    "state": "playing"
+  }
+}
