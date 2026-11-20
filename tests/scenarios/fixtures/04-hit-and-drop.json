@@ -1,0 +1,47 @@
+{
+  "id": "04-hit-and-drop",
+  "requirement": "C8",
+  "description": "Shade 3 m away reaches hit radius 1 m at tick 35; drops floor(4*0.5)=2",
+  "seed": 1,
+  "ticks": 120,
+  "snapshot_every": 10,
+  "scenario": {
+    "player": {
+      "carried": 4
+    },
+    "random_motes": false,
+    "random_shades": false,
+    "motes": [],
+    "shades": [
+      {
+        "id": "S1",
+        "pos": [
+          3,
+          1,
+          0
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 35,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 2,
+          "dropped": 2
+        }
+      }
+    ],
+    "absent_events": [
+      "game_over"
+    ],
+    "end": {
+      "ticks": 120,
+      "state": "playing",
+      "score": 0
+    }
+  }
+}

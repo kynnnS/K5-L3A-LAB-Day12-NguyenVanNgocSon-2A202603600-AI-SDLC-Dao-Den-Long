@@ -1,0 +1,104 @@
+{
+  "id": "02-collect-and-light",
+  "requirement": "C6",
+  "description": "Walk to L1 collecting 5 motes, interact -> deposit 5 + lantern_lit",
+  "seed": 1,
+  "ticks": 300,
+  "snapshot_every": 30,
+  "scenario": {
+    "random_motes": false,
+    "random_shades": false,
+    "motes": [
+      [
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        6
+      ],
+      [
+        0,
+        0,
+        9
+      ],
+      [
+        0,
+        0,
+        12
+      ],
+      [
+        0,
+        0,
+        15
+      ]
+    ],
+    "shades": []
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "move": [
+          0,
+          1
+        ]
+      },
+      {
+        "tick": 230,
+        "move": [
+          0,
+          0
+        ]
+      },
+      {
+        "tick": 240,
+        "interact": true
+      },
+      {
+        "tick": 241,
+        "interact": false
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 15,
+        "name": "mote_picked",
+        "data": {
+          "carried": 1
+        }
+      },
+      {
+        "name": "mote_picked",
+        "data": {
+          "carried": 5
+        }
+      },
+      {
+        "tick": 241,
+        "name": "deposit",
+        "data": {
+          "lantern_id": "L1",
+          "amount": 5,
+          "deposited": 5
+        }
+      },
+      {
+        "tick": 241,
+        "name": "lantern_lit",
+        "data": {
+          "lantern_id": "L1"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 300,
+      "state": "playing",
+      "score": 150
+    }
+  }
+}

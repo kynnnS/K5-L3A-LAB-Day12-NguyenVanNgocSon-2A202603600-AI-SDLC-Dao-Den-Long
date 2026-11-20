@@ -1,0 +1,84 @@
+{
+  "id": "05-win-all-lit",
+  "requirement": "C10",
+  "description": "4 lanterns pre-lit (no points); deposit 5 into L5 -> won/all_lit at tick 1 with bonus",
+  "seed": 1,
+  "ticks": 600,
+  "snapshot_every": 10,
+  "scenario": {
+    "player": {
+      "carried": 5
+    },
+    "random_motes": false,
+    "random_shades": false,
+    "motes": [],
+    "shades": [],
+    "lanterns": [
+      {
+        "id": "L1",
+        "lit": true
+      },
+      {
+        "id": "L2",
+        "lit": true
+      },
+      {
+        "id": "L3",
+        "lit": true
+      },
+      {
+        "id": "L4",
+        "lit": true
+      },
+      {
+        "id": "L5",
+        "pos": [
+          0,
+          0,
+          2
+        ]
+      }
+    ]
+  },
+  "inputs": {
+    "frames": [
+      {
+        "tick": 0,
+        "interact": true
+      }
+    ]
+  },
+  "expect": {
+    "events": [
+      {
+        "tick": 1,
+        "name": "deposit",
+        "data": {
+          "lantern_id": "L5",
+          "amount": 5,
+          "deposited": 5
+        }
+      },
+      {
+        "tick": 1,
+        "name": "lantern_lit",
+        "data": {
+          "lantern_id": "L5"
+        }
+      },
+      {
+        "tick": 1,
+        "name": "game_over",
+        "data": {
+          "result": "won",
+          "reason": "all_lit"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1,
+      "state": "won",
+      "score": 549
+    }
+  }
+}

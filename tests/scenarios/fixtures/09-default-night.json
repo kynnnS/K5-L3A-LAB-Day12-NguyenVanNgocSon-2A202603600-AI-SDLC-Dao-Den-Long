@@ -1,0 +1,55 @@
+{
+  "id": "09-default-night",
+  "requirement": "C3,C4,C11",
+  "description": "Default Night 1, idle player: S1 spawns at tick 600 on r=38, hits at 1234 (37 m / 0.05833 m/tick = 635 steps), then every invuln 120 ticks -> lost/no_flames at 1474",
+  "seed": 2026,
+  "ticks": 3600,
+  "snapshot_every": 60,
+  "expect": {
+    "events": [
+      {
+        "tick": 600,
+        "name": "shade_spawned",
+        "data": {
+          "id": "S1"
+        }
+      },
+      {
+        "tick": 1234,
+        "name": "player_hit",
+        "data": {
+          "by": "shade",
+          "flames": 2,
+          "dropped": 0
+        }
+      },
+      {
+        "tick": 1354,
+        "name": "player_hit",
+        "data": {
+          "flames": 1
+        }
+      },
+      {
+        "tick": 1474,
+        "name": "player_hit",
+        "data": {
+          "flames": 0
+        }
+      },
+      {
+        "tick": 1474,
+        "name": "game_over",
+        "data": {
+          "result": "lost",
+          "reason": "no_flames"
+        }
+      }
+    ],
+    "end": {
+      "ticks": 1474,
+      "state": "lost",
+      "score": 0
+    }
+  }
+}
