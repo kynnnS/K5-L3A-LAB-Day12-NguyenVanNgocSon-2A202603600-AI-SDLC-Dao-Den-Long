@@ -166,6 +166,7 @@ export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, s
     nextShadeId: 1,
     nextDrifterId: 1,
     prevButtons: { jump: false, interact: false, pulse: false, dash: false, pause: false },
+    bench: false,
   };
 
   for (const l of scenario.lanterns ?? []) {
@@ -395,7 +396,8 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
     state.wind = { active: true, dirDeg: Math.floor(random(state) * 360), ticksLeft: WIND_DURATION_TICKS };
   }
   // Ticket-03: fuel decay (1/s) + drain (5/s per draining shade, stacked), integer 1/60 units.
-  for (const l of state.lanterns) if (l.lit) l.fuel -= ctx.fuel.decay;
+  // (Ticket-04 bench scene: no fuel use.)
+  if (!state.bench) for (const l of state.lanterns) if (l.lit) l.fuel -= ctx.fuel.decay;
   const drains: Array<[Shade, Lantern]> = [];
   for (const s of [...state.shades].sort((a, b) => idCompare(a.id, b.id))) {
     if (s.state !== 'drain') continue;
@@ -423,8 +425,8 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
   // 3. Move Mây (jump, dash, pads, wind) then check falling off the island.
   movePlayer(state, ctx, input, jumpPressed, dashPressed, emit);
 
-  // 4. Pick up fireflies and charms.
-  if (!p.fallen) {
+  // 4. Pick up fireflies and charms (off in the bench scene).
+  if (!p.fallen && !state.bench) {
     state.motes = state.motes.filter((m) => {
       if (p.carried >= capacity(state, tuning)) return true;
       if (distXZ(p.pos, m.pos) > tuning.pickup_radius + EPS || Math.abs(p.pos[1] - m.pos[1]) > PICKUP_HEIGHT + EPS) return true;
@@ -536,8 +538,8 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
   for (const s of state.shades) moveShade(state, ctx, s);
   for (const d of state.drifters) moveDrifter(state, ctx, d);
 
-  // 9. Contacts: drifters steal first, then shades hit (ids ascending, max one flame per tick).
-  if (!p.fallen) {
+  // 9. Contacts: drifters steal first, then shades hit (ids ascending, max one flame per tick). Off in bench.
+  if (!p.fallen && !state.bench) {
     for (const d of [...state.drifters].sort((a, b) => idCompare(a.id, b.id))) {
       if (d.state !== 'chase' || d.hasStolen || distXZ(p.pos, d.pos) > DRIFTER_STEAL_RADIUS + EPS) continue;
       const amount = Math.min(DRIFTER_STEAL_MAX, p.carried);
@@ -568,11 +570,12 @@ export function step(state: GameState, tuning: Tuning, input: InputState): Timed
   }
 
   // 10. Spawns (new entities interact from the next tick).
-  spawn(state, ctx, t, emit);
+  if (!state.bench) spawn(state, ctx, t, emit);
 
   // 11. Win / lose (Ticket-03), after every update of the tick: no flames -> lost (always first);
   //     at dawn: lit >= ceil(0.6 x total) -> won (dawn_survived) else lost (dawn). No early win.
   const left = timeLeft(state);
+  if (state.bench) return events; // bench: the night never ends
   if (p.flames <= 0) {
     state.status = 'lost';
     emit({ name: 'game_over', data: { result: 'lost', reason: 'no_flames' } });
@@ -747,7 +750,7 @@ function moveShade(state: GameState, ctx: Ctx, s: Shade): void {
       s.targetLanternId = null;
       s.drainTicks = 0;
     }
-    const targetable = !p.fallen;
+    const targetable = !p.fallen && !state.bench; // bench: shades keep wandering
     const d = distXZ(s.pos, p.pos);
     if (!targetable) s.state = 'wander';
     else if (s.state === 'wander' && d <= SHADE_DETECT + EPS) s.state = 'chase';

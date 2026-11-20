@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import contractJson from '../../game.contract.json' with { type: 'json' };
 import { DT, FUEL_UNITS, WIND_PERIOD_TICKS, WIND_WARNING_TICKS } from '../core/constants.js';
+import { createBenchGame } from '../core/bench.js';
 import { getMap, nightDuration } from '../core/maps.js';
 import { capacity, createGame, requiredLit, step } from '../core/sim.js';
 import { parseTuning } from '../core/tuning.js';
@@ -16,9 +17,18 @@ import {
   PAL, buildCharm, buildDrifter, buildLantern, buildLeaves, buildMote, buildPlayer, buildPulseRing, buildShade, buildWorld,
   type LanternView, type ShadeView,
 } from './models.js';
+import { ACTIONS, ACTION_LABELS, DEFAULT_KEYMAP, keyConflicts, keyLabel, type KeyMap } from '../shared/keymap.js';
+import { isValidName, isoWithOffset, normalizeName, type LeaderboardEntry } from '../shared/leaderboard.js';
+import { loadLeaderboard, saveScore } from './leaderboard.js';
 import { loadSettings, saveSettings } from './settings.js';
 
 const tuning = parseTuning(contractJson);
+// Ticket-04 bench mode: ?bench=1&seed=42&duration=30 (opened by build/headless/bench.js).
+const params = new URLSearchParams(location.search);
+const BENCH = params.get('bench') === '1';
+const BENCH_SEED = Number(params.get('seed') ?? 42);
+const BENCH_DURATION_MS = Number(params.get('duration') ?? 30) * 1000;
+const BENCH_WARMUP_MS = 3000;
 const $ = (id: string) => document.getElementById(id)!;
 
 const INTRO: Record<number, string[]> = {
@@ -30,7 +40,7 @@ const INTRO: Record<number, string[]> = {
 // ---------- renderer / scene ----------
 const canvas = $('scene') as HTMLCanvasElement;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(BENCH ? 1 : Math.min(window.devicePixelRatio, 2)); // bench renders exactly 1280x720
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(PAL.sky);
@@ -46,8 +56,10 @@ const leaves = buildLeaves();
 scene.add(player.group, pulseRing, leaves);
 
 function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const w = BENCH ? 1280 : window.innerWidth;
+  const h = BENCH ? 720 : window.innerHeight;
+  renderer.setSize(w, h, BENCH); // bench: fixed 1280x720 canvas (CSS size too)
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
@@ -58,17 +70,21 @@ const settings = loadSettings();
 const audio = new Audio();
 audio.setVolume(settings.volume);
 const hud = new Hud(tuning);
-type Mode = 'menu' | 'intro' | 'playing' | 'result' | 'dawn';
+type Mode = 'menu' | 'intro' | 'playing' | 'result' | 'dawn' | 'bench';
 let mode: Mode = 'menu';
 let night: 1 | 2 | 3 = 1;
 const wonScores: number[] = [0, 0, 0];
+const wonFlags: boolean[] = [false, false, false];
+let nightSeed = 0;
+let shakeUntil = 0;
 let state: GameState | undefined;
 let forcePauseTicks = 0; // menu buttons toggle pause through the same input edge as Esc/P
 
 const settingsOpen = () => !$('settings').classList.contains('hidden');
 const input = new InputController(canvas, (code) => {
   audio.unlock();
-  if (code === 'Enter' && mode !== 'playing' && !settingsOpen()) ($('ov-primary') as HTMLButtonElement).click();
+  const typing = (document.activeElement as HTMLElement | null)?.tagName === 'INPUT';
+  if (code === 'Enter' && mode !== 'playing' && !settingsOpen() && !typing) ($('ov-primary') as HTMLButtonElement).click();
 });
 
 // Leaving the tab while playing pauses the night (same input edge as Esc/P).
@@ -96,18 +112,55 @@ function clearWorld() {
 }
 
 // ---------- overlay screens ----------
-function screen(title: string, sub: string, body: string, primary: string, onPrimary: () => void, secondary?: [string, () => void]) {
+function screen(title: string, sub: string, body: string, primary: string, onPrimary: () => void, ...extra: Array<[string, () => void]>) {
   $('ov-title').textContent = title;
   $('ov-sub').textContent = sub;
   $('ov-body').innerHTML = body;
   const p = $('ov-primary') as HTMLButtonElement;
   p.textContent = primary;
   p.onclick = () => { audio.unlock(); onPrimary(); };
-  const s = $('ov-secondary') as HTMLButtonElement;
-  s.classList.toggle('hidden', !secondary);
-  if (secondary) { s.textContent = secondary[0]; s.onclick = secondary[1]; }
+  const box = $('ov-buttons');
+  for (const b of [...box.querySelectorAll('button.extra')]) b.remove();
+  for (const [label, fn] of extra) {
+    const b = document.createElement('button');
+    b.className = 'ghost extra';
+    b.textContent = label;
+    b.onclick = fn;
+    box.appendChild(b);
+  }
   $('overlay').classList.remove('hidden');
   hud.show(false);
+}
+
+// ---------- leaderboard (Ticket-04 §3) ----------
+const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+function leaderboardTable(entries: LeaderboardEntry[]): string {
+  if (entries.length === 0) return '<p>Chưa có điểm nào.</p>';
+  return '<table class="lb"><tr><th>#</th><th>Tên</th><th>Điểm</th><th>Đêm thắng</th><th>Thời điểm</th></tr>'
+    + entries.map((e, i) => `<tr><td>${i + 1}</td><td>${esc(e.name)}</td><td>${e.score}</td><td>${e.nights_won}</td><td>${esc(e.achieved_at.replace('T', ' ').slice(0, 16))}</td></tr>`).join('') + '</table>';
+}
+async function showLeaderboard(back: () => void = () => showMenu()) {
+  const entries = await loadLeaderboard();
+  screen('Bảng xếp hạng', 'Top 10 · tổng điểm các Đêm đã thắng', leaderboardTable(entries), 'Quay lại (Enter)', back);
+}
+/** Name form after the Dawn screen or a lost night. */
+function scoreForm(): string {
+  const total = wonScores.reduce((a, b) => a + b, 0);
+  return `<form id="lb-form"><p>Lưu điểm <b>${total}</b> (${wonFlags.filter(Boolean).length} Đêm thắng) vào bảng xếp hạng:</p>`
+    + '<p><input id="lb-name" type="text" maxlength="12" placeholder="Tên (3–12 ký tự)" autocomplete="off" aria-label="Tên" /> <button type="submit">Lưu điểm</button></p>'
+    + '<p class="small">Chữ, số, dấu gạch dưới; có thể dùng tiếng Việt có dấu.</p><p id="lb-msg" class="warn" role="alert"></p></form>';
+}
+function wireScoreForm() {
+  const form = document.getElementById('lb-form') as HTMLFormElement | null;
+  if (!form) return;
+  form.onsubmit = async (ev) => {
+    ev.preventDefault();
+    const name = normalizeName(($('lb-name') as HTMLInputElement).value);
+    if (!isValidName(name)) { $('lb-msg').textContent = '⚠ Tên phải có 3–12 ký tự: chữ, số hoặc _.'; return; }
+    const entry: LeaderboardEntry = { name, score: wonScores.reduce((a, b) => a + b, 0), nights_won: wonFlags.filter(Boolean).length, achieved_at: isoWithOffset(new Date()), seed: nightSeed };
+    await saveScore(entry);
+    void showLeaderboard();
+  };
 }
 
 function showMenu() {
@@ -117,7 +170,7 @@ function showMenu() {
   audio.stopMusic();
   $('pause-menu').classList.add('hidden');
   screen('Đảo Đèn Lồng', 'Ba hòn đảo · ba đêm', '<p>Giúp <b>Mây</b> gom đom đóm và thắp lại các <b>Đèn Lồng Lớn</b>. Tránh <b class="ink">Bóng Mực</b> và <b class="drift">Gió Lạc</b>.</p>',
-    'Bắt đầu (Enter)', () => { wonScores.fill(0); showIntro(1); }, ['Cài đặt', () => openSettings()]);
+    'Bắt đầu (Enter)', () => { wonScores.fill(0); wonFlags.fill(false); showIntro(1); }, ['Bảng xếp hạng', () => void showLeaderboard()], ['Cài đặt', () => openSettings()]);
 }
 
 function showIntro(n: 1 | 2 | 3) {
@@ -133,7 +186,8 @@ function showIntro(n: 1 | 2 | 3) {
 function startNight() {
   clearWorld();
   const map = getMap(night, tuning);
-  state = createGame(tuning, Math.floor(Math.random() * 1e9), night); // client: each attempt is a new seed
+  nightSeed = Math.floor(Math.random() * 1e9); // client: each attempt is a new seed
+  state = createGame(tuning, nightSeed, night);
   world = buildWorld(map);
   scene.add(world);
   for (const l of state.lanterns) {
@@ -158,12 +212,14 @@ function showResult(result: 'won' | 'lost', reason: string) {
   const s = state!;
   if (result === 'won') {
     wonScores[night - 1] = s.score; // replays overwrite, never double count
+    wonFlags[night - 1] = true;
     audio.play('win');
     const total = wonScores.reduce((a, b) => a + b, 0);
     if (night === 3) {
       mode = 'dawn';
-      screen('Bình Minh', 'Ba hòn đảo đã sáng trở lại', `<p>Điểm Đêm 3: <b>${s.score}</b></p><p class="big">Tổng điểm: <b>${total}</b></p><p>Ông Đăng: "Cảm ơn con, Mây."</p>`,
-        'Về menu (Enter)', () => showMenu());
+      screen('Bình Minh', 'Ba hòn đảo đã sáng trở lại', `<p>Điểm Đêm 3: <b>${s.score}</b></p><p class="big">Tổng điểm: <b>${total}</b></p><p>Ông Đăng: "Cảm ơn con, Mây."</p>` + scoreForm(),
+        'Về menu', () => showMenu(), ['Bảng xếp hạng', () => void showLeaderboard()]);
+      wireScoreForm();
     } else {
       mode = 'result';
       screen(`Thắng Đêm ${night}!`, `${getMap(night, tuning).name} · ${s.lanterns.filter((l) => l.lit).length}/${s.lanterns.length} đèn sáng lúc bình minh`, `<p>Điểm đêm: <b>${s.score}</b> · Lửa còn: ${s.player.flames}</p><p>Tổng điểm: <b>${total}</b></p>`,
@@ -174,7 +230,8 @@ function showResult(result: 'won' | 'lost', reason: string) {
     audio.play('lose');
     const litNow = s.lanterns.filter((l) => l.lit).length;
     screen(`Thua Đêm ${night}`, reason === 'dawn' ? `Bình minh đến nhưng chỉ ${litNow}/${s.lanterns.length} đèn sáng (cần ${requiredLit(s, tuning)})` : 'Ngọn lửa của Mây đã tắt',
-      `<p>Điểm đêm này không được tính.</p>`, 'Chơi lại Đêm (Enter)', () => startNight(), ['Về menu', () => showMenu()]);
+      `<p>Điểm đêm này không được tính.</p>` + scoreForm(), 'Chơi lại Đêm', () => startNight(), ['Về menu', () => showMenu()]);
+    wireScoreForm();
   }
 }
 
@@ -190,19 +247,62 @@ sens.value = String(settings.sensitivity);
 vol.oninput = () => audio.setVolume(Number(vol.value)); // live preview; saved on "Lưu"
 const cb = $('set-cb') as HTMLInputElement;
 cb.checked = settings.colorblind;
-/** Ticket-03 colour-blind palette: view only (never touches GameState or headless output). */
+const rm = $('set-rm') as HTMLInputElement;
+const lt = $('set-lt') as HTMLInputElement;
+/** View-only settings (colour-blind palette, reduced motion, large text): never touch GameState / headless output. */
 function applyPalette() {
   document.body.classList.toggle('cb', settings.colorblind);
+  document.body.classList.toggle('rm', settings.reducedMotion);
+  document.documentElement.classList.toggle('large', settings.largeText);
   hud.colorblind = settings.colorblind;
+  hud.reducedMotion = settings.reducedMotion;
+  input.keymap = { ...settings.keymap };
+  const k = settings.keymap;
+  $('hud-hint').textContent = `${[k.up, k.left, k.down, k.right].map(keyLabel).join('')} di chuyển · Kéo chuột / ← → xoay camera · ${keyLabel(k.jump)} nhảy · ${keyLabel(k.dash)} lướt · ${keyLabel(k.interact)} nạp/châm đèn · ${keyLabel(k.pulse)} tỏa sáng · Esc/${keyLabel(k.pause)} tạm dừng`;
 }
+// Key remapping (Ticket-04 §4): click a key, press the new one; duplicates are flagged and block saving.
+let draftKeys: KeyMap = { ...settings.keymap };
+let waiting: string | null = null;
+function renderKeymap() {
+  const conflicts = keyConflicts(draftKeys);
+  const bad = new Set(conflicts.flatMap((c) => c.actions));
+  $('keymap').innerHTML = ACTIONS.map((a) => `<div><span>${ACTION_LABELS[a]}</span><button type="button" data-action="${a}" class="ghost${bad.has(a) ? ' dup' : ''}${waiting === a ? ' wait' : ''}">${waiting === a ? 'Nhấn phím…' : esc(keyLabel(draftKeys[a]))}</button></div>`).join('');
+  $('key-warn').textContent = conflicts.map((c) => c.reserved
+    ? `⚠ ${keyLabel(c.code)} là phím hệ thống (${c.actions.map((x) => ACTION_LABELS[x]).join(', ')})`
+    : `⚠ Trùng phím ${keyLabel(c.code)}: ${c.actions.map((x) => ACTION_LABELS[x]).join(', ')}`).join(' · ');
+  ($('set-close') as HTMLButtonElement).disabled = conflicts.length > 0;
+  for (const b of $('keymap').querySelectorAll('button')) {
+    (b as HTMLButtonElement).onclick = () => { waiting = (b as HTMLButtonElement).dataset.action!; input.capturing = true; renderKeymap(); };
+  }
+}
+window.addEventListener('keydown', (e) => {
+  if (!waiting) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  draftKeys = { ...draftKeys, [waiting]: e.code };
+  waiting = null;
+  input.capturing = false;
+  renderKeymap();
+}, true);
+$('key-reset').onclick = () => { draftKeys = { ...DEFAULT_KEYMAP }; waiting = null; input.capturing = false; renderKeymap(); };
 applyPalette();
-function openSettings() { $('settings').classList.remove('hidden'); }
+function openSettings() {
+  draftKeys = { ...settings.keymap };
+  rm.checked = settings.reducedMotion;
+  lt.checked = settings.largeText;
+  renderKeymap();
+  $('settings').classList.remove('hidden');
+}
 $('set-close').onclick = () => {
+  if (keyConflicts(draftKeys).length > 0) return;
   settings.volume = Number(vol.value);
   settings.sensitivity = Number(sens.value);
   audio.setVolume(settings.volume);
   input.sensitivity = settings.sensitivity;
   settings.colorblind = cb.checked;
+  settings.reducedMotion = rm.checked;
+  settings.largeText = lt.checked;
+  settings.keymap = { ...draftKeys };
   applyPalette();
   saveSettings(settings);
   $('settings').classList.add('hidden');
@@ -215,11 +315,11 @@ function onEvents(events: TimedEvent[]) {
       case 'mote_picked': audio.play('pickup'); break;
       case 'lantern_lit': audio.play('lantern'); hud.toast(`Đèn ${event.data.lantern_id} ${event.data.relight ? 'thắp lại' : 'đã sáng'}! Túi đựng: ${capacity(state!, tuning)}`); break;
       case 'refuel': audio.play('pickup'); hud.toast(`Châm dầu ${event.data.lantern_id}: ${Math.floor(event.data.fuel)}/${tuning.fuel_max}`); break;
-      case 'lantern_out': audio.play('shade'); hud.toast(`${settings.colorblind ? '⚠ ' : ''}Đèn ${event.data.lantern_id} đã tắt!`); break;
+      case 'lantern_out': audio.play('shade'); hud.toast(`${settings.colorblind ? '⚠ ' : ''}Đèn ${event.data.lantern_id} đã tắt!`); hud.caption(`Đèn ${event.data.lantern_id} đã tắt`); break;
       case 'pulse': audio.play('pulse'); pulseAnim = 0; break;
-      case 'player_hit': audio.play('hit'); hud.flashHit(); if (event.data.by === 'fall') hud.toast('Mây rơi xuống biển mây…'); break;
+      case 'player_hit': audio.play('hit'); hud.flashHit(); shakeUntil = performance.now() + 300; if (event.data.by === 'fall') hud.toast('Mây rơi xuống biển mây…'); break;
       case 'dash': audio.play('dash'); break;
-      case 'shade_spawned': audio.play('shade'); break;
+      case 'shade_spawned': audio.play('shade'); hud.caption('Bóng Mực xuất hiện'); hud.pointAtShade(event.data.id); break;
       case 'charm_picked': hud.toast('Bùa Gió! Chạy nhanh, lướt không hồi chiêu'); break;
       case 'drifter_steal': hud.toast(`Gió Lạc cướp ${event.data.amount} đom đóm!`); break;
       case 'paused': $('pause-menu').classList.remove('hidden'); break;
@@ -332,9 +432,15 @@ function sync(s: GameState, time: number) {
   if (s.wind.active && s.wind.dirDeg !== null) leaves.rotation.y = -((s.wind.dirDeg * Math.PI) / 180);
   leaves.rotation.x += warning || s.wind.active ? 0.01 : 0;
 
+  if (mode === 'bench') return; // bench camera is driven by the orbit in frame()
   const yaw = (input.camYawDeg * Math.PI) / 180;
   camera.position.lerp(new THREE.Vector3(p.pos[0] - Math.sin(yaw) * 9, p.pos[1] + 5.5, p.pos[2] - Math.cos(yaw) * 9), 0.15);
   camera.lookAt(p.pos[0], p.pos[1] + 1.2, p.pos[2]);
+  // Camera shake on hit (0.3 s), off with reduced motion (Ticket-04).
+  if (!settings.reducedMotion && performance.now() < shakeUntil) {
+    camera.position.x += (Math.random() - 0.5) * 0.3;
+    camera.position.y += (Math.random() - 0.5) * 0.3;
+  }
 }
 
 /** True during the 2 s before each Night 3 gust (Ticket-02 warning). */
@@ -349,6 +455,16 @@ const fps = { frames: 0, since: performance.now(), samples: [] as number[] };
 function frame(now: number) {
   const elapsed = Math.min(0.25, (now - last) / 1000);
   last = now;
+  if (state && mode === 'bench') {
+    accumulator += elapsed;
+    while (accumulator >= DT) { step(state, tuning, IDLE_INPUT); accumulator -= DT; }
+    // Orbit: centre (0,0,0), radius 30 m, Y 15 m, from (30,15,0), counter-clockwise seen from above
+    // (+X towards +Z, the maps' angle convention), one turn per 15 s; always looking at (0,0,0).
+    const t = benchStart < 0 ? 0 : (now - benchStart) / 1000;
+    const a = (2 * Math.PI * t) / 15;
+    camera.position.set(30 * Math.cos(a), 15, 30 * Math.sin(a));
+    camera.lookAt(0, 0, 0);
+  }
   if (state && mode === 'playing') {
     accumulator += elapsed;
     while (accumulator >= DT && mode === 'playing') {
@@ -357,23 +473,29 @@ function frame(now: number) {
       if (forcePauseTicks > 0) { inp.pause = forcePauseTicks === 2; forcePauseTicks--; }
       const wasGrounded = state.player.grounded;
       const wasWarning = windWarning(state);
+      const lowU = tuning.low_fuel_threshold * FUEL_UNITS;
+      const wasWeak = new Set(state.lanterns.filter((l) => l.lit && l.fuel < lowU).map((l) => l.id));
       onEvents(step(state, tuning, inp));
       // Warning cue once per gust, on the simulation tick it starts (not per rendered frame).
-      if (!wasWarning && windWarning(state) && state.status === 'playing') { audio.play('wind'); hud.toast('Gió sắp nổi!'); }
+      if (!wasWarning && windWarning(state) && state.status === 'playing') { audio.play('wind'); hud.toast('Gió sắp nổi!'); hud.caption('Gió sắp thổi'); }
+      for (const l of state.lanterns) if (l.lit && l.fuel < lowU && !wasWeak.has(l.id)) hud.caption(`Đèn ${l.id} sắp cạn dầu (dưới ${tuning.low_fuel_threshold})`);
       if (wasGrounded && !state.player.grounded && state.player.vel[1] > 6 && !state.player.launch) audio.play('jump');
       accumulator -= DT;
     }
   }
   if (state) {
     sync(state, now / 1000);
-    const tick = hud.update(state, camera, wonScores.reduce((a, b, i) => a + (i === night - 1 ? 0 : b), 0));
-    if (tick !== null) audio.play('tick');
+    if (mode !== 'bench') {
+      const tick = hud.update(state, camera, wonScores.reduce((a, b, i) => a + (i === night - 1 ? 0 : b), 0));
+      if (tick !== null) { audio.play('tick'); hud.caption(tick === 10 ? '10 giây cuối!' : `Còn ${tick} giây`); }
+    }
   } else {
     const a = now / 9000;
     camera.position.set(Math.sin(a) * 55, 26, Math.cos(a) * 55);
     camera.lookAt(0, 0, 0);
   }
   renderer.render(scene, camera);
+  if (mode === 'bench') benchFrame(now);
   fps.frames++;
   if (now - fps.since >= 1000) {
     fps.samples.push((fps.frames * 1000) / (now - fps.since));
@@ -385,5 +507,63 @@ function frame(now: number) {
   }
   requestAnimationFrame(frame);
 }
-showMenu();
+// ---------- Ticket-04 benchmark ----------
+const IDLE_INPUT = { move: [0, 0] as [number, number], camYawDeg: 0, jump: false, interact: false, pulse: false, dash: false, pause: false };
+let benchStart = -1;
+let benchLast = 0;
+let benchSum = 0;
+const benchDts: number[] = [];
+let benchFirstFrameEpoch = 0;
+let benchDone = false;
+function rendererName(): string {
+  const gl = renderer.getContext();
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  const gpu = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : String(gl.getParameter(gl.RENDERER));
+  return `three.js r${THREE.REVISION} WebGL${renderer.capabilities.isWebGL2 ? '2' : '1'} · ${gpu} · ${navigator.userAgent}`;
+}
+function startBench() {
+  mode = 'bench';
+  state = createBenchGame(tuning, BENCH_SEED);
+  world = buildWorld(getMap(1, tuning));
+  scene.add(world);
+  for (const l of state.lanterns) {
+    const v = buildLantern(tuning.safe_radius);
+    v.group.position.set(l.pos[0], l.pos[1], l.pos[2]);
+    scene.add(v.group);
+    lanternViews.set(l.id, v);
+  }
+  $('overlay').classList.add('hidden');
+  $('fps').classList.add('hidden');
+  hud.show(false);
+}
+/** A hidden window gets no frames (the browser stops rAF): discard and restart warm-up when visible again. */
+document.addEventListener('visibilitychange', () => {
+  if (mode !== 'bench' || benchDone || !document.hidden) return;
+  benchStart = -1;
+  benchSum = 0;
+  benchDts.length = 0;
+});
+/** Called after each rendered bench frame: 3 s warm-up, then exactly `duration` seconds of frame times. */
+function benchFrame(now: number) {
+  if (benchDone) return;
+  if (benchStart < 0) {
+    benchStart = now;
+    benchLast = now;
+    if (benchFirstFrameEpoch === 0) benchFirstFrameEpoch = performance.timeOrigin + performance.now(); // first bench frame
+    return;
+  }
+  const dt = now - benchLast;
+  benchLast = now;
+  if (now - benchStart < BENCH_WARMUP_MS) return;
+  benchDts.push(dt);
+  benchSum += dt;
+  if (benchSum >= BENCH_DURATION_MS) {
+    benchDone = true;
+    void fetch('/api/bench-result', { method: 'POST', body: JSON.stringify({ dts: benchDts, firstFrameEpoch: benchFirstFrameEpoch, renderer: rendererName() }) });
+    document.title = 'bench done';
+  }
+}
+
+if (BENCH) startBench();
+else showMenu();
 requestAnimationFrame(frame);

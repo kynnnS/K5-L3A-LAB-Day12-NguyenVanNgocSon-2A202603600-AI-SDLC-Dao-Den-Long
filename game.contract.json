@@ -1,9 +1,11 @@
 {
-  "contract_version": "1.2",
+  "contract_version": "1.3",
   "team": "2A202603600-nguyen-van-ngoc-son",
   "build_cmd": "npm ci && npm run build",
-  "run_cmd": "npm start",
+  "run_cmd": "node build/headless/serve.js",
   "headless_cmd": "node build/headless/cli.js",
+  "bench_cmd": "node build/headless/bench.js",
+  "soak_cmd": "node --expose-gc --jitless build/headless/soak.js",
   "tuning": {
     "player_speed": 6,
     "carry_capacity": 10,

@@ -15,9 +15,12 @@ const L5 = ['L1', 'L2', 'L3', 'L4', 'L5'];
 const ev = (e: ReturnType<typeof runSteps>, name: string) => e.filter((x) => x.event.name === name);
 
 describe('T1 contract v1.1 + standard numbers (Ticket-02 Part 1 / Part 4)', () => {
-  // Updated for Ticket-03: v1.1 -> v1.2, night durations 240/270/300, fuel keys, per_mote 5, no time bonus.
-  it('declares v1.2 and the exact standard tuning', () => {
-    expect(contract.contract_version).toBe('1.2');
+  // Updated for Ticket-03 (v1.2: night durations 240/270/300, fuel keys, per_mote 5, no time bonus) and
+  // Ticket-04 (v1.3: bench_cmd + soak_cmd; tuning unchanged).
+  it('declares v1.3 with bench_cmd / soak_cmd and the exact standard tuning', () => {
+    expect(contract.contract_version).toBe('1.3');
+    expect(contract.bench_cmd).toBe('node build/headless/bench.js');
+    expect(contract.soak_cmd).toBe('node --expose-gc --jitless build/headless/soak.js');
     expect(contract.tuning).toEqual({
       player_speed: 6, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1,
       interact_radius: 2, pulse_cost: 3, pulse_radius: 5, night1_duration_s: 240, flames: 3, invuln_s: 1.5,

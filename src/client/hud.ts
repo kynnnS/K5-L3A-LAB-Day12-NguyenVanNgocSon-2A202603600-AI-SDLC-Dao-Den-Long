@@ -10,7 +10,10 @@ export class Hud {
   private toastTimer = 0;
   private lastSecond = -1;
   private cells = -1;
+  private captionTimer = 0;
+  private shadeTarget: { id: string; until: number } | null = null;
   colorblind = false;
+  reducedMotion = false;
 
   constructor(private tuning: Tuning) {}
 
@@ -31,7 +34,22 @@ export class Hud {
     this.toastTimer = window.setTimeout(() => el.classList.remove('show'), 1800);
   }
 
+  /** Ticket-04 subtitles / visual cues (shade appears, wind, last 10 s, low fuel). */
+  caption(text: string): void {
+    const el = $('hud-caption');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(this.captionTimer);
+    this.captionTimer = window.setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  /** Edge-of-screen arrow towards a shade (e.g. one that just appeared) for `ms` milliseconds. */
+  pointAtShade(id: string, ms = 3000): void {
+    this.shadeTarget = { id, until: performance.now() + ms };
+  }
+
   flashHit(): void {
+    if (this.reducedMotion) return; // Ticket-04: reduced motion turns screen flashes off
     const f = $('flash');
     f.classList.add('on');
     requestAnimationFrame(() => requestAnimationFrame(() => f.classList.remove('on')));
@@ -110,6 +128,23 @@ export class Hud {
         arrow.style.transform = `translate(-50%, -50%) rotate(${ang}rad)`;
       }
     } else arrow.classList.add('hidden');
+
+    // Edge arrow towards the shade being pointed at (shade-appeared cue).
+    const shArrow = $('hud-shade-arrow');
+    const sh = this.shadeTarget && performance.now() < this.shadeTarget.until ? state.shades.find((x) => x.id === this.shadeTarget!.id) : undefined;
+    if (sh) {
+      const v = new THREE.Vector3(sh.pos[0], sh.pos[1], sh.pos[2]).project(camera);
+      const onScreen = v.z < 1 && Math.abs(v.x) < 0.95 && Math.abs(v.y) < 0.9;
+      const sx = v.z < 1 ? v.x : -v.x;
+      const sy = v.z < 1 ? v.y : -v.y;
+      const ang = Math.atan2(-sy, sx);
+      const r = onScreen ? 0 : 0.46;
+      shArrow.classList.remove('hidden');
+      shArrow.style.left = onScreen ? `${50 + v.x * 50}%` : `${50 + Math.cos(ang) * r * 100}%`;
+      shArrow.style.top = onScreen ? `${50 - v.y * 50}%` : `${50 + Math.sin(ang) * r * 100}%`;
+      shArrow.style.transform = onScreen ? 'translate(-50%, -150%)' : `translate(-50%, -50%) rotate(${ang}rad)`;
+      shArrow.textContent = onScreen ? '▼' : '➤';
+    } else shArrow.classList.add('hidden');
 
     if (secs <= 10 && secs !== this.lastSecond && state.status === 'playing') {
       this.lastSecond = secs;

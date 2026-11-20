@@ -196,4 +196,6 @@ export interface GameState {
   nextShadeId: number;
   nextDrifterId: number;
   prevButtons: { jump: boolean; interact: boolean; pulse: boolean; dash: boolean; pause: boolean };
+  /** Ticket-04 benchmark scene: no spawns, damage, pickups, fuel use or end of night; shades only wander. */
+  bench: boolean;
 }

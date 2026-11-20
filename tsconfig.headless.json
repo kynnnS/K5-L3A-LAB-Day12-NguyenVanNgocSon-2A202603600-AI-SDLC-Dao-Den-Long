@@ -11,5 +11,5 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": ["src/core", "src/headless"]
+  "include": ["src/core", "src/headless", "src/shared"]
 }

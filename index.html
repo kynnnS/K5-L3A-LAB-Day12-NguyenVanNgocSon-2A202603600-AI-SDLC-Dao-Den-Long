@@ -19,8 +19,10 @@
     </div>
     <div id="hud-prompt" class="prompt"></div>
     <div id="hud-arrow" class="arrow hidden">➤</div>
+    <div id="hud-shade-arrow" class="arrow shade-arrow hidden" aria-hidden="true">➤</div>
+    <div id="hud-caption" class="caption" role="status" aria-live="polite"></div>
     <div id="hud-toast" class="toast"></div>
-    <div class="hint">WASD di chuyển · Kéo chuột / ← → xoay camera · Space nhảy · Shift lướt · E nạp đèn · F tỏa sáng · Esc/P tạm dừng</div>
+    <div id="hud-hint" class="hint"></div>
   </div>
   <div id="fps" class="fps"></div>
   <div id="flash"></div>
@@ -29,7 +31,7 @@
       <h1 id="ov-title">Đảo Đèn Lồng</h1>
       <p id="ov-sub"></p>
       <div id="ov-body"></div>
-      <div class="buttons"><button id="ov-primary">Bắt đầu</button><button id="ov-secondary" class="ghost hidden"></button></div>
+      <div class="buttons" id="ov-buttons"><button id="ov-primary">Bắt đầu</button></div>
     </div>
   </div>
   <div id="pause-menu" class="modal hidden">
@@ -44,12 +46,18 @@
     </div>
   </div>
   <div id="settings" class="modal hidden">
-    <div class="card">
+    <div class="card wide">
       <h1>Cài đặt</h1>
       <label>Âm lượng <input id="set-volume" type="range" min="0" max="1" step="0.05" /></label>
       <label>Độ nhạy chuột <input id="set-sens" type="range" min="0.2" max="3" step="0.1" /></label>
       <label>Bảng màu dễ phân biệt <input id="set-cb" type="checkbox" /></label>
-      <button id="set-close">Lưu</button>
+      <label>Giảm chuyển động (tắt rung camera, chớp màn hình) <input id="set-rm" type="checkbox" /></label>
+      <label>Chữ lớn (×1.25) <input id="set-lt" type="checkbox" /></label>
+      <h2>Phím</h2>
+      <div id="keymap" class="keymap"></div>
+      <p class="small">Esc luôn mở menu tạm dừng; ← → xoay camera.</p>
+      <p id="key-warn" class="warn" role="alert"></p>
+      <div class="buttons"><button id="key-reset" class="ghost">Khôi phục mặc định</button><button id="set-close">Lưu</button></div>
     </div>
   </div>
   <script type="module" src="./src/client/main.ts"></script>
