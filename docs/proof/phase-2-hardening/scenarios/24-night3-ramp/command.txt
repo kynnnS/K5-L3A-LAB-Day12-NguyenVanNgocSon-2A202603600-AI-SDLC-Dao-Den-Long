@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 3 --ticks 90 --snapshot-every 90 --out docs/proof/phase-2-hardening/scenarios/24-night3-ramp/output.jsonl --scenario docs/proof/phase-2-hardening/scenarios/24-night3-ramp/scenario.json --inputs docs/proof/phase-2-hardening/scenarios/24-night3-ramp/inputs.json
+exit=0

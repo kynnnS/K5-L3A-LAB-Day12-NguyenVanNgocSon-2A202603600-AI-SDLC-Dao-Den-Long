@@ -1,0 +1,46 @@
+{
+  "snapshots": [
+    {
+      "tick": 0,
+      "shades": [
+        {
+          "id": "S2"
+        },
+        {
+          "id": "S1"
+        },
+        {
+          "id": "S3"
+        }
+      ],
+      "motes": [
+        {
+          "id": "M1",
+          "pos": [
+            30,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 240,
+      "motes": [
+        {
+          "id": "M1"
+        },
+        {
+          "id": "M2",
+          "kind": "random",
+          "ttl_s": null
+        }
+      ],
+      "motes_active": 2
+    }
+  ],
+  "end": {
+    "ticks": 240,
+    "state": "playing"
+  }
+}

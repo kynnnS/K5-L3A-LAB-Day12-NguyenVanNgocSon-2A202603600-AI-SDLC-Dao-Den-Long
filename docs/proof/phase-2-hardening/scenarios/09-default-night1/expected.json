@@ -1,0 +1,43 @@
+{
+  "events": [
+    {
+      "tick": 300,
+      "name": "shade_spawned",
+      "data": {
+        "id": "S1"
+      }
+    },
+    {
+      "tick": 300,
+      "name": "shade_spawned",
+      "data": {
+        "id": "S2"
+      }
+    },
+    {
+      "tick": 780,
+      "name": "shade_spawned",
+      "data": {
+        "id": "S3"
+      }
+    }
+  ],
+  "event_counts": {
+    "shade_spawned": 3,
+    "player_hit": 0
+  },
+  "snapshots": [
+    {
+      "tick": 0,
+      "motes_active": 20
+    },
+    {
+      "tick": 790,
+      "motes_active": 23
+    }
+  ],
+  "end": {
+    "ticks": 790,
+    "state": "playing"
+  }
+}

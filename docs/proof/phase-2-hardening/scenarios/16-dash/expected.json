@@ -1,0 +1,53 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "dash",
+      "data": {}
+    },
+    {
+      "tick": 91,
+      "name": "dash",
+      "data": {}
+    }
+  ],
+  "event_counts": {
+    "dash": 2
+  },
+  "snapshots": [
+    {
+      "tick": 12,
+      "player": {
+        "pos": [
+          0,
+          0,
+          2.8
+        ],
+        "dash_cd_s": 1.317
+      }
+    },
+    {
+      "tick": 18,
+      "player": {
+        "pos": [
+          0,
+          0,
+          2.8
+        ]
+      }
+    },
+    {
+      "tick": 102,
+      "player": {
+        "pos": [
+          0,
+          0,
+          5.6
+        ]
+      }
+    }
+  ],
+  "end": {
+    "ticks": 150
+  }
+}

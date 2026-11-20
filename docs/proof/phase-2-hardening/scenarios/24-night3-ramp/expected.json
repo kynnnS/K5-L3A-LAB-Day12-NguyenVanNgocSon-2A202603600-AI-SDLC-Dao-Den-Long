@@ -1,0 +1,18 @@
+{
+  "snapshots": [
+    {
+      "tick": 90,
+      "player": {
+        "pos": [
+          19.053,
+          3,
+          11
+        ],
+        "grounded": true
+      }
+    }
+  ],
+  "end": {
+    "ticks": 90
+  }
+}
