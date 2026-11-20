@@ -28,3 +28,27 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 - Số liệu thực đo được: subagent reviewer dùng **96 656 token** (16 lần gọi tool, khoảng 4 phút). Số này do harness báo khi subagent hoàn thành.
 - Phiên agent chính: extension không hiển thị số token, nên **chưa có số liệu thực**. Người dùng cần chạy `/cost` (hoặc xem trang Usage) cuối phase và điền vào đây: `Phase 1: … token / … USD`.
 - Cách tiết kiệm đã dùng: đọc tài liệu một lần rồi tóm tắt vào kế hoạch; ghi file trực tiếp thay vì in code ra chat; dùng một bộ test chung cho unit và scenario; chỉ một reviewer subagent ở cuối phase thay vì review liên tục.
+
+## Phase 2 (Ticket-02)
+
+### Cách làm việc
+1. Lưu Ticket-02 nguyên văn vào repo. Làm Change Impact Analysis, ghi giả định B1–B12, rồi **dừng chờ duyệt**.
+2. Sau khi duyệt: core + contract v1.1 → test (unit + 28 fixture tính tay) → client → tài liệu → verify → reviewer độc lập.
+3. Trước khi viết test, mỗi kỳ vọng được tính bằng công thức ghi trong `description` của fixture. Kết quả: 27/28 fixture khớp ngay ở lần chạy đầu; fixture còn lại sai do lỗi dựng tình huống (xem lỗi 13).
+
+### Lỗi thực tế của AI và cách phát hiện
+
+| # | Lỗi | Phát hiện bằng | Cách sửa / cải tiến harness |
+|---|---|---|---|
+| 8 | Đặt điểm xuất phát Đêm 3 ở (0,0,0), mà điểm này nằm **trong tháp chuông** (ticket chỉ quy định xuất phát cho Đêm 1) | Chạy thử headless cả 3 Đêm: Đêm 3 không có lần chạm nào, `grounded` sai | Giả định B12: (0,0,−30), ghi chú trong `maps.ts` |
+| 9 | Recoil chỉ đi 59 tick (trạng thái đặt sau bước di chuyển) | Tính tay khi chuẩn bị fixture | Bộ đếm = 60 + 1, có unit test 2 m/60 tick |
+| 10 | Tiếp đất sau bục nhảy có thể trễ 1 tick vì sai số dấu phẩy động (quỹ đạo lý thuyết chạm đúng y = 0) | Tính tay quỹ đạo | Thêm sai số 1e-9 khi so độ cao |
+| 11 | Bóng Mực đang bị đẩy khỏi vùng an toàn vẫn tự đuổi vào trong, nên thoát chậm hơn mức "tối đa 30 tick" | Tính tay khi viết unit test | Bóng đang bị đẩy ra thì không tự di chuyển |
+| 12 | Hai test sai số học: đếm tick 120 thay vì 121 cho "120 tick sau tick 1"; test Gió Lạc bị kết thúc sớm vì Bóng Mực đánh chết Mây | Test đỏ, đọc lại lập luận | Sửa test (không đổi code). Ghi vào CLAUDE.md: tự kiểm off-by-one |
+| 13 | Fixture gió dùng hàm mẫu tắt mọi thứ, **kể cả gió** | Fixture đỏ | Bật `wind_enabled`. CLAUDE.md ghi bài học "helper tắt cả gió" |
+| 14 | `git rm` toàn bộ fixture làm mất luôn thư mục, khiến script sinh fixture lỗi | Lỗi `FileNotFoundError` | Tạo lại thư mục rồi chạy lại |
+
+### Token / chi phí
+- Reviewer Phase 1 dùng 96 656 token (số do harness báo). Reviewer Phase 2: xem mục đánh giá trong `phase-2.md`.
+- Phiên chính: cần chạy `/cost` để có số thật (extension không hiển thị).
+- Cách tiết kiệm: sinh fixture bằng một script (một lần ghi), bỏ qua file lớn, chỉ một reviewer chạy song song với việc viết tài liệu.
