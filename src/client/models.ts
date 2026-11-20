@@ -1,174 +1,200 @@
-/** Low-poly model builders (visual only; no game rules here). */
+/** Low-poly model builders. World geometry is generated from the SAME NightMap the simulation uses. */
 import * as THREE from 'three';
-import { ISLAND_RADIUS } from '../core/constants.js';
+import type { NightMap } from '../core/maps.js';
+
+/** Ticket-02 standard palette. */
+export const PAL = {
+  sky: 0x0e1430, fog: 0x1b2350, grass: 0x2f5d50, sand: 0xc9b48a, wood: 0x6b4a2f, cloudSea: 0x12384a,
+  lanternLit: 0xffb347, lanternCore: 0xffe9b0, lanternOff: 0x5b5f6e, moteCore: 0xfff6c2, moteHalo: 0xffe58a,
+  shadeBody: 0x120a1a, shadeRim: 0x7a3cff, shadeStunned: 0x3a3450, robe: 0xe8e2d0, scarf: 0xc8102e,
+  gold: 0xf2c14e, drifter: 0x8fa3b8,
+};
 
 const flat = (color: number, extra: THREE.MeshStandardMaterialParameters = {}) =>
   new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.9, ...extra });
 
-export const WARM = 0xffa64d;
+function disk(r: number, h: number, mat: THREE.Material, x: number, yTop: number, z: number): THREE.Mesh {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), mat);
+  m.position.set(x, yTop - h / 2, z);
+  return m;
+}
 
-export function buildIsland(): { group: THREE.Group; grass: THREE.MeshStandardMaterial } {
-  const group = new THREE.Group();
-  const grass = flat(0x27324a);
-  const top = new THREE.Mesh(new THREE.CylinderGeometry(ISLAND_RADIUS, ISLAND_RADIUS - 3, 3, 40, 1), grass);
-  top.position.y = -1.5;
-  group.add(top);
-  const rock = new THREE.Mesh(new THREE.ConeGeometry(ISLAND_RADIUS - 3, 18, 40, 1), flat(0x2a2238));
-  rock.rotation.x = Math.PI;
-  rock.position.y = -12;
-  group.add(rock);
-
-  // Deterministic decoration (trees + stones), purely visual.
-  let s = 1234;
-  const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-  const treeMat = flat(0x1f3b3a);
-  const trunkMat = flat(0x3b2a22);
-  const stoneMat = flat(0x3d3a52);
-  for (let i = 0; i < 46; i++) {
-    const a = rnd() * Math.PI * 2;
-    const r = 8 + rnd() * (ISLAND_RADIUS - 10);
-    const x = Math.sin(a) * r;
-    const z = Math.cos(a) * r;
-    if (Math.abs(r - 22) < 4) continue; // keep lantern ring clear
-    if (rnd() < 0.6) {
-      const h = 2 + rnd() * 2.5;
-      const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.22, h * 0.4, 5), trunkMat);
-      trunk.position.y = h * 0.2;
-      const crown = new THREE.Mesh(new THREE.ConeGeometry(0.9 + rnd() * 0.5, h, 6), treeMat);
-      crown.position.y = h * 0.4 + h * 0.5;
-      tree.add(trunk, crown);
-      tree.position.set(x, 0, z);
-      group.add(tree);
-    } else {
-      const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.4 + rnd() * 0.6, 0), stoneMat);
-      st.position.set(x, 0.2, z);
-      st.rotation.set(rnd() * 3, rnd() * 3, 0);
-      group.add(st);
+export function buildWorld(map: NightMap): THREE.Group {
+  const g = new THREE.Group();
+  const grass = flat(PAL.grass);
+  const sand = flat(PAL.sand);
+  for (const d of map.islands) {
+    g.add(disk(d.r, 0.6, grass, d.cx, 0, d.cz));
+    g.add(disk(d.r + 0.6, 0.5, sand, d.cx, -0.35, d.cz));
+    const rock = new THREE.Mesh(new THREE.ConeGeometry(d.r, d.r * 0.5, 32), flat(0x2a2f45));
+    rock.rotation.x = Math.PI;
+    rock.position.set(d.cx, -0.6 - d.r * 0.25, d.cz);
+    g.add(rock);
+  }
+  if (map.bridge) {
+    const b = map.bridge;
+    const wood = flat(PAL.wood);
+    for (let x = b.x0; x < b.x1; x += 0.6) {
+      const plank = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, b.z1 - b.z0), wood);
+      plank.position.set(x + 0.25, -0.075, (b.z0 + b.z1) / 2);
+      g.add(plank);
     }
   }
-  return { group, grass };
-}
-
-export function buildCloudSea(): THREE.Group {
-  const group = new THREE.Group();
-  // Walkable cloud floor just below the island top (core has no world boundary, assumption A8).
-  const sea = new THREE.Mesh(new THREE.CircleGeometry(400, 48), new THREE.MeshStandardMaterial({ color: 0x2f2558, roughness: 1 }));
-  sea.rotation.x = -Math.PI / 2;
-  sea.position.y = -0.15;
-  group.add(sea);
-  const puffMat = flat(0x3a2f66, { transparent: true, opacity: 0.85 });
-  let s = 99;
-  const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-  for (let i = 0; i < 60; i++) {
-    const a = rnd() * Math.PI * 2;
-    const r = ISLAND_RADIUS + 8 + rnd() * 90;
-    const puff = new THREE.Mesh(new THREE.IcosahedronGeometry(3 + rnd() * 6, 0), puffMat);
-    puff.position.set(Math.sin(a) * r, -1.2 + rnd() * 0.8, Math.cos(a) * r);
-    puff.scale.y = 0.45;
-    group.add(puff);
+  if (map.tiers) {
+    const tierMat = flat(0x3a6b5c);
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, 24, 0, Math.PI, false);
+    shape.absarc(0, 0, 12, Math.PI, 0, true);
+    const tier1 = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 3, bevelEnabled: false, curveSegments: 32 }), tierMat);
+    tier1.rotation.x = Math.PI / 2; // shape XY -> XZ (y of shape becomes +Z), extrude goes down
+    tier1.position.y = 3;
+    g.add(tier1);
+    g.add(disk(8, 6, flat(0x447a69), 0, 6, 0));
+    for (const ramp of map.ramps) {
+      const len = Math.hypot(ramp.r0 - ramp.r1, ramp.h1);
+      const box = new THREE.Mesh(new THREE.BoxGeometry(len, 0.3, ramp.width), flat(PAL.wood));
+      const a = (ramp.angleDeg * Math.PI) / 180;
+      const mid = (ramp.r0 + ramp.r1) / 2;
+      box.position.set(Math.cos(a) * mid, ramp.h1 / 2 - 0.15, Math.sin(a) * mid);
+      box.rotation.y = -a;
+      box.rotation.z = -Math.atan2(ramp.h1, ramp.r0 - ramp.r1); // high end towards the centre (local -X)
+      g.add(box);
+    }
   }
-  return group;
+  if (map.tower) {
+    const t = map.tower;
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(t.r, t.r * 1.1, t.height, 12), flat(0x4a3a5a));
+    tower.position.set(t.x, t.y0 + t.height / 2, t.z);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(t.r * 1.5, 2.5, 12), flat(PAL.wood));
+    roof.position.set(t.x, t.y0 + t.height + 1.25, t.z);
+    const bell = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 8), flat(PAL.gold, { metalness: 0.6, roughness: 0.4 }));
+    bell.position.set(t.x, t.y0 + t.height - 0.5, t.z);
+    g.add(tower, roof, bell);
+  }
+  for (const p of map.pads) {
+    const pad = new THREE.Mesh(new THREE.CylinderGeometry(p.r, p.r, 0.12, 24), new THREE.MeshStandardMaterial({ color: PAL.gold, emissive: PAL.gold, emissiveIntensity: 0.8 }));
+    pad.position.set(p.x, p.y + 0.06, p.z);
+    g.add(pad);
+  }
+  const sea = new THREE.Mesh(new THREE.CircleGeometry(500, 48), new THREE.MeshStandardMaterial({ color: PAL.cloudSea, roughness: 1 }));
+  sea.rotation.x = -Math.PI / 2;
+  sea.position.y = -8;
+  g.add(sea);
+  return g;
 }
 
-export interface LanternView {
-  group: THREE.Group;
-  body: THREE.MeshStandardMaterial;
-  light: THREE.PointLight;
-  ring: THREE.Mesh;
-  fill: THREE.Mesh;
-}
+export interface LanternView { group: THREE.Group; body: THREE.MeshStandardMaterial; core: THREE.Mesh; light: THREE.PointLight; ring: THREE.Mesh; fill: THREE.Mesh }
 
 export function buildLantern(safeRadius: number): LanternView {
   const group = new THREE.Group();
-  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 3.2, 6), flat(0x4a3324));
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 3.2, 6), flat(PAL.wood));
   post.position.y = 1.6;
-  const arm = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.12), flat(0x4a3324));
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.12), flat(PAL.wood));
   arm.position.set(0.5, 3.1, 0);
-  const body = new THREE.MeshStandardMaterial({ color: 0x7a2a1e, emissive: 0x000000, flatShading: true });
+  const body = new THREE.MeshStandardMaterial({ color: PAL.lanternOff, emissive: 0x000000, flatShading: true });
   const shell = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.9, 8), body);
   shell.position.set(1, 2.55, 0);
-  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.35, 8), flat(0x2c1a12));
-  cap.position.set(1, 3.15, 0);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.3, 8), flat(0x3d3a52));
-  base.position.y = 0.15;
-  const light = new THREE.PointLight(WARM, 0, 16, 1.6);
+  const core = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshBasicMaterial({ color: PAL.lanternCore }));
+  core.position.copy(shell.position);
+  core.visible = false;
+  const light = new THREE.PointLight(PAL.lanternLit, 0, 16, 1.6);
   light.position.set(1, 2.6, 0);
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(safeRadius - 0.12, safeRadius, 48),
-    new THREE.MeshBasicMaterial({ color: WARM, transparent: true, opacity: 0, side: THREE.DoubleSide }),
-  );
+  const ring = new THREE.Mesh(new THREE.RingGeometry(safeRadius - 0.12, safeRadius, 48),
+    new THREE.MeshBasicMaterial({ color: PAL.lanternLit, transparent: true, opacity: 0, side: THREE.DoubleSide }));
   ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0.03;
-  // Progress pillar: grows as light is deposited.
-  const fill = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 1, 8), new THREE.MeshBasicMaterial({ color: 0xffd27a }));
+  ring.position.y = 0.05;
+  const fill = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 1, 8), new THREE.MeshBasicMaterial({ color: PAL.lanternCore }));
   fill.position.set(1, 2.2, 0);
   fill.scale.y = 0.001;
-  group.add(post, arm, shell, cap, base, light, ring, fill);
-  return { group, body, light, ring, fill };
+  group.add(post, arm, shell, core, light, ring, fill);
+  return { group, body, core, light, ring, fill };
 }
 
-export interface PlayerView {
-  group: THREE.Group;
-  lanternLight: THREE.PointLight;
-  lanternGlow: THREE.MeshStandardMaterial;
-}
+export interface PlayerView { group: THREE.Group; lanternLight: THREE.PointLight; lanternGlow: THREE.MeshStandardMaterial }
 
-/** Mây: small keeper wearing a nón lá with a little lantern hanging from the brim. */
+/** Mây: robe, red scarf, nón lá with a little lantern hanging from the brim. */
 export function buildPlayer(): PlayerView {
   const group = new THREE.Group();
-  const robe = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 8), flat(0x3f6fb5));
+  const robe = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 8), flat(PAL.robe));
   robe.position.y = 0.55;
+  const scarf = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.07, 6, 12), flat(PAL.scarf));
+  scarf.rotation.x = Math.PI / 2;
+  scarf.position.y = 1.08;
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 8), flat(0xf1c9a5));
   head.position.y = 1.28;
-  const hat = new THREE.Mesh(new THREE.ConeGeometry(0.62, 0.32, 14), flat(0xe8cf8a));
+  const hat = new THREE.Mesh(new THREE.ConeGeometry(0.62, 0.32, 14), flat(PAL.sand));
   hat.position.y = 1.56;
-  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.45, 4), flat(0x3b2a22));
-  stick.position.set(0.5, 1.2, 0.25);
-  const lanternGlow = new THREE.MeshStandardMaterial({ color: 0xff8a3d, emissive: WARM, emissiveIntensity: 1.5, flatShading: true });
+  const lanternGlow = new THREE.MeshStandardMaterial({ color: PAL.lanternLit, emissive: PAL.lanternLit, emissiveIntensity: 1.5, flatShading: true });
   const lantern = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 0), lanternGlow);
   lantern.position.set(0.5, 0.95, 0.25);
-  const lanternLight = new THREE.PointLight(WARM, 6, 9, 1.8);
+  const lanternLight = new THREE.PointLight(PAL.lanternLit, 6, 9, 1.8);
   lanternLight.position.copy(lantern.position);
-  group.add(robe, head, hat, stick, lantern, lanternLight);
+  group.add(robe, scarf, head, hat, lantern, lanternLight);
   return { group, lanternLight, lanternGlow };
 }
 
-export function buildMote(): THREE.Mesh {
-  return new THREE.Mesh(
-    new THREE.SphereGeometry(0.14, 6, 5),
-    new THREE.MeshStandardMaterial({ color: 0xfff2a8, emissive: 0xffe066, emissiveIntensity: 2.2 }),
-  );
+export function buildMote(dropped: boolean): THREE.Group {
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 5), new THREE.MeshBasicMaterial({ color: PAL.moteCore })));
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshBasicMaterial({ color: PAL.moteHalo, transparent: true, opacity: dropped ? 0.25 : 0.4 }));
+  g.add(halo);
+  return g;
 }
 
-export interface ShadeView {
-  group: THREE.Group;
-  mat: THREE.MeshStandardMaterial;
-}
+export interface ShadeView { group: THREE.Group; body: THREE.MeshStandardMaterial }
 
 export function buildShade(): ShadeView {
   const group = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: 0x1a0a26, emissive: 0x3a0f5c, emissiveIntensity: 0.6, flatShading: true, transparent: true, opacity: 0.95 });
-  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(0.75, 1), mat);
+  const body = new THREE.MeshStandardMaterial({ color: PAL.shadeBody, emissive: PAL.shadeRim, emissiveIntensity: 0.35, flatShading: true, transparent: true, opacity: 0.95 });
+  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(0.75, 1), body);
+  const rim = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 1), new THREE.MeshBasicMaterial({ color: PAL.shadeRim, wireframe: true, transparent: true, opacity: 0.5 }));
   const eyeMat = new THREE.MeshBasicMaterial({ color: 0xd9b8ff });
   for (const x of [-0.22, 0.22]) {
     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), eyeMat);
     eye.position.set(x, 0.15, 0.65);
     group.add(eye);
   }
-  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.9, 7), mat);
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.9, 7), body);
   tail.position.y = -0.75;
   tail.rotation.x = Math.PI;
-  group.add(blob, tail);
-  return { group, mat };
+  group.add(blob, rim, tail);
+  return { group, body };
+}
+
+export function buildDrifter(): THREE.Group {
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({ color: PAL.drifter, emissive: PAL.drifter, emissiveIntensity: 0.3, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+  for (let i = 0; i < 3; i++) {
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.25, 6, 1), mat);
+    strip.position.y = i * 0.25;
+    strip.rotation.y = i * 0.6;
+    g.add(strip);
+  }
+  return g;
+}
+
+export function buildCharm(): THREE.Group {
+  const g = new THREE.Group();
+  const paper = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.04), new THREE.MeshStandardMaterial({ color: PAL.scarf, emissive: PAL.scarf, emissiveIntensity: 0.4 }));
+  const border = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.88, 0.02), new THREE.MeshBasicMaterial({ color: PAL.gold }));
+  border.position.z = -0.02;
+  g.add(border, paper);
+  return g;
 }
 
 export function buildPulseRing(): THREE.Mesh {
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.85, 1, 48),
-    new THREE.MeshBasicMaterial({ color: 0xffe2a0, transparent: true, opacity: 0, side: THREE.DoubleSide }),
-  );
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1, 48),
+    new THREE.MeshBasicMaterial({ color: PAL.lanternCore, transparent: true, opacity: 0, side: THREE.DoubleSide }));
   ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0.1;
   return ring;
+}
+
+/** Leaves blown around as the 2 s wind warning. */
+export function buildLeaves(): THREE.Points {
+  const n = 120;
+  const pos = new Float32Array(n * 3);
+  for (let i = 0; i < n * 3; i++) pos[i] = (Math.random() - 0.5) * 30;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  return new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x9ccf6a, size: 0.25, transparent: true, opacity: 0 }));
 }

@@ -9,30 +9,46 @@
 <body>
   <canvas id="scene"></canvas>
   <div id="hud" class="hidden">
-    <div class="panel top-left">
-      <div class="row"><span class="label">Lửa</span><span id="hud-flames" class="flames"></span></div>
-      <div class="row"><span class="label">Đom đóm</span><span id="hud-carried"></span></div>
-      <div class="row"><span class="label">Đèn</span><span id="hud-lanterns"></span></div>
-    </div>
-    <div class="panel top-right">
-      <div class="row"><span class="label">Bình minh</span><span id="hud-time"></span></div>
-      <div class="row"><span class="label">Điểm</span><span id="hud-score"></span></div>
-      <div class="row"><span class="label">Tỏa sáng</span><span id="hud-pulse"></span></div>
+    <div class="tl"><div id="hud-flames" class="flames"></div></div>
+    <div class="tc"><div id="hud-time" class="timer">05:00</div></div>
+    <div class="tr"><div><span class="label">Đèn</span> <b id="hud-lanterns">0/5</b></div><div><span class="label">Điểm</span> <b id="hud-score" class="score">0</b></div></div>
+    <div class="bc"><div id="hud-motes" class="motes"></div></div>
+    <div class="br">
+      <div id="cd-dash" class="cd" title="Lướt (Shift)"><span>Lướt</span><small>Shift</small></div>
+      <div id="cd-pulse" class="cd" title="Tỏa Sáng (F)"><span>Tỏa sáng</span><small>F</small></div>
     </div>
     <div id="hud-prompt" class="prompt"></div>
+    <div id="hud-arrow" class="arrow hidden">➤</div>
     <div id="hud-toast" class="toast"></div>
-    <div class="hint">WASD di chuyển · Kéo chuột / ← → xoay camera · Space nhảy · E nạp đèn · F tỏa sáng · R chơi lại</div>
+    <div class="hint">WASD di chuyển · Kéo chuột / ← → xoay camera · Space nhảy · Shift lướt · E nạp đèn · F tỏa sáng · Esc/P tạm dừng</div>
   </div>
+  <div id="fps" class="fps"></div>
   <div id="flash"></div>
-  <div id="overlay">
+  <div id="overlay" class="hidden">
     <div class="card">
       <h1 id="ov-title">Đảo Đèn Lồng</h1>
-      <p id="ov-sub">Đêm 1 – Đảo Bến</p>
-      <div id="ov-body">
-        <p>Sương đen đã nuốt hết ánh sáng của đảo. Hãy giúp <b>Mây</b> gom đom đóm và thắp lại <b>5 Đèn Lồng Lớn</b> trước bình minh.</p>
-        <p>Tránh <b class="ink">Bóng Mực</b>. Chúng sợ ánh đèn: đứng gần đèn đã thắp là an toàn.</p>
+      <p id="ov-sub"></p>
+      <div id="ov-body"></div>
+      <div class="buttons"><button id="ov-primary">Bắt đầu</button><button id="ov-secondary" class="ghost hidden"></button></div>
+    </div>
+  </div>
+  <div id="pause-menu" class="modal hidden">
+    <div class="card">
+      <h1>Tạm dừng</h1>
+      <div class="col">
+        <button id="pm-resume">Tiếp tục</button>
+        <button id="pm-restart" class="ghost">Chơi lại Đêm</button>
+        <button id="pm-settings" class="ghost">Cài đặt</button>
+        <button id="pm-menu" class="ghost">Về menu</button>
       </div>
-      <button id="ov-btn">Bắt đầu (Enter)</button>
+    </div>
+  </div>
+  <div id="settings" class="modal hidden">
+    <div class="card">
+      <h1>Cài đặt</h1>
+      <label>Âm lượng <input id="set-volume" type="range" min="0" max="1" step="0.05" /></label>
+      <label>Độ nhạy chuột <input id="set-sens" type="range" min="0.2" max="3" step="0.1" /></label>
+      <button id="set-close">Lưu</button>
     </div>
   </div>
   <script type="module" src="./src/client/main.ts"></script>

@@ -6,20 +6,19 @@ export class InputController {
   private keys = new Set<string>();
   private dragging = false;
   camYawDeg = 0;
-  /** World-space facing (radians) of the last non-zero move, for the character model. */
-  facing = 0;
+  sensitivity = 1;
 
   constructor(canvas: HTMLCanvasElement, onKey: (code: string) => void) {
     window.addEventListener('keydown', (e) => {
+      if (!e.repeat) onKey(e.code);
       this.keys.add(e.code);
       if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
-      onKey(e.code);
     });
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
     window.addEventListener('blur', () => this.keys.clear());
     canvas.addEventListener('pointerdown', (e) => { this.dragging = true; canvas.setPointerCapture(e.pointerId); });
     canvas.addEventListener('pointerup', () => { this.dragging = false; });
-    canvas.addEventListener('pointermove', (e) => { if (this.dragging) this.camYawDeg -= e.movementX * 0.3; });
+    canvas.addEventListener('pointermove', (e) => { if (this.dragging) this.camYawDeg -= e.movementX * 0.3 * this.sensitivity; });
   }
 
   private has(...codes: string[]): boolean {
@@ -28,21 +27,28 @@ export class InputController {
 
   /** Called once per fixed simulation step. */
   read(): InputState {
-    if (this.has('ArrowLeft')) this.camYawDeg += 120 * DT;
-    if (this.has('ArrowRight')) this.camYawDeg -= 120 * DT;
+    if (this.has('ArrowLeft')) this.camYawDeg += 120 * DT * this.sensitivity;
+    if (this.has('ArrowRight')) this.camYawDeg -= 120 * DT * this.sensitivity;
     const fwd = (this.has('KeyW', 'ArrowUp') ? 1 : 0) - (this.has('KeyS', 'ArrowDown') ? 1 : 0);
     const strafe = (this.has('KeyD') ? 1 : 0) - (this.has('KeyA') ? 1 : 0);
     // Camera looks along (sin yaw, cos yaw); contract input +x maps to screen-left, so negate strafe.
-    const move: [number, number] = [-strafe, fwd];
-    if (fwd !== 0 || strafe !== 0) {
-      const th = (this.camYawDeg * Math.PI) / 180;
-      this.facing = Math.atan2(move[0] * Math.cos(th) + move[1] * Math.sin(th), -move[0] * Math.sin(th) + move[1] * Math.cos(th));
-    }
-    return { move, camYawDeg: this.camYawDeg, jump: this.has('Space'), interact: this.has('KeyE'), pulse: this.has('KeyF') };
+    return {
+      move: [-strafe, fwd],
+      camYawDeg: this.camYawDeg,
+      jump: this.has('Space'),
+      interact: this.has('KeyE'),
+      pulse: this.has('KeyF'),
+      dash: this.has('ShiftLeft', 'ShiftRight'),
+      pause: this.has('Escape', 'KeyP'),
+    };
+  }
+
+  /** Input while a menu is open: nothing held except pause (lets the core see the release edge). */
+  idle(): InputState {
+    return { move: [0, 0], camYawDeg: this.camYawDeg, jump: false, interact: false, pulse: false, dash: false, pause: this.has('Escape', 'KeyP') };
   }
 
   reset(): void {
     this.camYawDeg = 0;
-    this.facing = 0;
   }
 }
