@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đảo Đèn Lồng</title>
+  <link rel="stylesheet" href="./src/client/style.css" />
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <div id="hud" class="hidden">
+    <div class="panel top-left">
+      <div class="row"><span class="label">Lửa</span><span id="hud-flames" class="flames"></span></div>
+      <div class="row"><span class="label">Đom đóm</span><span id="hud-carried"></span></div>
+      <div class="row"><span class="label">Đèn</span><span id="hud-lanterns"></span></div>
+    </div>
+    <div class="panel top-right">
+      <div class="row"><span class="label">Bình minh</span><span id="hud-time"></span></div>
+      <div class="row"><span class="label">Điểm</span><span id="hud-score"></span></div>
+      <div class="row"><span class="label">Tỏa sáng</span><span id="hud-pulse"></span></div>
+    </div>
+    <div id="hud-prompt" class="prompt"></div>
+    <div id="hud-toast" class="toast"></div>
+    <div class="hint">WASD di chuyển · Kéo chuột / ← → xoay camera · Space nhảy · E nạp đèn · F tỏa sáng · R chơi lại</div>
+  </div>
+  <div id="flash"></div>
+  <div id="overlay">
+    <div class="card">
+      <h1 id="ov-title">Đảo Đèn Lồng</h1>
+      <p id="ov-sub">Đêm 1 – Đảo Bến</p>
+      <div id="ov-body">
+        <p>Sương đen đã nuốt hết ánh sáng của đảo. Hãy giúp <b>Mây</b> gom đom đóm và thắp lại <b>5 Đèn Lồng Lớn</b> trước bình minh.</p>
+        <p>Tránh <b class="ink">Bóng Mực</b>. Chúng sợ ánh đèn: đứng gần đèn đã thắp là an toàn.</p>
+      </div>
+      <button id="ov-btn">Bắt đầu (Enter)</button>
+    </div>
+  </div>
+  <script type="module" src="./src/client/main.ts"></script>
+</body>
+</html>
