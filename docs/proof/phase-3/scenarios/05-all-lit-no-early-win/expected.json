@@ -1,0 +1,58 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "deposit",
+      "data": {
+        "lantern_id": "L5",
+        "amount": 10,
+        "deposited": 10
+      }
+    },
+    {
+      "tick": 1,
+      "name": "lantern_lit",
+      "data": {
+        "lantern_id": "L5",
+        "relight": false
+      }
+    }
+  ],
+  "event_counts": {
+    "game_over": 0
+  },
+  "snapshots": [
+    {
+      "tick": 600,
+      "state": "playing",
+      "lanterns": [
+        {
+          "id": "L1",
+          "lit": true
+        },
+        {
+          "id": "L2",
+          "lit": true
+        },
+        {
+          "id": "L3",
+          "lit": true
+        },
+        {
+          "id": "L4",
+          "lit": true
+        },
+        {
+          "id": "L5",
+          "lit": true,
+          "fuel": 90
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 600,
+    "state": "playing",
+    "score": 150
+  }
+}

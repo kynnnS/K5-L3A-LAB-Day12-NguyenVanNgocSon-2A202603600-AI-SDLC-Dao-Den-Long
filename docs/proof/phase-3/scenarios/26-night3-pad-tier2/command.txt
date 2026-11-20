@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 3 --ticks 50 --snapshot-every 50 --out docs/proof/phase-3/scenarios/26-night3-pad-tier2/output.jsonl --scenario docs/proof/phase-3/scenarios/26-night3-pad-tier2/scenario.json
+exit=0

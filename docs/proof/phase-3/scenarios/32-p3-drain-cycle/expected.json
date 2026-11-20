@@ -1,0 +1,105 @@
+{
+  "events": [
+    {
+      "tick": 60,
+      "name": "fuel_drain",
+      "data": {
+        "lantern_id": "L1",
+        "shade_id": "S1",
+        "fuel": 14
+      }
+    },
+    {
+      "tick": 120,
+      "name": "fuel_drain",
+      "data": {
+        "lantern_id": "L1",
+        "shade_id": "S1",
+        "fuel": 8
+      }
+    },
+    {
+      "tick": 180,
+      "name": "fuel_drain",
+      "data": {
+        "lantern_id": "L1",
+        "shade_id": "S1",
+        "fuel": 2
+      }
+    },
+    {
+      "tick": 200,
+      "name": "lantern_out",
+      "data": {
+        "lantern_id": "L1"
+      }
+    }
+  ],
+  "event_counts": {
+    "fuel_drain": 3,
+    "lantern_out": 1
+  },
+  "snapshots": [
+    {
+      "tick": 190,
+      "shades": [
+        {
+          "id": "S1",
+          "state": "drain"
+        }
+      ],
+      "lanterns": [
+        {
+          "id": "L1",
+          "lit": true,
+          "fuel": 1
+        },
+        {
+          "id": "L2"
+        },
+        {
+          "id": "L3"
+        },
+        {
+          "id": "L4"
+        },
+        {
+          "id": "L5"
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "shades": [
+        {
+          "id": "S1",
+          "state": "wander"
+        }
+      ],
+      "lanterns": [
+        {
+          "id": "L1",
+          "lit": false,
+          "fuel": 0
+        },
+        {
+          "id": "L2"
+        },
+        {
+          "id": "L3"
+        },
+        {
+          "id": "L4"
+        },
+        {
+          "id": "L5"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 210,
+    "state": "playing",
+    "score": 0
+  }
+}

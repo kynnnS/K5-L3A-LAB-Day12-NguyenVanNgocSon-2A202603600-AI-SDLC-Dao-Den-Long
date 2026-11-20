@@ -59,3 +59,24 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 - Reviewer Phase 1 dùng 96 656 token (số do harness báo). Reviewer Phase 2 dùng 152 934 token, 40 lần gọi công cụ, khoảng 10 phút (số do harness báo).
 - Phiên chính: cần chạy `/cost` để có số thật (extension không hiển thị).
 - Cách tiết kiệm: sinh fixture bằng một script (một lần ghi), bỏ qua file lớn, chỉ một reviewer chạy song song với việc viết tài liệu.
+
+## Phase 3 (Ticket-03)
+
+### Cách làm việc
+- Người dùng cấp quyền làm trọn Phase 3. Ticket được lưu nguyên văn trước, rồi mới viết phân tích ảnh hưởng ([phase-3.md](phase-3.md) §1).
+- Thứ tự P0 → P1 theo prompt: core (dầu, thứ tự tick, drain, bình minh, sức chứa, điểm, contract) → cập nhật test bị luật mới làm sai → test và fixture mới → client → ADR / CHANGELOG / harness → bằng chứng → review độc lập.
+- Ngay sau khi sửa core chỉ chạy test cũ: đúng 8/94 test đỏ, và cả 8 đều ở chỗ luật bị thay (bảng §4). Đây là cách kiểm nhanh rằng thay đổi không lan sang luật cũ.
+- Kỳ vọng của 33 unit test và 16 fixture mới được tính tay bằng đơn vị dầu 1/60 trước khi chạy; cả 49 PASS ngay lần đầu (không chỉnh kỳ vọng theo output).
+
+### Lỗi thực tế của AI và cách phát hiện
+
+| # | Lỗi | Phát hiện bằng | Cách sửa / cải tiến harness |
+|---|---|---|---|
+| 22 | Thêm `capacity` vào snapshot nhưng `snapshotRecord` không nhận tuning (gọi hàm `tuningOf` không tồn tại) | Đọc lại diff trước khi typecheck | Truyền `tuning` từ `run.ts` |
+| 23 | Ghi đè `hud.ts` sau khi chính mình vừa sửa bằng script, nên công cụ ghi từ chối vì file đã đổi | Lỗi của công cụ Write | Đọc lại rồi ghi. Không mất dữ liệu |
+| 24 | Đổi kiểu `Settings` (thêm `colorblind`) làm test cài đặt cũ không còn typecheck | `npm run typecheck` | Cập nhật test và thêm test cho cài đặt cũ thiếu khóa mới |
+
+### Token / chi phí
+- Phiên chính: cần chạy `/cost` để có số thật.
+- Reviewer Phase 3: xem mục đánh giá trong [phase-3.md](phase-3.md).
+- Cách tiết kiệm: sinh 16 fixture bằng một script; chỉ đọc đúng các hàm core bị ảnh hưởng; một reviewer chạy song song trong lúc viết ADR và tài liệu.

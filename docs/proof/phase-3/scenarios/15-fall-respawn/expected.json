@@ -1,0 +1,48 @@
+{
+  "events": [
+    {
+      "tick": 66,
+      "name": "player_hit",
+      "data": {
+        "by": "fall",
+        "flames": 2,
+        "dropped": 0,
+        "lost": 4
+      }
+    }
+  ],
+  "event_counts": {
+    "player_hit": 1
+  },
+  "snapshots": [
+    {
+      "tick": 63,
+      "player": {
+        "grounded": false
+      }
+    },
+    {
+      "tick": 126,
+      "player": {
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "vel": [
+          0,
+          0,
+          0
+        ],
+        "grounded": true,
+        "invuln": true,
+        "flames": 2,
+        "carried": 0
+      }
+    }
+  ],
+  "end": {
+    "ticks": 130,
+    "state": "playing"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "snapshots": [
+    {
+      "tick": 10,
+      "shades": [
+        {
+          "id": "S1",
+          "state": "wander"
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "shades": [
+        {
+          "id": "S1",
+          "state": "drain",
+          "pos": [
+            0,
+            1,
+            23
+          ]
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 20,
+    "state": "playing",
+    "score": 0
+  }
+}

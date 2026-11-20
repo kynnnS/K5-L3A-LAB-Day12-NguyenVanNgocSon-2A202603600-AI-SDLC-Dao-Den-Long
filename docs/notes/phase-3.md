@@ -74,8 +74,35 @@ Không có test nào bị skip hay xóa mà không có test thay thế.
 
 ## 5. Ma trận truy vết
 
-Cập nhật sau lần chạy `bash scripts/verify.sh phase-3`.
+Nguồn: [SUMMARY.md](../proof/phase-3/SUMMARY.md) (`bash scripts/verify.sh phase-3` tại commit a972764: 6/6 PASS, 144/144 test). Bằng chứng từng fixture (output CLI thật): [../proof/phase-3/scenarios/](../proof/phase-3/scenarios/README.md).
+
+| Yêu cầu Ticket-03 | Test / fixture | Bằng chứng | Trạng thái |
+|---|---|---|---|
+| §1 Thắp → 100, hao 1/s, không sai số | unit P3-1 (3 060 tick → đúng 2 940 đơn vị) | unit-and-scenario-tests.log | PASS |
+| §1 Cạn đúng tick, `lantern_out` một lần, reset `deposited`, giữ `ever_lit` | unit P3-1, fixture 29 | scenarios/29-p3-fuel-decay-out | PASS |
+| §1 Châm dầu (ceil, ≤ 100, ≤ đang mang, +5), đèn đầy không được chọn, chọn gần nhất / id nhỏ | unit P3-1, fixture 30 | scenarios/30-p3-refuel | PASS |
+| §1 Thắp lại 5 đom đóm, `relight: true`, `relit_count` | unit P3-1, fixture 31 | scenarios/31-p3-relight | PASS |
+| §2 Vùng an toàn: đúng 30 còn, < 30 mất | unit P3-2, fixture 33 | scenarios/33-p3-wander-to-drain | PASS |
+| §2 Chọn đèn yếu (chỉ wander, gần nhất, id nhỏ), chase không đổi mục tiêu | unit P3-2 | unit-and-scenario-tests.log | PASS |
+| §2 Drain 5/s, cộng dồn, `fuel_drain` mỗi 60 tick, dừng khi đèn tắt | unit P3-2, fixture 32 | scenarios/32-p3-drain-cycle | PASS |
+| §2 drain → chase (≤ 6 m), → stunned (+15), → wander (châm ≥ 30 / > 2 m), đẩy ra vô hại | unit P3-2, fixture 34 | scenarios/34-p3-pulse-drain | PASS |
+| §3 Thắng/thua bình minh 3/5, 4/6, 5/7 (và thiếu 1 đèn) | unit P3-3, fixture 35–40 | scenarios/35…40 | PASS |
+| §3 Không thắng sớm | unit P3-3, fixture 05 | scenarios/05-all-lit-no-early-win | PASS |
+| §3 Đèn cạn ở tick cuối; hết lửa ở tick cuối → `no_flames` | unit P3-3, fixture 41, 42 | scenarios/41, 42 | PASS |
+| §4 Sức chứa 10 → 20, thắp lại tính, châm dầu và scenario không tính | unit P3-4, fixture 31, 43 | scenarios/43-p3-capacity-cap | PASS |
+| §5 Điểm mới | unit P3-1…P3-3, fixture 02, 30, 31, 34, 35–40 | scenarios/* | PASS |
+| §6 Mù màu: lưu cài đặt | `settings.test.ts` | unit-and-scenario-tests.log | PASS |
+| §6 Mù màu: màu Bóng Mực, ⚠, đèn xẹp/rách, nhấp nháy | Đọc code (`main.ts › sync`, `models.ts`, `style.css`) | — | Code PASS, hình ảnh NOT VERIFIED |
+| §6 Không đổi headless | `src/core` không tham chiếu `colorblind`; mọi fixture chạy qua CLI không có cài đặt | — | PASS (đọc code + fixture) |
+| §7 Contract v1.2 (tuning, snapshot, scenario, sự kiện, bỏ `all_lit`) | unit T1, P3-5; `checkSchema` trên 44 fixture | unit-and-scenario-tests.log | PASS |
+| Pause đóng băng dầu và hút | unit P3-5, fixture 44 | scenarios/44-p3-pause-fuel | PASS |
+| Hồi quy Phase 1–2 không bị thay | 86 test cũ không đổi | unit-and-scenario-tests.log | PASS |
+| Tất định 3 Đêm, hiệu năng 21 600 tick ≤ 30 s | verify.sh (89 / 113 / 147 ms, Apple M5) | determinism.log, performance.log | PASS |
+| HUD dầu/sức chứa/mục tiêu, FPS ≥ 30 | Chơi thủ công | Chưa có ảnh | NOT VERIFIED |
 
 ## 6. Đánh giá Phase 3
 
-Cập nhật sau review độc lập.
+- **Đạt:** mọi luật kiểm được bằng headless của Ticket-03 đều có test hoặc fixture tính tay và PASS qua CLI thật. Chỉ 8 test cũ đỏ, đều ở đúng chỗ luật bị thay, và đã được cập nhật hoặc thay có ghi lý do.
+- **Review độc lập:** một agent reviewer đã được giao đối chiếu core với Ticket-03 (chạy song song, chỉ đọc). Kết quả **chưa về** lúc chốt bằng chứng Phase 3, vì phiên làm việc phải dừng. Phát hiện nào hợp lệ sẽ được sửa ở commit sau và ghi bổ sung ở đây.
+- **Chưa kiểm:** phần nhìn và nghe (đèn nhấp nháy, xẹp/rách, màu mù màu, HUD, FPS). Máy làm lab không cho chụp màn hình tự động.
+- **Bài học:** biểu diễn dầu bằng số nguyên 1/60 giúp mọi kỳ vọng tính tay khớp chính xác ngay lần đầu (49/49 test mới PASS mà không phải chỉnh). Chạy test cũ ngay sau khi sửa core là cách nhanh nhất để thấy thay đổi đã khoanh đúng vùng.

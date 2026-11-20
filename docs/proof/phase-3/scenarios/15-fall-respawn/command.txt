@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 1 --ticks 130 --snapshot-every 63 --out docs/proof/phase-3/scenarios/15-fall-respawn/output.jsonl --scenario docs/proof/phase-3/scenarios/15-fall-respawn/scenario.json --inputs docs/proof/phase-3/scenarios/15-fall-respawn/inputs.json
+exit=0

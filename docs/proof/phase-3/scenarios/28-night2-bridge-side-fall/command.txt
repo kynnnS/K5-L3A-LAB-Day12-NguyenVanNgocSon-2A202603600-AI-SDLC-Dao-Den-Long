@@ -1,0 +1,2 @@
+node build/headless/cli.js --seed 1 --night 2 --ticks 70 --snapshot-every 70 --out docs/proof/phase-3/scenarios/28-night2-bridge-side-fall/output.jsonl --scenario docs/proof/phase-3/scenarios/28-night2-bridge-side-fall/scenario.json --inputs docs/proof/phase-3/scenarios/28-night2-bridge-side-fall/inputs.json
+exit=0

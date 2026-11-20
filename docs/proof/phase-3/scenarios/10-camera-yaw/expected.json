@@ -1,0 +1,28 @@
+{
+  "snapshots": [
+    {
+      "tick": 60,
+      "player": {
+        "pos": [
+          6,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "tick": 120,
+      "player": {
+        "pos": [
+          10.243,
+          0,
+          4.243
+        ]
+      }
+    }
+  ],
+  "end": {
+    "ticks": 120,
+    "state": "playing"
+  }
+}

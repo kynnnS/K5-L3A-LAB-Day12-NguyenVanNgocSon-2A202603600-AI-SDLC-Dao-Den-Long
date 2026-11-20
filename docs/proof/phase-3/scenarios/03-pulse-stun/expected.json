@@ -1,0 +1,73 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "pulse",
+      "data": {
+        "stunned_ids": [
+          "S1",
+          "S2"
+        ]
+      }
+    }
+  ],
+  "event_counts": {
+    "pulse": 1
+  },
+  "snapshots": [
+    {
+      "tick": 15,
+      "player": {
+        "carried": 1
+      },
+      "shades": [
+        {
+          "id": "S1",
+          "pos": [
+            7,
+            1,
+            0
+          ],
+          "state": "stunned"
+        },
+        {
+          "id": "S2",
+          "pos": [
+            0,
+            1,
+            -8.9
+          ],
+          "state": "stunned"
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "shades": [
+        {
+          "id": "S1",
+          "pos": [
+            7,
+            1,
+            0
+          ],
+          "state": "stunned"
+        },
+        {
+          "id": "S2",
+          "pos": [
+            0,
+            1,
+            -8.9
+          ],
+          "state": "stunned"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 120,
+    "state": "playing",
+    "score": 10
+  }
+}

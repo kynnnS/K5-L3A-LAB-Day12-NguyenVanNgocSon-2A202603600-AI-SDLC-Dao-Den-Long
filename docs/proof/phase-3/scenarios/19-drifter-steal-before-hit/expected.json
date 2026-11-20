@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "drifter_steal",
+      "data": {
+        "drifter_id": "D1",
+        "amount": 3,
+        "carried": 3
+      }
+    },
+    {
+      "tick": 1,
+      "name": "player_hit",
+      "data": {
+        "by": "shade",
+        "flames": 2,
+        "dropped": 1
+      }
+    }
+  ],
+  "snapshots": [
+    {
+      "tick": 1,
+      "player": {
+        "carried": 2
+      },
+      "drifters": [
+        {
+          "id": "D1",
+          "state": "flee",
+          "stolen": 3
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 1
+  }
+}

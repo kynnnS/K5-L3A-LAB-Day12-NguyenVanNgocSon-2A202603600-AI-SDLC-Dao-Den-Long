@@ -1,0 +1,49 @@
+{
+  "events": [
+    {
+      "tick": 1,
+      "name": "paused",
+      "data": {}
+    }
+  ],
+  "event_counts": {
+    "fuel_drain": 0
+  },
+  "snapshots": [
+    {
+      "tick": 100,
+      "state": "paused",
+      "sim_tick": 0,
+      "time_left_s": 240,
+      "lanterns": [
+        {
+          "id": "L1",
+          "fuel": 20
+        },
+        {
+          "id": "L2"
+        },
+        {
+          "id": "L3"
+        },
+        {
+          "id": "L4"
+        },
+        {
+          "id": "L5"
+        }
+      ],
+      "shades": [
+        {
+          "id": "S1",
+          "state": "drain"
+        }
+      ]
+    }
+  ],
+  "end": {
+    "ticks": 100,
+    "state": "playing",
+    "score": 0
+  }
+}
