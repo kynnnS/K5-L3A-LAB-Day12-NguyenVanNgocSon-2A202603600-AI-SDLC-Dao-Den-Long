@@ -55,7 +55,7 @@ node build/headless/cli.js --seed 1 --night 1 --ticks 600 --out out.jsonl \
 
 - Mã thoát: `0` thành công · `1` sai tham số · `2` file inputs/scenario sai định dạng. Lỗi in ra stderr, stdout để trống.
 - Mọi số trong `tuning` là số game thật sự dùng: core đọc trực tiếp từ `game.contract.json`.
-- `fall_enabled: false`: đảo có rìa chặn, không rơi xuống được, nên không bao giờ có sự kiện `player_hit` với `by: "fall"`.
+- `fall_enabled: false`: không có rơi khỏi đảo. Ra ngoài đảo thì Mây đi tiếp trên biển mây, không bị phạt, nên không bao giờ có sự kiện `player_hit` với `by: "fall"`.
 - Không có `dash`: trường này trong inputs bị bỏ qua.
 
 ## Kiểm thử và bằng chứng
@@ -74,7 +74,7 @@ bash scripts/verify.sh phase-1   # typecheck, test, build, determinism + lưu b�
 ```
 src/core/      luật game thuần (fixed step 1/60 s, PRNG có seed), dùng chung cho cả hai bên
 src/headless/  CLI theo Test Contract
-src/client/    Three.js: render + input, gọi cùng hàm step() của core
+src/client/    Three.js: models.ts (hình), input.ts (phím/chuột), hud.ts (HUD), main.ts (vòng lặp fixed-step)
 tests/         unit (core) + scenarios (chạy CLI thật, có fixture)
 ```
 

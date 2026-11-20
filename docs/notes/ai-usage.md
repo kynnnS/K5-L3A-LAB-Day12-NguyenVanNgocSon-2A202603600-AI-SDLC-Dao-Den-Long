@@ -19,9 +19,12 @@ Công cụ: **Claude Code** (VS Code extension), model Claude Opus 5.5. Người
 | 3 | Test truyền tuple `[x,y,z]` thẳng vào `createGame` (chỉ parser của CLI mới chuyển tuple sang `{pos}`) | Test đỏ + `tsc` báo lỗi kiểu | Sửa test. Typecheck nằm trong verify gate và Stop hook |
 | 4 | Kỳ vọng "sinh 2 Bóng Mực trong 40 s" quên mất người chơi đứng yên sẽ bị đánh chết trước giây 35 | Test đỏ | Viết lại kỳ vọng fixture 09 bằng tính tay (chạm ở tick 1234/1354/1474, thua ở 1474) rồi mới chạy |
 | 5 | Script kiểm tra hook dùng `PIPESTATUS` (bash) trong shell zsh nên mã thoát rỗng | Đọc log bằng chứng thấy `exit=` trống | Chạy lại trong `bash -c`, lưu log mới |
+| 6 | Agent tự đặt giới hạn đảo 40 m trong core (một quyết định thiết kế, không phải yêu cầu), làm vị trí lệch khỏi contract khi đi xa | **Subagent reviewer độc lập** chạy CLI với đường đi dài | Bỏ giới hạn, thêm fixture 15. Bài học: luật không có trong contract thì không được làm đổi các con số mà contract quy định |
+| 7 | Test yếu: so khớp mảng "partial" bỏ qua phần tử thừa; một test đặt tên "missing args" nhưng không thiếu tham số nào | Reviewer độc lập | So khớp đúng độ dài, test thiếu từng tham số |
 
-Những lỗi trên đều bị **test hoặc đối chiếu lập luận** chặn lại trước khi commit. Không có lỗi nào lọt vào code đã commit.
+Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trước khi commit. Lỗi 6–7 đã lọt vào commit và chỉ được phát hiện nhờ reviewer độc lập. Đây là lý do giữ bước review bằng một agent khác trong harness.
 
 ### Token / chi phí
-- Extension không hiển thị số token cho agent, nên **chưa có số liệu thực**. Người dùng cần chạy `/cost` (hoặc xem trang Usage) cuối phase và điền vào đây: `Phase 1: … token / … USD`.
+- Số liệu thực đo được: subagent reviewer dùng **96 656 token** (16 lần gọi tool, khoảng 4 phút). Số này do harness báo khi subagent hoàn thành.
+- Phiên agent chính: extension không hiển thị số token, nên **chưa có số liệu thực**. Người dùng cần chạy `/cost` (hoặc xem trang Usage) cuối phase và điền vào đây: `Phase 1: … token / … USD`.
 - Cách tiết kiệm đã dùng: đọc tài liệu một lần rồi tóm tắt vào kế hoạch; ghi file trực tiếp thay vì in code ra chat; dùng một bộ test chung cho unit và scenario; chỉ một reviewer subagent ở cuối phase thay vì review liên tục.
