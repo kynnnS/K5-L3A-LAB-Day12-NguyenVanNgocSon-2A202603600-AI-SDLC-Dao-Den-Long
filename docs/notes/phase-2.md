@@ -28,7 +28,7 @@ Phần **giữ nguyên** từ Phase 1: mô hình tick (snapshot 0, sự kiện g
 |---|---|---|
 | B1 | "Tăng tốc/dừng ≤ 0.1 s" | Đổi vận tốc **tức thì** (0 s vẫn thỏa ≤ 0.1 s). Giữ đúng `speed × t` mà test Phase 1 có thể kiểm |
 | B2 | Thời gian spawning; cách wander | spawning kéo dài 60 tick: không di chuyển, không gây hit, không bị pulse. wander đi 2 m/s tới điểm ngẫu nhiên có seed cách 3–8 m |
-| B3 | "Chênh cao ≤ 1.5 m" khi chạm | So `|player.y − shade.y|` (chân Mây với tâm Bóng Mực). Tâm Bóng Mực ở mặt đất + 1 m |
+| B3 | "Chênh cao ≤ 1.5 m" khi chạm | So `|player.y − shade.y|` (chân Mây với tâm Bóng Mực). Tâm Bóng Mực ở mặt đất + 1 m. Bóng Mực đặt bằng scenario cũng được đưa về mặt đất + 1 m ngay khi tạo (ví dụ PRD ghi `y = 0`) |
 | B4 | `score` khi thua | Dòng `end`/snapshot vẫn ghi điểm đã tích lũy trong Đêm. Tổng điểm chuỗi 3 Đêm (chỉ cộng Đêm thắng) tính ở client |
 | B5 | Tick của `night_start` | Ghi một lần ở tick 0, ngay sau snapshot 0 |
 | B6 | Kiểu dữ liệu chưa rõ | `invuln` là boolean; `wind.dir_deg` là `null` khi không có gió; `ttl_s` là `null` với đom đóm thường; `charms.respawn_s` là 0 khi bùa đang có |
@@ -39,7 +39,12 @@ Phần **giữ nguyên** từ Phase 1: mô hình tick (snapshot 0, sự kiện g
 | B11 | Gió Lạc | Bị loại bỏ thì xóa khỏi mảng `drifters`. Điểm sinh dùng điểm sinh của Bóng Mực. Chỉ con đang `chase` mới cướp. Pulse trúng con đang `idle` thì không có tác dụng. Gió Lạc bay (không bị mép đảo/vách/vùng an toàn chặn) |
 | B12 | Điểm xuất phát Đêm 2/3 | Đêm 2: (0,0,0). Đêm 3: (0,0,−30), vì (0,0,0) nằm trong tháp chuông. Hướng mặt ban đầu là +Z |
 | B13 | Lướt khi đang được bục nhảy phóng | Lướt ghi đè vận tốc ngang trong 12 tick và giữ độ cao. Sau đó vận tốc phóng tiếp tục cho tới khi chạm đất |
-| B14 | Đom đóm rơi ở chỗ không có mặt đất | Lấy độ cao mặt đất tại điểm đó; nếu không có mặt đất thì dùng độ cao của Mây |
+| B14 | Đom đóm rơi ở chỗ không có mặt đất | Lấy độ cao mặt đất tại điểm đó; nếu không có mặt đất thì dùng độ cao của Mây (đom đóm có thể nằm trên biển mây, không nhặt được: hạn chế đã biết) |
+| B15 | "Hướng đang di chuyển" khi lướt | Đang được bục nhảy phóng thì lướt theo hướng vận tốc phóng; ngoài ra theo hướng phím (đổi tức thì, B1); đứng yên thì theo hướng mặt |
+| B16 | `move` có thành phần ngoài [−1, 1] | Chấp nhận và chuẩn hóa về độ dài 1 (không coi là file lỗi) |
+| B17 | Dòng `end` khi lần chạy dừng lúc đang tạm dừng | PRD chỉ cho `playing`/`won`/`lost` ở dòng `end`, nên ghi `playing`; snapshot vẫn ghi `paused` |
+| B18 | "Điểm trống" khi sinh đom đóm | Điểm chuẩn bị chiếm nếu có bất kỳ đom đóm nào (thường, từ scenario hay rơi) đứng trên nó (XZ ≤ 10⁻⁶ m) |
+| B19 | Đẩy lùi "dừng nếu gặp vật cản" | Dừng **đúng tại** vật cản (chia đôi bước để tìm phần đi được), không dừng sớm cả bước |
 
 ## 3. Acceptance criteria cho từng mục Phần 3
 
@@ -88,5 +93,17 @@ Trạng thái lấy từ [SUMMARY.md](../proof/phase-2/SUMMARY.md) (`bash script
 
 - **Đạt:** mọi yêu cầu kiểm được bằng headless đều có test hoặc fixture tính tay và PASS qua CLI thật. Tất định và hiệu năng đạt với biên rất rộng (khoảng 0.13 s so với ngưỡng 30 s).
 - **Chưa kiểm:** phần giao diện (chuỗi Đêm, menu, cài đặt, âm thanh, HUD, FPS) chỉ kiểm được bằng tay. Máy làm lab không có công cụ tự động hóa trình duyệt, nên các mục này để NOT VERIFIED cho tới khi có ảnh chụp trong `docs/proof/phase-2/screenshots/`.
-- **Review độc lập:** một agent reviewer chạy song song, đối chiếu code với Ticket-02. Kết quả chưa về khi tạo tag `phase-2`. Lỗi hợp lệ nào nó tìm ra sẽ được sửa bằng commit mới sau tag (không gắn lại tag) và ghi ở đây.
+- **Review độc lập** (agent reviewer chạy CLI thật, không sửa file, 152 934 token): không có lỗi nghiêm trọng, 1 lỗi lớn, 8 lỗi nhỏ. Tất cả được xử lý **trước** khi gắn tag `phase-2`:
+
+| # | Phát hiện | Xử lý | Test |
+|---|---|---|---|
+| M1 | Sinh đom đóm không coi đom đóm scenario/rơi là đã chiếm điểm, nên sinh chồng lên và phá luật "hết điểm trống thì bỏ lượt" | Sửa (B18) | unit "mote respawn skips points occupied…" |
+| m1 | Bóng Mực scenario `y = 0` giữ nguyên tới lần di chuyển đầu, làm Tỏa Sáng lệch 0.8 m chiều cao | Sửa (B3) | unit "scenario shade at y = 0…" |
+| m2 | Dòng `end` có thể ghi `paused` | Sửa (B17) | unit "end record never says paused" |
+| m3 | Đẩy lùi dừng sớm tới 0.267 m trước vật cản | Sửa (B19); test cũ 39.8 m đổi thành 40 m có ghi lý do | unit "knock-back stops at…" (mép đảo, vùng an toàn) |
+| m4 | Bóng Mực scenario ở `recoil` chỉ đi 59 tick | Sửa: mặc định 60 + 1 như khi gây hit | unit "scenario shade in recoil…" |
+| m5 | Lướt khi đang bị phóng dùng hướng phím | Sửa (B15) | unit "dash during a pad launch…" |
+| m6 | `move` ngoài [−1, 1] không báo lỗi | Ghi giả định B16 | — |
+| m7 | Bóng Mực đuổi không trượt quanh vật cản (kẹt ở tháp/mép) | Hạn chế đã biết, ticket không yêu cầu | — |
+| m8 | Đom đóm rơi có thể nằm trên biển mây | Hạn chế đã biết (B14) | — |
 - **Bài học:** hàm mẫu của test tắt mọi thứ, kể cả gió. Các phép tính off-by-one (recoil 60 + 1, tick k + 1) phải tính tay trước khi viết test. Cả hai đã ghi vào `CLAUDE.md`.

@@ -168,7 +168,32 @@ describe('T6 pulse', () => {
   it('knock-back stops at an obstacle (island edge)', () => {
     const s = game({ player: { pos: [37, 0, 0], carried: 3 }, shades: [{ id: 'A', pos: [39, 1, 0] }] });
     runSteps(s, 20, [{ tick: 0, pulse: true }]);
-    expect(s.shades[0]!.pos[0]).toBeCloseTo(39 + 3 * (4 / 15), 9); // 4th push would cross r = 40
+    // Ticket-02 "dừng nếu gặp vật cản": 3 full pushes reach 39.8, the 4th stops AT the r = 40 edge
+    // (was 39.8 before the Phase 2 review: the whole step used to be dropped, stopping short).
+    expect(s.shades[0]!.pos[0]).toBeCloseTo(40, 6);
+    expect(s.shades[0]!.pos[0]).toBeLessThanOrEqual(40);
+  });
+  it('knock-back stops at the edge of a lit safe zone (not short of it)', () => {
+    // L1 lit at (0,0,22): zone edge z = 16. Shade at z = 14.5, player at z = 12.5 -> push +Z.
+    const s = game({ player: { pos: [0, 0, 12.5], carried: 3 }, lanterns: [{ id: 'L1', pos: [0, 0, 22], lit: true }], shades: [{ id: 'A', pos: [0, 1, 14.5] }] });
+    runSteps(s, 20, [{ tick: 0, pulse: true }]);
+    // 14.5 + 5 x 0.2667 = 15.833 < 16; the 6th push stops at the zone edge z = 16.
+    expect(s.shades[0]!.pos[2]).toBeCloseTo(16, 6);
+  });
+  it('scenario shade at y = 0 is placed at ground + 1 (PRD example uses y = 0)', () => {
+    // Pulse centre y = 0.8; shade XZ 4.97 m away. Centre at y 1 -> 3D 4.974 <= 5 -> stunned.
+    const s = game({ player: { carried: 3 }, shades: [{ id: 'A', pos: [4.97, 0, 0] }] });
+    expect(s.shades[0]!.pos[1]).toBe(1);
+    runSteps(s, 1, [{ tick: 0, pulse: true }]);
+    expect(s.shades[0]!.state).toBe('stunned');
+  });
+  it('scenario shade in recoil (default) moves exactly 2 m like a hit', () => {
+    const s = game({ player: { pos: [-20, 0, 0] }, shades: [{ id: 'A', pos: [0, 1, 0], state: 'recoil' }] });
+    runSteps(s, 59);
+    expect(s.shades[0]!.pos[0]).toBeCloseTo(59 * (2 / 60), 9);
+    runSteps(s, 1); // 60th moving tick: 2 m total, recoilDir points away from Mây (+X)
+    expect(s.shades[0]!.pos[0]).toBeCloseTo(2, 9);
+    expect(s.shades[0]!.state).toBe('recoil');
   });
 });
 
@@ -377,6 +402,33 @@ describe('T14 terrain: pads, bridge, ramps, walls, tower', () => {
     const t = game({ player: { pos: [0, 6, 4] } }, 3);
     runSteps(t, 60, [{ tick: 0, move: [0, -1] }]);
     expect(t.player.pos[2]).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('Phase 2 review fixes', () => {
+  it('dash during a pad launch follows the launch direction, not the stick (B15)', () => {
+    const s = game({ player: { pos: [20, 0, 18] } }, 2);
+    runSteps(s, 1); // tick 1: pad launch toward island B
+    expect(s.player.launch).not.toBeNull();
+    runSteps(s, 1, [{ tick: 1, move: [-1, 0], dash: true }]); // stick points away from B
+    const [ux, uz] = [50 / Math.hypot(50, 18), -18 / Math.hypot(50, 18)];
+    expect(s.player.dashDir[0]).toBeCloseTo(ux, 9);
+    expect(s.player.dashDir[1]).toBeCloseTo(uz, 9);
+  });
+  it('mote respawn skips points occupied by scenario motes (no free point -> skip)', () => {
+    const pts = getMap(1, T).motePoints;
+    const s = game({ random_motes: true, player: { carried: 10 }, motes: pts.map((p) => ({ pos: [...p] as [number, number, number] })) });
+    runSteps(s, 240);
+    expect(s.motes.length).toBe(pts.length); // all points taken: tick 240 spawns nothing
+    const one = game({ random_motes: true, player: { carried: 10 }, motes: pts.slice(1).map((p) => ({ pos: [...p] as [number, number, number] })) });
+    runSteps(one, 240);
+    expect(one.motes.length).toBe(pts.length);
+    expect(one.motes.at(-1)!.pos).toEqual(pts[0]); // the only free point
+  });
+  it('end record never says paused (Contract: playing | won | lost); snapshot does', () => {
+    const lines = runHeadless({ tuning: T, seed: 1, night: 1, ticks: 40, snapshotEvery: 10, frames: [{ tick: 29, pause: true }] }).map((l) => JSON.parse(l) as Record<string, any>);
+    expect(lines.filter((l) => l.type === 'snapshot').at(-1)!.state).toBe('paused');
+    expect(lines.at(-1)).toMatchObject({ type: 'end', state: 'playing', ticks: 40 });
   });
 });
 

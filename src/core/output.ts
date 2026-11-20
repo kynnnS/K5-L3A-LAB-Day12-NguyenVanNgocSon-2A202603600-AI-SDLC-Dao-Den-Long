@@ -42,5 +42,6 @@ export function eventRecord(e: TimedEvent): Record<string, unknown> {
 }
 
 export function endRecord(state: GameState): Record<string, unknown> {
-  return { type: 'end', ticks: state.tick, state: state.status, score: state.score };
+  // Contract v1.0: end.state is playing | won | lost. A run that stops while paused is still playing.
+  return { type: 'end', ticks: state.tick, state: state.status === 'paused' ? 'playing' : state.status, score: state.score };
 }

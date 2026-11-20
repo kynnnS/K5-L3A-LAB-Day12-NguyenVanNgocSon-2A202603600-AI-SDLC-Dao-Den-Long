@@ -47,8 +47,13 @@ Lỗi 1–5 bị **test hoặc đối chiếu lập luận** chặn lại trư�
 | 12 | Hai test sai số học: đếm tick 120 thay vì 121 cho "120 tick sau tick 1"; test Gió Lạc bị kết thúc sớm vì Bóng Mực đánh chết Mây | Test đỏ, đọc lại lập luận | Sửa test (không đổi code). Ghi vào CLAUDE.md: tự kiểm off-by-one |
 | 13 | Fixture gió dùng hàm mẫu tắt mọi thứ, **kể cả gió** | Fixture đỏ | Bật `wind_enabled`. CLAUDE.md ghi bài học "helper tắt cả gió" |
 | 14 | `git rm` toàn bộ fixture làm mất luôn thư mục, khiến script sinh fixture lỗi | Lỗi `FileNotFoundError` | Tạo lại thư mục rồi chạy lại |
+| 15 | Vị trí trống của đom đóm chỉ xét đom đóm tự sinh (scenario và đom đóm rơi bị bỏ qua) | Reviewer độc lập (M1) | So vị trí thay vì chỉ số điểm; unit test |
+| 16 | Đẩy lùi bỏ cả bước khi gặp vật cản nên dừng sớm; unit test cũ lại khóa đúng hành vi sai đó (39.8 m) | Reviewer độc lập | Chia đôi bước; test đổi thành 40 m kèm lý do. Bài học: test viết theo code, không theo câu chữ ticket |
+| 17 | Dòng `end` ghi `paused`, ngoài tập giá trị PRD cho phép | Reviewer độc lập | Ghi `playing`; unit test |
+| 18 | Bóng Mực scenario `y = 0`, mặc định recoil 59 tick, hướng lướt khi bị phóng | Reviewer độc lập | Sửa + unit test cho từng lỗi |
+| 19 | `git push` bị từ chối vì token thiếu quyền `workflow` (repo có `.github/workflows/ci.yml`) | Lỗi từ GitHub | Người dùng cấp quyền qua `gh auth refresh -s workflow`; không xóa `ci.yml` khỏi lịch sử |
 
 ### Token / chi phí
-- Reviewer Phase 1 dùng 96 656 token (số do harness báo). Reviewer Phase 2: xem mục đánh giá trong `phase-2.md`.
+- Reviewer Phase 1 dùng 96 656 token (số do harness báo). Reviewer Phase 2 dùng 152 934 token, 40 lần gọi công cụ, khoảng 10 phút (số do harness báo).
 - Phiên chính: cần chạy `/cost` để có số thật (extension không hiển thị).
 - Cách tiết kiệm: sinh fixture bằng một script (một lần ghi), bỏ qua file lớn, chỉ một reviewer chạy song song với việc viết tài liệu.

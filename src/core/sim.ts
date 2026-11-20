@@ -26,6 +26,7 @@ import type {
 } from './types.js';
 
 const EPS = 1e-9;
+const POINT_EPS = 1e-6; // a mote this close (XZ) to a standard point occupies it
 
 export function secondsToTicks(s: number): number {
   return Math.round(s * TICKS_PER_SECOND);
@@ -74,6 +75,8 @@ export interface Ctx { map: NightMap; tuning: Tuning }
 /** Builds the initial state (snapshot tick 0). Scenario setup emits no events and awards no points. */
 export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, scenario: ScenarioSpec = {}): GameState {
   const map = getMap(night, tuning);
+  const gctx: Ctx = { map, tuning };
+  const hover = (v: Vec3, h: number): Vec3 => { const q: Vec3 = [...v]; setHoverY(gctx, q, h); return q; };
   const sp = scenario.player ?? {};
   const pos: Vec3 = sp.pos ? [...sp.pos] : [...map.start];
   const g = groundHeight(map, pos[0], pos[2]);
@@ -150,10 +153,13 @@ export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, s
     const taken = new Set(scenario.shades.map((s) => s.id).filter((x): x is string => !!x));
     state.shades = scenario.shades.map((s) => {
       const st = s.state ?? 'wander';
-      const defTicks = st === 'spawning' ? SHADE_SPAWNING_TICKS : st === 'recoil' ? SHADE_RECOIL_TICKS : st === 'stunned' ? secondsToTicks(tuning.pulse_stun_s) : 0;
+      // Recoil default: 60 moving ticks like a hit (+1 because step 2 decrements before step 8 moves).
+      const defTicks = st === 'spawning' ? SHADE_SPAWNING_TICKS : st === 'recoil' ? SHADE_RECOIL_TICKS + 1 : st === 'stunned' ? secondsToTicks(tuning.pulse_stun_s) : 0;
+      const sp: Vec3 = [...s.pos];
+      setHoverY(gctx, sp, SHADE_HEIGHT); // B3: a shade hovers with its centre at ground + 1 m
       return {
         id: s.id ?? freeId('S', () => state.nextShadeId++, taken),
-        pos: [...s.pos], state: st, stateTicks: s.state_ticks_left ?? defTicks,
+        pos: sp, state: st, stateTicks: s.state_ticks_left ?? defTicks,
         pushTicks: 0, pushDir: [1, 0], recoilDir: unit(s.pos[0] - pos[0], s.pos[2] - pos[2]),
         wanderTarget: null, expelling: false,
       };
@@ -164,7 +170,7 @@ export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, s
     const taken = new Set(scenario.drifters.map((d) => d.id).filter((x): x is string => !!x));
     state.drifters = scenario.drifters.map((d) => ({
       id: d.id ?? freeId('D', () => state.nextDrifterId++, taken),
-      pos: [...d.pos], state: d.state ?? 'idle', stolen: d.stolen ?? 0, hasStolen: (d.stolen ?? 0) > 0,
+      pos: hover(d.pos, DRIFTER_HEIGHT), state: d.state ?? 'idle', stolen: d.stolen ?? 0, hasStolen: (d.stolen ?? 0) > 0,
       stateTicks: d.state_ticks_left ?? (d.state === 'flee' ? DRIFTER_FLEE_TICKS : 0), wanderTarget: null,
     }));
   }
@@ -184,8 +190,10 @@ export function createGame(tuning: Tuning, seed: number, night: 1 | 2 | 3 = 1, s
 
 // ---------------------------------------------------------------- helpers
 
-function moteBlockedPoint(state: GameState, i: number): boolean {
-  return state.motes.some((m) => m.point === i);
+/** A standard point is taken if any mote (random, scenario or dropped) stands on it (XZ). */
+function moteBlockedPoint(state: GameState, map: NightMap, i: number): boolean {
+  const q = map.motePoints[i]!;
+  return state.motes.some((m) => m.point === i || distXZ(m.pos, q) <= POINT_EPS);
 }
 
 function inLitZone(state: GameState, pos: Vec3, r: number): Lantern | undefined {
@@ -500,7 +508,8 @@ function movePlayer(state: GameState, ctx: Ctx, input: InputState, jumpPressed: 
   const charm = p.charmTicks > 0;
   if (dashPressed && p.dashTicks === 0 && (p.dashCdTicks === 0 || charm)) {
     p.dashTicks = secondsToTicks(tuning.dash_duration_s);
-    p.dashDir = moving ? unit(wx, wz) : [...p.facing];
+    // "Hướng đang di chuyển": during a pad launch Mây moves along the launch velocity (B13/B15).
+    p.dashDir = p.launch ? unit(p.launch[0], p.launch[1]) : moving ? unit(wx, wz) : [...p.facing];
     p.dashCdTicks = charm ? 0 : secondsToTicks(tuning.dash_cooldown_s);
     emit({ name: 'dash', data: {} });
   }
@@ -585,14 +594,23 @@ function movePlayer(state: GameState, ctx: Ctx, input: InputState, jumpPressed: 
 
 // ---------------------------------------------------------------- shades / drifters
 
-/** Moves along (ux,uz) by `dist`, stopping at obstacles. Returns false if fully blocked. */
+/**
+ * Moves along (ux,uz) by up to `dist`. If the full step hits an obstacle, the body stops at it
+ * (largest free fraction, found by bisection: deterministic, 30 halvings < 1e-9 m).
+ * Returns false if the full step was not possible.
+ */
 function pushBody(state: GameState, ctx: Ctx, pos: Vec3, ux: number, uz: number, dist: number, respectSafe: boolean): boolean {
-  const nx = pos[0] + ux * dist;
-  const nz = pos[2] + uz * dist;
-  if (shadeBlocked(state, ctx, nx, nz, pos[1], respectSafe)) return false;
-  pos[0] = nx;
-  pos[2] = nz;
-  return true;
+  const free = (f: number) => !shadeBlocked(state, ctx, pos[0] + ux * dist * f, pos[2] + uz * dist * f, pos[1], respectSafe);
+  let f = 1;
+  if (!free(1)) {
+    let lo = 0;
+    let hi = 1;
+    for (let k = 0; k < 30; k++) { const mid = (lo + hi) / 2; if (free(mid)) lo = mid; else hi = mid; }
+    f = lo;
+  }
+  pos[0] += ux * dist * f;
+  pos[2] += uz * dist * f;
+  return f === 1;
 }
 
 function moveShade(state: GameState, ctx: Ctx, s: Shade): void {
@@ -613,9 +631,7 @@ function moveShade(state: GameState, ctx: Ctx, s: Shade): void {
     if (s.state === 'chase') {
       const stepLen = ctx.map.shadeSpeed * DT;
       const [ux, uz] = unit(p.pos[0] - s.pos[0], p.pos[2] - s.pos[2]);
-      const nx = d <= stepLen ? p.pos[0] : s.pos[0] + ux * stepLen;
-      const nz = d <= stepLen ? p.pos[2] : s.pos[2] + uz * stepLen;
-      if (!shadeBlocked(state, ctx, nx, nz, s.pos[1], false)) { s.pos[0] = nx; s.pos[2] = nz; }
+      pushBody(state, ctx, s.pos, ux, uz, Math.min(d, stepLen), false);
     } else {
       if (!s.wanderTarget || Math.hypot(s.wanderTarget[0] - s.pos[0], s.wanderTarget[1] - s.pos[2]) < 0.3) {
         s.wanderTarget = pickWanderTarget(state, ctx, s.pos);
@@ -667,7 +683,7 @@ function moveDrifter(state: GameState, ctx: Ctx, d: Drifter): void {
 function spawn(state: GameState, ctx: Ctx, t: number, emit: (e: GameEvent) => void): void {
   const { map } = ctx;
   if (state.randomMotes && t % MOTE_RESPAWN_TICKS === 0 && state.motes.length < MOTE_CAP) {
-    const free = map.motePoints.map((_, i) => i).filter((i) => !moteBlockedPoint(state, i));
+    const free = map.motePoints.map((_, i) => i).filter((i) => !moteBlockedPoint(state, map, i));
     if (free.length > 0) {
       const i = free[Math.floor(random(state) * free.length)]!;
       const taken = new Set(state.motes.map((m) => m.id));
